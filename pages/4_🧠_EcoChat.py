@@ -170,15 +170,11 @@ def reset_conversation():
 # --- Sidebar Setup ---
 st.sidebar.title("Chatbot Settings")
 
-#Define model clients
+# Define model clients
 client_names = ["Provided API Call", "HF-Token"]
 client_select = st.sidebar.selectbox("Select Model Client", client_names)
 
-
-
-
-
-
+# Handle Hugging Face Token
 if "HF-Token" in client_select:
     try:
         if "API_token" not in st.session_state:
@@ -190,17 +186,24 @@ if "HF-Token" in client_select:
     except Exception as e:
         st.sidebar.error(f"Credentials Error:\n\n {e}")
 
-elif "Provided API Call"  in client_select:
+# Handle GROQ Token from secrets
+elif "Provided API Call" in client_select:
     try:
         if "API_token" not in st.session_state:
             st.session_state.API_token = None
 
-        st.session_state.API_token = os.environ.get('GROQ_API_TOKEN')#Should be like os.environ.get('HUGGINGFACE_API_TOKEN')
-
+        # ✅ Use secrets safely here
+        st.session_state.API_token = st.secrets["GROQ_API_TOKEN"]
         model_links = model_links_groq
 
+        if not st.session_state.API_token:
+            st.error("Missing GROQ API Token. Please add it to your Streamlit secrets.")
+            st.stop()
+
     except Exception as e:
-        st.sidebar.error(f"Credentials Error:\n\n {e}")
+        st.sidebar.error("Credentials Error. Check your secrets configuration.")
+        st.stop()
+
 
 
 
