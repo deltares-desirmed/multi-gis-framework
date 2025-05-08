@@ -40,3 +40,5 @@ python-dotenv
 langchain-community
 sentence-transformers
 chromadb
+protobuf==3.20.*
+
