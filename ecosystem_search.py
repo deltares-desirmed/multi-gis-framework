@@ -21,6 +21,12 @@ from sentence_transformers import SentenceTransformer
 import faiss
 import pickle
 
+# --- Configuration ---
+DATA_PATH = "database/ecosystem_data.xlsx"
+FAISS_PATH = "vector_store/ess_index.faiss"
+META_PATH = "vector_store/ess_meta.pkl"
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+
 # ----------- Step 1: Load Excel sheets -----------
 def load_excel_data(path):
     """Reads all sheets in the Excel workbook into a dictionary of DataFrames."""
@@ -37,19 +43,21 @@ def dataframe_to_chunks(df_dict):
     metadata = []
     for sheet_name, df in df_dict.items():
         for idx, row in df.iterrows():
-            text = f"Sheet: {sheet_name}\n" + "\n".join([f"{col}: {row[col]}" for col in df.columns if pd.notna(row[col])])
+            text = f"Sheet: {sheet_name}\n" + "\n".join(
+                [f"{col}: {row[col]}" for col in df.columns if pd.notna(row[col])]
+            )
             chunks.append(text)
             metadata.append({"sheet": sheet_name, "row": idx})
     return chunks, metadata
 
 # ----------- Step 3: Create embeddings -----------
-def embed_chunks(chunks, model_name="sentence-transformers/all-MiniLM-L6-v2"):
+def embed_chunks(chunks, model_name=MODEL_NAME):
     model = SentenceTransformer(model_name)
     embeddings = model.encode(chunks, show_progress_bar=True)
-    return embeddings
+    return model, embeddings
 
 # ----------- Step 4: Store vectors in FAISS -----------
-def save_faiss_index(embeddings, chunks, metadata, faiss_path, meta_path):
+def save_faiss_index(embeddings, chunks, metadata, faiss_path=FAISS_PATH, meta_path=META_PATH):
     dim = embeddings.shape[1]
     index = faiss.IndexFlatL2(dim)
     index.add(embeddings)
@@ -58,7 +66,7 @@ def save_faiss_index(embeddings, chunks, metadata, faiss_path, meta_path):
         pickle.dump({"chunks": chunks, "metadata": metadata}, f)
 
 # ----------- Step 5: Query function -----------
-def search_index(query, model, faiss_path, meta_path, top_k=5):
+def search_index(query, model, faiss_path=FAISS_PATH, meta_path=META_PATH, top_k=5):
     index = faiss.read_index(faiss_path)
     with open(meta_path, "rb") as f:
         meta = pickle.load(f)
@@ -67,14 +75,20 @@ def search_index(query, model, faiss_path, meta_path, top_k=5):
     results = [meta["chunks"][i] for i in I[0]]
     return results
 
-# Example (to be moved to main app)
-"""
-excel_data = load_excel_data("database/ESS_database.xlsx")
-chunks, metadata = dataframe_to_chunks(excel_data)
-embeddings = embed_chunks(chunks)
-save_faiss_index(embeddings, chunks, metadata, "ess_index.faiss", "ess_meta.pkl")
+# ----------- Step 6: Context injector for chatbot -----------
+def get_context_chunks(query):
+    """Loads model and searches relevant chunks for a query."""
+    model = SentenceTransformer(MODEL_NAME)
+    return search_index(query, model)
 
-# Later during user query
-model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-results = search_index("Which ecosystems help reduce erosion?", model, "ess_index.faiss", "ess_meta.pkl")
-"""
+# Optional: Initial run to generate index if not present
+if __name__ == "__main__":
+    if not os.path.exists(FAISS_PATH):
+        print("[INFO] Generating vector index from Excel data...")
+        excel_data = load_excel_data(DATA_PATH)
+        chunks, metadata = dataframe_to_chunks(excel_data)
+        model, embeddings = embed_chunks(chunks)
+        save_faiss_index(embeddings, chunks, metadata)
+        print("[INFO] Vector index saved.")
+    else:
+        print("[INFO] FAISS index already exists. Ready for query.")

@@ -39,7 +39,10 @@ def load_knowledge():
 
 retriever, ess_df = load_knowledge()
 
-# --- Somewhere in your chatbot input flow ---
+# --- Sidebar or interface setup ---
+st.title("🧠 EcoChat: Ask About Ecosystem Services")
+
+# --- Chat Input ---
 user_question = st.chat_input("Ask EcoChat about ecosystem services...")
 
 if user_question:
@@ -47,20 +50,22 @@ if user_question:
     results_df, top_chunks = search_ess_knowledge(user_question, retriever, ess_df)
 
     # Step 2: Display results (natural text + reference table)
-    st.markdown("### Relevant Knowledge Snippets")
-    for chunk in top_chunks:
-        st.markdown(f"- {chunk}")
+    st.markdown("### 🔍 Relevant Knowledge Snippets")
+    for i, chunk in enumerate(top_chunks):
+        st.markdown(f"**{i+1}.** {chunk}")
 
-    with st.expander("See matching ESS rows"):
+    st.markdown("\n")
+    with st.expander("📄 See matching ESS database rows"):
         st.dataframe(results_df, use_container_width=True)
 
-    # Optional: Feed top_chunks into your LLM prompt here
-    # Example:
-    # llm_response = my_llm(prompt=f"Context: {top_chunks}\n\nQuestion: {user_question}")
-    # st.markdown("### EcoChat's Response")
+    # Optional: Feed top_chunks into your LLM prompt here (RAG-style)
+    # Example placeholder:
+    # llm_response = my_llm(prompt=f"Context:\n{top_chunks}\n\nQuestion: {user_question}")
+    # st.markdown("### 🤖 EcoChat's Response")
     # st.write(llm_response)
 
-    st.success("Response generated based on both model and database context!")
+    st.success("✅ Response generated using model + ESS database context!")
+
 
 
 st.set_page_config(page_title="EcoChat", page_icon="🧠")
