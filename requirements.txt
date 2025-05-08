@@ -39,7 +39,7 @@ python-dotenv==1.0.1
 sentence-transformers==2.2.2
 huggingface_hub==0.14.1 
 transformers==4.30.2 
-torch==2.0.1 
+torch==2.2.x
 protobuf==3.20.3
 
 
