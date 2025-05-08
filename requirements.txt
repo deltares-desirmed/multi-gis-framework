@@ -41,4 +41,8 @@ langchain-community
 sentence-transformers
 chromadb
 protobuf==3.20.*
+torch==2.0.1
+sentence-transformers
+chromadb
+streamlit==1.30.0
 
