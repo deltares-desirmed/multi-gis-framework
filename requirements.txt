@@ -29,3 +29,4 @@ nbserverproxy
 
 # Tropical cyclone package (optional)
 tropycal
+ipython==8.21.0
