@@ -77,6 +77,11 @@ model_links_groq ={
                       "inf_point":"https://api.groq.com/openai/v1",
                       "link":"llama-3.1-8b-instant",
                       },
+      "Meta-Llama-4-Scout-17B": {
+      "inf_point": "https://api.groq.com/openai/v1",
+      "link": "meta-llama/llama-4-scout-17b-16e-instruct",
+},
+
   }
 
 #Pull info about the model to display
@@ -125,6 +130,12 @@ model_info ={
         {'description':"""The Llama (3.1) model is a **Large Language Model (LLM)** that's able to have question and answer interactions.\n \
             \nIt was created by the [**Meta's AI**](https://llama.meta.com/) team and has over  **8 billion parameters.** \n""",
         'logo':'Llama3_1_logo.png'},
+    "Meta-Llama-4-Scout-17B": {
+    'description': """The Llama 4 Scout model is a **Large Language Model (LLM)** designed for fast and accurate interactions.\
+    \nIt is part of Meta's Llama 4 series and optimized for instruction-following and chat-based applications.\n \
+    \nCreated by [**Meta AI**](https://llama.meta.com/) with **17 billion parameters**.""",
+    'logo': 'https://upload.wikimedia.org/wikipedia/commons/0/0b/Meta_Platforms_Inc._logo.svg'},
+
 }
 
 
