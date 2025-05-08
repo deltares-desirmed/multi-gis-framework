@@ -20,51 +20,33 @@ tropycal
 # git+https://github.com/giswqs/geemap
 
 # Essential Streamlit & GIS Stack
-streamlit==1.30.0
-folium==0.15.1
-geopandas==0.14.3
-fiona==1.9.5
-shapely==2.0.3
-pyproj==3.6.1
-geemap==0.28.0
-leafmap==0.30.0
-earthengine-api==0.1.365
-google-auth==2.29.0
+fiona
+shapely
+pyproj
+earthengine-api
+google-auth
 
 # Optional tools (version-safe)
-keplergl==0.3.2
-owslib==0.28.1
-palettable==3.3.0
-plotly==5.18.0
-localtileserver==0.5.10  # downgraded to compatible version
+keplergl
+owslib
+palettable
+plotly
+localtileserver
 
-# Streamlit integrations
-streamlit-folium==0.17.2
-streamlit-bokeh-events==0.1.2
-streamlit-keplergl==0.3.0
+
 
 
 # Jupyter support
-jupyter-server-proxy==4.1.2
-nbserverproxy==0.8.8
+jupyter-server-proxy
+nbserverproxy
 
 # Tropical cyclone and misc
-tropycal==0.3.0
-ipython==8.21.0
+
 
 # AI, RAG & Vector Search
-openai==1.24.1
-langchain==0.1.17
-langchain-community==0.0.36
-python-dotenv==1.0.1
-sentence-transformers==2.2.2
-chromadb==0.4.23
 openai
 langchain
 python-dotenv
 langchain-community
 
 # Fixes
-protobuf==3.20.3
-torch==2.0.1
-openpyxl==3.1.2
