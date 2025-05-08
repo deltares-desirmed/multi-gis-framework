@@ -1,4 +1,4 @@
-# === Core Streamlit and GIS Dependencies ===
+# Essential Streamlit & GIS Stack
 streamlit==1.30.0
 folium==0.15.1
 geopandas==0.14.3
@@ -10,35 +10,35 @@ leafmap==0.30.0
 earthengine-api==0.1.365
 google-auth==2.29.0
 
-# === Optional Mapping and Visualization Tools ===
+# Optional tools (version-safe)
 keplergl==0.3.2
 owslib==0.28.1
-palettable==3.3.3
-plotly==5.20.0
-localtileserver==0.8.4
+palettable==3.3.0
+plotly==5.18.0
+localtileserver==0.5.10  # downgraded to compatible version
 
-# === Streamlit Integrations ===
+# Streamlit integrations
 streamlit-folium==0.17.2
 streamlit-bokeh-events==0.1.2
 streamlit-keplergl==0.3.2
 
-# === Jupyter Support (optional) ===
+# Jupyter support
 jupyter-server-proxy==4.1.2
 nbserverproxy==0.8.8
 
-# === Cyclone and Notebook Enhancers ===
+# Tropical cyclone and misc
 tropycal==0.3.0
 ipython==8.21.0
 
-# === AI + RAG Stack ===
+# AI, RAG & Vector Search
 openai==1.24.1
 langchain==0.1.17
 langchain-community==0.0.36
 python-dotenv==1.0.1
 sentence-transformers==2.2.2
-chromadb==0.4.24
+chromadb==0.4.23
 
-# === Fixes for Compatibility ===
+# Fixes
 protobuf==3.20.3
 torch==2.0.1
 openpyxl==3.1.2
