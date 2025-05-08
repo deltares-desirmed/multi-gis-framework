@@ -31,6 +31,7 @@ load_dotenv()
 
 
 from ecosystem_search import search_ess_knowledge
+st.set_page_config(page_title="EcoChat", page_icon="🧠")
 
 # --- Title & Interface ---
 st.set_page_config(page_title="EcoChat", layout="wide")
@@ -63,7 +64,7 @@ if user_question:
 
 
 
-st.set_page_config(page_title="EcoChat", page_icon="🧠")
+
 
 
 API_CALL_LIMIT = 10 # Define the limit
