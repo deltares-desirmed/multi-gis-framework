@@ -16,5 +16,10 @@ streamlit-bokeh-events
 streamlit-folium
 streamlit-keplergl
 tropycal
-
+streamlit
+geopandas
+fiona
+folium>=0.15.0
+leafmap
+geemap
 
