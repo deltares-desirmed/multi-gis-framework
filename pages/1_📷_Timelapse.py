@@ -11,6 +11,14 @@ import geemap.colormaps as cm
 import geemap.foliumap as geemap
 from datetime import date
 from shapely.geometry import Polygon
+import tempfile
+import uuid
+
+# 🩹 Patch to avoid PermissionError with geemap.temp_file_path
+def safe_temp_file_path(ext=".gif"):
+    return os.path.join(tempfile.gettempdir(), f"{uuid.uuid4()}{ext}")
+
+geemap.temp_file_path = safe_temp_file_path  # override the original method
 
 st.set_page_config(layout="wide")
 warnings.filterwarnings("ignore")
