@@ -20,7 +20,8 @@ localtileserver==0.5.10  # downgraded to compatible version
 # Streamlit integrations
 streamlit-folium==0.17.2
 streamlit-bokeh-events==0.1.2
-streamlit-keplergl==0.3.2
+streamlit-keplergl==0.3.0
+
 
 # Jupyter support
 jupyter-server-proxy==4.1.2
