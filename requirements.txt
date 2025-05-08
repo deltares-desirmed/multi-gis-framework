@@ -1,25 +1,31 @@
---find-links=https://girder.github.io/large_image_wheels GDAL
-# cartopy
-folium==0.13.0
-geemap[extra]
-geopandas
-jupyter-server-proxy
+# Core dependencies
+streamlit==1.45.0
+folium==0.15.1
+geopandas==0.14.3
+fiona==1.9.5
+shapely==2.0.3
+pyproj==3.6.1
+geemap==0.28.0
+leafmap==0.30.0
+
+# Earth Engine
+earthengine-api
+
+# Optional mapping tools
 keplergl
-leafmap
-localtileserver
-nbserverproxy
 owslib
 palettable
 plotly
-streamlit
+localtileserver
+
+# Streamlit integrations
 streamlit-bokeh-events
 streamlit-folium
 streamlit-keplergl
-tropycal
-streamlit
-geopandas
-fiona
-folium>=0.15.0
-leafmap
-geemap
 
+# Jupyter support (if needed)
+jupyter-server-proxy
+nbserverproxy
+
+# Tropical cyclone package (optional)
+tropycal
