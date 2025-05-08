@@ -14,7 +14,7 @@ A streamlit multipage app for geospatial applications. It can be deployed to [St
 3. Find your favorite emoji from https://emojipedia.org.
 4. Add a new app to the `pages/` directory with an emoji in the file name, e.g., 1_🚀_Chart.py.
 
-## Demos
+## Demo
 
 ![](https://i.imgur.com/6lj0oAO.png)
 
