@@ -1,9 +1,13 @@
 import streamlit as st
+
+# This MUST be the first Streamlit command
+st.set_page_config(layout="wide")
+
 import leafmap.foliumap as leafmap
 import utils_ee
-utils_ee.initialize_earth_engine()
 
-st.set_page_config(layout="wide")
+# Now safe to call Streamlit functions
+utils_ee.initialize_earth_engine()
 
 st.sidebar.title("About")
 st.sidebar.info(
@@ -28,7 +32,6 @@ st.sidebar.info(
     """
 )
 
-
 st.title("Streamlit for Geospatial Applications")
 
 st.markdown(
@@ -47,7 +50,7 @@ st.subheader("Timelapse of Satellite Imagery")
 st.markdown(
     """
     The following timelapse animations were created using the Timelapse web app. Click `Timelapse` on the left sidebar menu to create your own timelapse for any location around the globe.
-"""
+    """
 )
 
 row1_col1, row1_col2 = st.columns(2)
