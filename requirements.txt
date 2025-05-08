@@ -1,3 +1,24 @@
+--find-links=https://girder.github.io/large_image_wheels GDAL
+# cartopy
+folium==0.13.0
+geemap[extra]
+geopandas
+jupyter-server-proxy
+keplergl
+leafmap
+localtileserver
+nbserverproxy
+owslib
+palettable
+plotly
+streamlit
+streamlit-bokeh-events
+streamlit-folium
+streamlit-keplergl
+tropycal
+# git+https://github.com/giswqs/leafmap
+# git+https://github.com/giswqs/geemap
+
 # Essential Streamlit & GIS Stack
 streamlit==1.30.0
 folium==0.15.1
@@ -38,6 +59,10 @@ langchain-community==0.0.36
 python-dotenv==1.0.1
 sentence-transformers==2.2.2
 chromadb==0.4.23
+openai
+langchain
+python-dotenv
+langchain-community
 
 # Fixes
 protobuf==3.20.3
