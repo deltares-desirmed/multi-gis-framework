@@ -1,30 +1,32 @@
 # ecosystem_search.py
 """
-Ecosystem Services Knowledge Retrieval Module
-----------------------------------------------
+Ecosystem Services Knowledge Retrieval Module (Chroma Version for Windows)
+--------------------------------------------------------------------------
 This script enables retrieval-augmented generation (RAG) from an Excel-based
 multi-sheet database of ecosystem services. It transforms structured data into
-vector-searchable knowledge for intelligent LLM responses.
+vector-searchable knowledge using Chroma for intelligent LLM responses.
 
 Logical Steps:
 1. Load Excel sheets into DataFrames
 2. Convert rows into meaningful text chunks
 3. Embed chunks using SentenceTransformers
-4. Store chunks and vectors in FAISS index
-5. Allow semantic query to retrieve relevant chunks
-6. (Optional) Reuse chunks to inject context into LLM prompts
+4. Store chunks and embeddings in Chroma vector DB
+5. Query top matches using semantic similarity
+6. Return context to be injected into LLM prompts
 """
 
-import pandas as pd
 import os
-from sentence_transformers import SentenceTransformer
-import faiss
+import pandas as pd
 import pickle
+from sentence_transformers import SentenceTransformer
+from chromadb import Client
+from chromadb.config import Settings
+from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 
 # --- Configuration ---
 DATA_PATH = "database/ecosystem_data.xlsx"
-FAISS_PATH = "vector_store/ess_index.faiss"
-META_PATH = "vector_store/ess_meta.pkl"
+VECTOR_FOLDER = "vector_store"
+VECTOR_DB_NAME = "ess_knowledge"
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
 # ----------- Step 1: Load Excel sheets -----------
@@ -50,45 +52,35 @@ def dataframe_to_chunks(df_dict):
             metadata.append({"sheet": sheet_name, "row": idx})
     return chunks, metadata
 
-# ----------- Step 3: Create embeddings -----------
-def embed_chunks(chunks, model_name=MODEL_NAME):
-    model = SentenceTransformer(model_name)
-    embeddings = model.encode(chunks, show_progress_bar=True)
-    return model, embeddings
+# ----------- Step 3–4: Embedding & Storing in Chroma DB -----------
+def build_vector_store(chunks, metadata, persist_dir=VECTOR_FOLDER):
+    if not os.path.exists(persist_dir):
+        os.makedirs(persist_dir)
 
-# ----------- Step 4: Store vectors in FAISS -----------
-def save_faiss_index(embeddings, chunks, metadata, faiss_path=FAISS_PATH, meta_path=META_PATH):
-    dim = embeddings.shape[1]
-    index = faiss.IndexFlatL2(dim)
-    index.add(embeddings)
-    faiss.write_index(index, faiss_path)
-    with open(meta_path, "wb") as f:
-        pickle.dump({"chunks": chunks, "metadata": metadata}, f)
+    embedding_fn = SentenceTransformerEmbeddingFunction(model_name=MODEL_NAME)
+    client = Client(Settings(chroma_db_impl="duckdb+parquet", persist_directory=persist_dir))
+    collection = client.create_collection(name=VECTOR_DB_NAME, embedding_function=embedding_fn)
 
-# ----------- Step 5: Query function -----------
-def search_index(query, model, faiss_path=FAISS_PATH, meta_path=META_PATH, top_k=5):
-    index = faiss.read_index(faiss_path)
-    with open(meta_path, "rb") as f:
-        meta = pickle.load(f)
-    q_vec = model.encode([query])
-    D, I = index.search(q_vec, top_k)
-    results = [meta["chunks"][i] for i in I[0]]
-    return results
+    ids = [f"chunk_{i}" for i in range(len(chunks))]
+    collection.add(documents=chunks, metadatas=metadata, ids=ids)
+    client.persist()
+    return collection
 
-# ----------- Step 6: Context injector for chatbot -----------
-def get_context_chunks(query):
-    """Loads model and searches relevant chunks for a query."""
-    model = SentenceTransformer(MODEL_NAME)
-    return search_index(query, model)
+# ----------- Step 5: Semantic Query -----------
+def search_ess_knowledge(query, top_k=5):
+    embedding_fn = SentenceTransformerEmbeddingFunction(model_name=MODEL_NAME)
+    client = Client(Settings(chroma_db_impl="duckdb+parquet", persist_directory=VECTOR_FOLDER))
+    collection = client.get_collection(name=VECTOR_DB_NAME, embedding_function=embedding_fn)
+    results = collection.query(query_texts=[query], n_results=top_k)
+    chunks = results["documents"][0]
+    metadatas = results["metadatas"][0]
+    df = pd.DataFrame(metadatas)
+    return df, chunks
 
-# Optional: Initial run to generate index if not present
+# ----------- Step 6: Optional Initial Index Creation -----------
 if __name__ == "__main__":
-    if not os.path.exists(FAISS_PATH):
-        print("[INFO] Generating vector index from Excel data...")
-        excel_data = load_excel_data(DATA_PATH)
-        chunks, metadata = dataframe_to_chunks(excel_data)
-        model, embeddings = embed_chunks(chunks)
-        save_faiss_index(embeddings, chunks, metadata)
-        print("[INFO] Vector index saved.")
-    else:
-        print("[INFO] FAISS index already exists. Ready for query.")
+    print("[INFO] Creating knowledge index from Excel...")
+    excel_data = load_excel_data(DATA_PATH)
+    chunks, metadata = dataframe_to_chunks(excel_data)
+    build_vector_store(chunks, metadata)
+    print("[INFO] Chroma vector store created and saved.")
