@@ -3,16 +3,19 @@ import leafmap.foliumap as leafmap
 
 st.set_page_config(layout="wide")
 
-# Customize the sidebar
-markdown = """
-Web App URL: <https://geotemplate.streamlit.app>
-GitHub Repository: <https://github.com/giswqs/streamlit-multipage-template>
-"""
+st.sidebar.info(
+    """
+    - Web App URL: <https://streamlit.gishub.org>
+    - GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
+    """
+)
 
-st.sidebar.title("About")
-st.sidebar.info(markdown)
-logo = "https://i.imgur.com/UbOXYAU.png"
-st.sidebar.image(logo)
+st.sidebar.title("Contact")
+st.sidebar.info(
+    """
+    Qiusheng Wu at [wetlands.io](https://wetlands.io) | [GitHub](https://github.com/giswqs) | [Twitter](https://twitter.com/giswqs) | [YouTube](https://youtube.com/@giswqs) | [LinkedIn](https://www.linkedin.com/in/giswqs)
+    """
+)
 
 # Customize page title
 st.title("Streamlit for Geospatial Applications")
