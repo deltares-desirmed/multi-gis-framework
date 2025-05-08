@@ -39,3 +39,4 @@ langchain
 python-dotenv
 langchain-community
 sentence-transformers
+chromadb
