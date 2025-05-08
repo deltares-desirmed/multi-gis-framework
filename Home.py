@@ -1,5 +1,7 @@
 import streamlit as st
 import leafmap.foliumap as leafmap
+import util_ee
+util_ee.initialize_earth_engine()
 
 st.set_page_config(layout="wide")
 
