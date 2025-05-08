@@ -27,6 +27,40 @@ load_dotenv()
 # #-------------------------------------------
 
 
+# Inside EcoChat.py or your main chatbot logic
+
+import streamlit as st
+from ecosystem_search import load_ess_index, search_ess_knowledge
+
+# Load the FAISS index and metadata once at startup
+@st.cache_resource(show_spinner="Loading ecosystem service knowledge...", ttl=3600)
+def load_knowledge():
+    return load_ess_index()
+
+retriever, ess_df = load_knowledge()
+
+# --- Somewhere in your chatbot input flow ---
+user_question = st.chat_input("Ask EcoChat about ecosystem services...")
+
+if user_question:
+    # Step 1: Search relevant text snippets from ESS database
+    results_df, top_chunks = search_ess_knowledge(user_question, retriever, ess_df)
+
+    # Step 2: Display results (natural text + reference table)
+    st.markdown("### Relevant Knowledge Snippets")
+    for chunk in top_chunks:
+        st.markdown(f"- {chunk}")
+
+    with st.expander("See matching ESS rows"):
+        st.dataframe(results_df, use_container_width=True)
+
+    # Optional: Feed top_chunks into your LLM prompt here
+    # Example:
+    # llm_response = my_llm(prompt=f"Context: {top_chunks}\n\nQuestion: {user_question}")
+    # st.markdown("### EcoChat's Response")
+    # st.write(llm_response)
+
+    st.success("Response generated based on both model and database context!")
 
 
 st.set_page_config(page_title="EcoChat", page_icon="🧠")
