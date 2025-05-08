@@ -11,14 +11,22 @@ import geemap.colormaps as cm
 import geemap.foliumap as geemap
 from datetime import date
 from shapely.geometry import Polygon
+import os
 import tempfile
 import uuid
+from pathlib import Path
 
-# 🩹 Patch to avoid PermissionError with geemap.temp_file_path
+# Fix geemap temp file path to avoid permission errors
 def safe_temp_file_path(ext=".gif"):
     return os.path.join(tempfile.gettempdir(), f"{uuid.uuid4()}{ext}")
 
-geemap.temp_file_path = safe_temp_file_path  # override the original method
+import geemap.foliumap as geemap
+geemap.temp_file_path = safe_temp_file_path
+
+# Fix for streamlit download path permission issue
+DOWNLOADS_PATH = Path(tempfile.gettempdir()) / "streamlit_downloads"
+DOWNLOADS_PATH.mkdir(parents=True, exist_ok=True)
+
 
 st.set_page_config(layout="wide")
 warnings.filterwarnings("ignore")
