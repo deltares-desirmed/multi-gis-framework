@@ -1,32 +1,32 @@
 # ecosystem_search.py
 """
-Ecosystem Services Knowledge Retrieval Module (Chroma Version for Windows)
+Ecosystem Services Knowledge Retrieval Module (Safe Portable Version)
 --------------------------------------------------------------------------
 This script enables retrieval-augmented generation (RAG) from an Excel-based
 multi-sheet database of ecosystem services. It transforms structured data into
-vector-searchable knowledge using Chroma for intelligent LLM responses.
+vector-searchable knowledge using SentenceTransformers and local cosine similarity
+instead of Chroma or FAISS, making it lighter and more compatible across systems.
 
 Logical Steps:
 1. Load Excel sheets into DataFrames
 2. Convert rows into meaningful text chunks
 3. Embed chunks using SentenceTransformers
-4. Store chunks and embeddings in Chroma vector DB
-5. Query top matches using semantic similarity
+4. Save embeddings and metadata locally
+5. Query top matches using cosine similarity
 6. Return context to be injected into LLM prompts
 """
 
 import os
 import pandas as pd
+import numpy as np
 import pickle
 from sentence_transformers import SentenceTransformer
-from chromadb import Client
-from chromadb.config import Settings
-from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
+from sklearn.metrics.pairwise import cosine_similarity
 
 # --- Configuration ---
 DATA_PATH = "database/ecosystem_data.xlsx"
-VECTOR_FOLDER = "vector_store"
-VECTOR_DB_NAME = "ess_knowledge"
+EMBEDDING_PATH = "vector_store/ess_embeddings.npz"
+CHUNKS_META_PATH = "vector_store/ess_chunks_metadata.pkl"
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
 # ----------- Step 1: Load Excel sheets -----------
@@ -52,35 +52,44 @@ def dataframe_to_chunks(df_dict):
             metadata.append({"sheet": sheet_name, "row": idx})
     return chunks, metadata
 
-# ----------- Step 3–4: Embedding & Storing in Chroma DB -----------
-def build_vector_store(chunks, metadata, persist_dir=VECTOR_FOLDER):
-    if not os.path.exists(persist_dir):
-        os.makedirs(persist_dir)
+# ----------- Step 3: Create embeddings -----------
+def embed_chunks(chunks):
+    model = SentenceTransformer(MODEL_NAME)
+    embeddings = model.encode(chunks, show_progress_bar=True)
+    return model, embeddings
 
-    embedding_fn = SentenceTransformerEmbeddingFunction(model_name=MODEL_NAME)
-    client = Client(Settings(chroma_db_impl="duckdb+parquet", persist_directory=persist_dir))
-    collection = client.create_collection(name=VECTOR_DB_NAME, embedding_function=embedding_fn)
+# ----------- Step 4: Save locally -----------
+def save_local_store(embeddings, chunks, metadata):
+    if not os.path.exists("vector_store"):
+        os.makedirs("vector_store")
+    np.savez(EMBEDDING_PATH, embeddings=embeddings)
+    with open(CHUNKS_META_PATH, "wb") as f:
+        pickle.dump({"chunks": chunks, "metadata": metadata}, f)
 
-    ids = [f"chunk_{i}" for i in range(len(chunks))]
-    collection.add(documents=chunks, metadatas=metadata, ids=ids)
-    client.persist()
-    return collection
-
-# ----------- Step 5: Semantic Query -----------
+# ----------- Step 5: Semantic Search -----------
 def search_ess_knowledge(query, top_k=5):
-    embedding_fn = SentenceTransformerEmbeddingFunction(model_name=MODEL_NAME)
-    client = Client(Settings(chroma_db_impl="duckdb+parquet", persist_directory=VECTOR_FOLDER))
-    collection = client.get_collection(name=VECTOR_DB_NAME, embedding_function=embedding_fn)
-    results = collection.query(query_texts=[query], n_results=top_k)
-    chunks = results["documents"][0]
-    metadatas = results["metadatas"][0]
-    df = pd.DataFrame(metadatas)
-    return df, chunks
+    model = SentenceTransformer(MODEL_NAME)
+    query_vec = model.encode([query])
+
+    # Load stored data
+    with np.load(EMBEDDING_PATH) as data:
+        embeddings = data["embeddings"]
+    with open(CHUNKS_META_PATH, "rb") as f:
+        meta = pickle.load(f)
+
+    # Cosine similarity
+    scores = cosine_similarity(query_vec, embeddings)[0]
+    top_idx = np.argsort(scores)[::-1][:top_k]
+    top_chunks = [meta["chunks"][i] for i in top_idx]
+    top_meta = [meta["metadata"][i] for i in top_idx]
+    df = pd.DataFrame(top_meta)
+    return df, top_chunks
 
 # ----------- Step 6: Optional Initial Index Creation -----------
 if __name__ == "__main__":
-    print("[INFO] Creating knowledge index from Excel...")
+    print("[INFO] Creating local vector index from Excel...")
     excel_data = load_excel_data(DATA_PATH)
     chunks, metadata = dataframe_to_chunks(excel_data)
-    build_vector_store(chunks, metadata)
-    print("[INFO] Chroma vector store created and saved.")
+    model, embeddings = embed_chunks(chunks)
+    save_local_store(embeddings, chunks, metadata)
+    print("[INFO] Local vector index saved. Ready for querying.")
