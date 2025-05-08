@@ -29,7 +29,7 @@ load_dotenv()
 
 
 
-
+st.set_page_config(page_title="EcoChat", page_icon="🧠")
 
 
 API_CALL_LIMIT = 10 # Define the limit
