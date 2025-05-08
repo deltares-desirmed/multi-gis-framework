@@ -36,17 +36,15 @@ openai==1.24.1
 langchain==0.1.17
 langchain-community==0.0.36
 python-dotenv==1.0.1
-sentence-transformers==2.2.2
-huggingface_hub==0.14.1 
-transformers==4.30.2 
-torch==2.2.x
-protobuf==3.20.3
+
 
 
 # === Vector Search (Safe Local Embeddings) ===
 sentence-transformers==2.2.2
-transformers==4.29.2
-torch==2.0.1
+huggingface_hub==0.20.3 
+transformers==4.38.0 
+torch==2.2.2
+protobuf==3.20.3
 
 # === Misc Fixes ===
 protobuf==3.20.3
