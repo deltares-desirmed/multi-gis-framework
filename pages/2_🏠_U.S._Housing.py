@@ -12,8 +12,8 @@ from leafmap.common import hex_to_rgb
 import tempfile
 from pathlib import Path
 
-DOWNLOADS_PATH = Path(tempfile.gettempdir()) / "streamlit_downloads"
-DOWNLOADS_PATH.mkdir(parents=True, exist_ok=True)
+from config import DOWNLOADS_PATH
+
 
 st.set_page_config(layout="wide")
 
