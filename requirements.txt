@@ -9,7 +9,7 @@ geemap==0.28.0
 leafmap==0.30.0
 
 # === Earth Engine + Google Auth ===
-earthengine-api==1.5.15
+earthengine-api==1.5.14
 google-auth==2.29.0
 
 # === Optional Mapping Tools ===
