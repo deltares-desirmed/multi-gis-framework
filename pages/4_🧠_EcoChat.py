@@ -28,36 +28,36 @@ load_dotenv()
 
 
 # EcoChat.py — Streamlit Chatbot Using Local Embedding Search
-import streamlit as st
-from ecosystem_search import search_ess_knowledge
+# import streamlit as st
+# from ecosystem_search import search_ess_knowledge
 
-# --- Page config ---
-st.set_page_config(page_title="EcoChat", page_icon="🧠", layout="wide")
-st.title("🧠 EcoChat: Ask About Ecosystem Services")
+# # --- Page config ---
+# st.set_page_config(page_title="EcoChat", page_icon="🧠", layout="wide")
+# st.title("🧠 EcoChat: Ask About Ecosystem Services")
 
-# --- Chat Input ---
-user_question = st.chat_input("Ask EcoChat about ecosystem services...")
+# # --- Chat Input ---
+# user_question = st.chat_input("Ask EcoChat about ecosystem services...")
 
-if user_question:
-    # Step 1: Search in-memory vector store using cosine similarity
-    results_df, top_chunks = search_ess_knowledge(user_question)
+# if user_question:
+#     # Step 1: Search in-memory vector store using cosine similarity
+#     results_df, top_chunks = search_ess_knowledge(user_question)
 
-    # Step 2: Show natural-language snippets
-    st.markdown("### 🔍 Relevant Knowledge Snippets")
-    for i, chunk in enumerate(top_chunks):
-        st.markdown(f"**{i+1}.** {chunk}")
+#     # Step 2: Show natural-language snippets
+#     st.markdown("### 🔍 Relevant Knowledge Snippets")
+#     for i, chunk in enumerate(top_chunks):
+#         st.markdown(f"**{i+1}.** {chunk}")
 
-    # Step 3: Optional table for source rows
-    with st.expander("📄 Matching ESS database rows"):
-        st.dataframe(results_df, use_container_width=True)
+#     # Step 3: Optional table for source rows
+#     with st.expander("📄 Matching ESS database rows"):
+#         st.dataframe(results_df, use_container_width=True)
 
-    # Step 4 (Optional): Placeholder for future LLM integration
-    # Example:
-    # llm_response = my_llm(prompt=f"Context:\n{top_chunks}\n\nQuestion: {user_question}")
-    # st.markdown("### 🤖 EcoChat's Response")
-    # st.write(llm_response)
+#     # Step 4 (Optional): Placeholder for future LLM integration
+#     # Example:
+#     # llm_response = my_llm(prompt=f"Context:\n{top_chunks}\n\nQuestion: {user_question}")
+#     # st.markdown("### 🤖 EcoChat's Response")
+#     # st.write(llm_response)
 
-    st.success("✅ Response generated using local embedding search on ESS data.")
+#     st.success("✅ Response generated using local embedding search on ESS data.")
 
 
 

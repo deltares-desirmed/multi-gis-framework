@@ -1,48 +1,70 @@
-# === Core Dependencies ===
-streamlit==1.30.0
-folium==0.15.1
-geopandas==0.14.3
-fiona==1.9.5
-shapely==2.0.3
-pyproj==3.6.1
-geemap==0.28.0
-leafmap==0.30.0
+--find-links=https://girder.github.io/large_image_wheels GDAL
+# cartopy
+folium==0.13.0
+geemap[extra]
+geopandas
+jupyter-server-proxy
+keplergl
+leafmap
+localtileserver
+nbserverproxy
+owslib
+palettable
+plotly
+streamlit
+streamlit-bokeh-events
+streamlit-folium
+streamlit-keplergl
+tropycal
+# git+https://github.com/giswqs/leafmap
+# git+https://github.com/giswqs/geemap
 
-# === Earth Engine + Google Auth ===
-earthengine-api==1.5.14
-google-auth==2.29.0
+openai
+langchain
+python-dotenv
+langchain-community
 
-# === Optional Mapping Tools ===
-keplergl==0.2.1  # Compatible with Python 3.9
-owslib==0.28.1
-palettable==3.3.0
-plotly==5.18.0
-localtileserver==0.5.10
-
-# === Streamlit Integrations ===
-streamlit-bokeh-events==0.1.2
-streamlit-folium==0.17.2
-streamlit-keplergl==0.3.0  # Latest available
-
-# === Jupyter Support ===
-jupyter-server-proxy==4.1.2
-nbserverproxy==0.8.8
-
-# === Tropical Cyclones (Optional) ===
-tropycal==0.3.0
-
-# === AI + RAG Stack ===
-openai==1.24.1
-langchain==0.1.17
-langchain-community==0.0.36
-python-dotenv==1.0.1
+--find-links=https://girder.github.io/large_image_wheels GDAL
+geemap
+geopandas
+jupyter-server-proxy
+keplergl
+leafmap
+localtileserver
+nbserverproxy
+streamlit
+streamlit-option-menu
+streamlit-folium
+psycopg2-binary
+fiona
+networkx
+openpyxl 
+osmnx
+pandas
+folium
+rasterstats
+pandas
+geopandas
+folium
+streamlit
+streamlit-folium
+openpyxl
+pandas
+altair
+plotly
+seaborn
+numpy
+geopandas
+leafmap
+owslib
+streamlit
 
 # === Vector Search & Embeddings ===
-sentence-transformers==2.2.2
-huggingface_hub==0.14.1
-transformers==4.38.0
-torch==2.2.2
-protobuf==3.20.3
+# sentence-transformers==2.2.2
+# huggingface_hub==0.14.1
+# transformers==4.38.0
+# torch==2.2.2
+# protobuf==3.20.3
 
 # === GDAL Installation (Handled Separately) ===
 # Install GDAL manually due to version conflicts:
