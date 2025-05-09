@@ -1,42 +1,25 @@
-# === Core Dependencies ===
-streamlit==1.34.0
-folium==0.15.1
-geopandas==0.14.3
-fiona==1.9.5
-gdal==3.6.2
-rasterio==1.3.9
-shapely==2.0.3
-pyproj==3.6.1
-geemap==0.29.0
-leafmap==0.31.0
+# === Python Version Constraint ===
+python_requires = >=3.10, <3.12
 
-# === Earth Engine + Google Auth ===
-earthengine-api==0.1.365
-google-auth==2.29.0
+# === Streamlit Integrations ===
+streamlit==1.30.0
+streamlit-bokeh-events==0.1.2
+streamlit-folium==0.17.2
+streamlit-keplergl==0.3.0  # Max available
 
 # === Optional Mapping Tools ===
-keplergl==0.3.2
+keplergl==0.2.1  # Compatible with Python 3.12 if needed
 owslib==0.28.1
 palettable==3.3.0
 plotly==5.18.0
-localtileserver==0.5.10
-
-# === Streamlit Integrations ===
-streamlit-bokeh-events==0.1.2
-streamlit-folium==0.17.2  # Keep compatible version
-streamlit-keplergl==0.3.0
-
-# === Optional Mapping Tools ===
-keplergl==0.2.1  # Downgraded version
-owslib==0.28.1
-palettable==3.3.0
 
 # === Jupyter Support ===
 jupyter-server-proxy==4.1.2
 nbserverproxy==0.8.8
 
-# === Tropical Cyclones ===
-tropycal==0.3.0
+# === Earth Engine + Google Auth ===
+earthengine-api==0.1.365
+google-auth==2.29.0
 
 # === AI + RAG Stack ===
 openai==1.24.1
@@ -44,11 +27,11 @@ langchain==0.1.17
 langchain-community==0.0.36
 python-dotenv==1.0.1
 
-# === Vector Search ===
 sentence-transformers==2.2.2
 huggingface_hub==0.14.1
 transformers==4.38.0
-torch==2.2.2
+torch==2.2.2  # Stick to this if using Python 3.10/3.11
+protobuf==3.20.3
 
-# === System Libraries ===
+# === Misc Fixes ===
 protobuf==3.20.3
