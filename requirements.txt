@@ -23,8 +23,13 @@ localtileserver==0.5.10
 
 # === Streamlit Integrations ===
 streamlit-bokeh-events==0.1.2
-streamlit-folium==0.18.0
-streamlit-keplergl==0.4.0
+streamlit-folium==0.17.2  # Keep compatible version
+streamlit-keplergl==0.3.0
+
+# === Optional Mapping Tools ===
+keplergl==0.2.1  # Downgraded version
+owslib==0.28.1
+palettable==3.3.0
 
 # === Jupyter Support ===
 jupyter-server-proxy==4.1.2
