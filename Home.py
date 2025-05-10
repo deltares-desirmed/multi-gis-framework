@@ -9,8 +9,9 @@ import utils_ee
 # Now safe to call Streamlit functions
 utils_ee.initialize_earth_engine()
 
-st.sidebar.title("About")
-st.sidebar.info(
+# st.sidebar.title("About")
+st.title("Streamlit for Geospatial Applications")
+st.markdown(
     """
     This multi-GIS support platform is developed by Deltares to assist regional partners in advancing their work under the DesirMED (Tasks 4.1, 4.2, and 4.4) and NBRACER (Tasks D5.1, D5.3, and D5.5) projects.To get the ost of out of why analysis is done the way it is done here, you have to consult to deliverables. This webpage on visualise and demonstrate the operational frameworks developed under these tasks.
 
@@ -43,7 +44,7 @@ st.sidebar.info(
 #     """
 # )
 
-st.title("Streamlit for Geospatial Applications")
+
 
 st.markdown(
     """
