@@ -41,11 +41,10 @@ networkx
 openpyxl 
 osmnx
 pandas
-folium
+# folium
 rasterstats
 pandas
 geopandas
-folium
 streamlit
 streamlit-folium
 openpyxl
