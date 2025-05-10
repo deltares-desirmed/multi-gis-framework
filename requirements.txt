@@ -1,70 +1,46 @@
 --find-links=https://girder.github.io/large_image_wheels GDAL
-# cartopy
-folium==0.13.0
+
+# Core GIS Libraries
+folium==0.12.1.post1  # Compatible with leafmap split_map
 geemap[extra]
 geopandas
-jupyter-server-proxy
-keplergl
-leafmap
+fiona
+leafmap==0.30.0
 localtileserver
-nbserverproxy
 owslib
-palettable
+osmnx
+rasterstats
+networkx
+openpyxl
+psycopg2-binary
+pandas
+numpy
+
+# Visualization
 plotly
+seaborn
+altair
+
+# Streamlit and Integrations
 streamlit
+streamlit-option-menu
 streamlit-bokeh-events
 streamlit-folium
 streamlit-keplergl
-tropycal
-# git+https://github.com/giswqs/leafmap
-# git+https://github.com/giswqs/geemap
 
-openai
-langchain
-python-dotenv
-langchain-community
-
---find-links=https://girder.github.io/large_image_wheels GDAL
-geemap
-geopandas
+# Jupyter Support
 jupyter-server-proxy
-keplergl
-leafmap
-localtileserver
 nbserverproxy
-streamlit
-streamlit-option-menu
-streamlit-folium
-psycopg2-binary
-fiona
-networkx
-openpyxl 
-osmnx
-pandas
-# folium
-rasterstats
-pandas
-geopandas
-streamlit
-streamlit-folium
-openpyxl
-pandas
-altair
-plotly
-seaborn
-numpy
-geopandas
-leafmap
-owslib
-streamlit
 
-# === Vector Search & Embeddings ===
+# Optional: Tropical Cyclone Analysis
+tropycal
+
+# AI & RAG (Commented out for now; uncomment if needed)
 # sentence-transformers==2.2.2
 # huggingface_hub==0.14.1
 # transformers==4.38.0
 # torch==2.2.2
 # protobuf==3.20.3
 
-# === GDAL Installation (Handled Separately) ===
-# Install GDAL manually due to version conflicts:
-# conda install -c conda-forge gdal=3.6.2
+# GDAL handled separately to avoid wheel issues.
+# Recommendation: conda install -c conda-forge gdal=3.6.2
