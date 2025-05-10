@@ -9,25 +9,27 @@ import utils_ee
 # Now safe to call Streamlit functions
 utils_ee.initialize_earth_engine()
 
-# st.sidebar.title("About")
-st.title("Streamlit for Geospatial Applications")
+st.title("Multi-GIS Support Platform for Climate Resilience and NbS")
+
 st.markdown(
     """
-    This multi-GIS support platform is developed by Deltares to assist regional partners in advancing their work under the DesirMED (Tasks 4.1, 4.2, and 4.4) and NBRACER (Tasks D5.1, D5.3, and D5.5) projects.To get the ost of out of why analysis is done the way it is done here, you have to consult to deliverables. This webpage on visualise and demonstrate the operational frameworks developed under these tasks.
+    This platform is developed by Deltares to support regional partners in advancing their work under the **DesirMED** (Tasks 4.1, 4.2, 4.4) and **NBRACER** (Tasks D5.1, D5.3, D5.5) projects. To fully understand the methodologies applied here, users are encouraged to consult the relevant project deliverables. This platform primarily serves to **visualize and demonstrate the operational frameworks** developed within these tasks.
 
-    The platform provides integrated web-mapping and decision-support based on uniform and globally recognized datasets, aligned with European data standards. It offers practical demonstrations of methodologies for climate resilience assessments, ecosystem services valuation, and Nature-based Solutions (NbS) mainstreaming across marine, coastal, urban, and rural landscapes. Note that most datasets used here are coarser. For a customised version tailored to a more regional specific needs, check this webGIS tool and the quiclscan tool.
+    The platform integrates **web-mapping and decision-support tools** based on globally recognized datasets, following European data standards. It provides practical demonstrations of methodologies for **climate resilience assessment**, **ecosystem services valuation**, and **mainstreaming of Nature-based Solutions (NbS)** across marine, coastal, urban, and rural landscapes.  
+    *Note: The datasets used here are generalized for demonstration purposes. For region-specific, higher-resolution analyses, please refer to the dedicated WebGIS and QuickScan tools.*
 
-    Users can explore solutions to support:
-    - Landscape Characterisation and NbS Potential Mapping (DesirMED Task 4.1)
-    - Risk Assessment (DesirMED Task 4.2)
-    - Balanced Portofios and Pathways (DesirMED Task 4.4)
-    - Conceptual framework for the design and implementation of NBS (NBRACER Task D5.1)
-    - Tool for characterisation and modelling of biodiversity and ecosystem services (NBRACER Task D5.3)
-    - Tool & guide for adaptation & transformation paths for Landscapes (NBRACER Task D5.5)
-    
-    This platform aims to foster data-driven dialogue, accelerate systemic adaptation, and strengthen regional governance capacities through interactive visualizations and scenario analyses.
+    **Key Applications:**
+    - **DesirMED Task 4.1:** Landscape Characterisation and NbS Potential Mapping  
+    - **DesirMED Task 4.2:** Risk Assessment and Vulnerability Analysis  
+    - **DesirMED Task 4.4:** Balanced Portfolios and Adaptation Pathways  
+    - **NBRACER Task D5.1:** Conceptual Framework for NbS Design and Implementation  
+    - **NBRACER Task D5.3:** Tools for Biodiversity and Ecosystem Services Characterisation  
+    - **NBRACER Task D5.5:** Tools and Guidelines for Adaptation & Transformation Pathways  
+
+    This platform fosters **data-driven dialogue**, accelerates **systemic adaptation processes**, and strengthens **regional governance capacities** through interactive visualizations and scenario exploration.
     """
 )
+
 
 st.sidebar.title("Contact")
 st.sidebar.info(
