@@ -76,5 +76,5 @@ with row1_col2:
     st.image("https://github.com/giswqs/data/raw/main/timelapse/fire.gif")
 
 with row1_col3:
-    st.image("https://github.com/giswqs/data/raw/main/timelapse/goes.gif")
-    st.image("https://github.com/giswqs/data/raw/main/timelapse/fire.gif")
+    st.image("https://github.com/deltares-desirmed/multi-gis-framework/blob/main/img/nbs.png")
+    st.image("https://github.com/deltares-desirmed/multi-gis-framework/blob/main/img/nbs.png")
