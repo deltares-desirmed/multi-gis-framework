@@ -15,6 +15,7 @@ openpyxl
 psycopg2-binary
 pandas
 numpy
+keplergl
 
 # Visualization
 plotly
