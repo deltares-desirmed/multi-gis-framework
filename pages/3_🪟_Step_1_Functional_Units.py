@@ -57,4 +57,3 @@ with col2:
     m3d.add_overture_3d_buildings()
     m3d.add_layer_control()
     m3d.to_streamlit(height=600)
--
