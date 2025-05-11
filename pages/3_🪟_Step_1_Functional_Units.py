@@ -35,7 +35,7 @@ os.environ["MAPTILER_KEY"] = "iiyRi7eIx4NmHrMOEZsc"
 import streamlit as st
 import os
 import ee
-import leafmap.foliumap as leafmap
+import leafmap.kepler as leafmap  # Use Kepler for 3D visualizations
 
 # Initialize Earth Engine
 if not ee.data._initialized:
@@ -63,7 +63,7 @@ if mode == "2D Split Map":
         with st.echo():
             m = leafmap.Map()
             m.split_map(
-                left_layer="ESA WorldCover 2020 S2 FCC", 
+                left_layer="ESA WorldCover 2020 S2 FCC",
                 right_layer="ESA WorldCover 2020"
             )
             m.add_legend(title="ESA Land Cover", builtin_legend="ESA_WorldCover")
@@ -72,29 +72,27 @@ if mode == "2D Split Map":
 elif mode == "3D Visualization":
     st.title("3D Data Visualization with Globe Projection")
 
-    m = leafmap.Map(style="3d-terrain", projection="globe", height=700)
+    m = leafmap.Map(style="3d-terrain", center=[0, 0], zoom=1)
+
     dataset = ee.ImageCollection("ESA/WorldCover/v200").first()
-    vis_params = {"bands": ["Map"], "opacity": 0.5}
+    vis_params = {"bands": ["Map"], "min": 0, "max": 100, "opacity": 0.5}
 
-    m.add_ee_layer(dataset, vis_params=vis_params, name="ESA Worldcover")
-    m.add_legend(builtin_legend="ESA_WorldCover", title="ESA Landcover")
+    # Proper way to add EE Image in Kepler
+    m.add_ee_layer(dataset, vis_params, "ESA WorldCover")
 
-    # Add Overture 3D buildings for enhanced visualization
+    # Add Overture 3D buildings
     m.add_overture_3d_buildings()
 
-    # Optional: Add Nighttime Lights Visualization
     if st.checkbox("Show Nighttime Lights"):
-        night_dataset = ee.ImageCollection("NOAA/VIIRS/DNB/ANNUAL_V22").filter(
-            ee.Filter.date("2022-01-01", "2023-01-01")
-        ).select("maximum")
+        night_dataset = ee.ImageCollection("NOAA/VIIRS/DNB/ANNUAL_V22") \
+            .filterDate("2022-01-01", "2023-01-01").select("maximum")
         night_vis = {"min": 0.0, "max": 60.0, "opacity": 0.5}
-        m.add_ee_layer(night_dataset, vis_params=night_vis, name="Nighttime Lights")
+        m.add_ee_layer(night_dataset.mean(), night_vis, "Nighttime Lights")
 
     # Country Boundaries Layer
     countries = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017").style(
         fillColor="00000000", color="ff0000", width=1.0
     )
-    m.add_ee_layer(countries, vis_params={}, name="Country Boundaries")
+    m.add_ee_layer(countries, {}, "Country Boundaries")
 
-    m.add_layer_control()
     m.to_streamlit(height=700)
