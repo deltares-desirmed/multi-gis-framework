@@ -38,7 +38,7 @@ import ee
 import os
 
 # Streamlit Page Config
-st.set_page_config(layout="wide")
+# st.set_page_config(layout="wide")
 
 # Load your MapTiler API key
 os.environ["MAPTILER_KEY"] = "iiyRi7eIx4NmHrMOEZsc"
