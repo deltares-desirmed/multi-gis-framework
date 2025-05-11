@@ -74,9 +74,9 @@ elif mode == "3D Visualization":
 
     m = leafmap.Map(style="3d-terrain", projection="globe", height=700)
     dataset = ee.ImageCollection("ESA/WorldCover/v200").first()
-    vis_params = {"bands": ["Map"]}
+    vis_params = {"bands": ["Map"], "opacity": 0.5}
 
-    m.add_ee_layer(dataset, vis_params, name="ESA Worldcover", opacity=0.5)
+    m.add_ee_layer(dataset, vis_params=vis_params, name="ESA Worldcover")
     m.add_legend(builtin_legend="ESA_WorldCover", title="ESA Landcover")
 
     # Add Overture 3D buildings for enhanced visualization
@@ -87,14 +87,14 @@ elif mode == "3D Visualization":
         night_dataset = ee.ImageCollection("NOAA/VIIRS/DNB/ANNUAL_V22").filter(
             ee.Filter.date("2022-01-01", "2023-01-01")
         ).select("maximum")
-        night_vis = {"min": 0.0, "max": 60.0}
-        m.add_ee_layer(night_dataset, night_vis, name="Nighttime Lights")
+        night_vis = {"min": 0.0, "max": 60.0, "opacity": 0.5}
+        m.add_ee_layer(night_dataset, vis_params=night_vis, name="Nighttime Lights")
 
     # Country Boundaries Layer
     countries = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017").style(
         fillColor="00000000", color="ff0000", width=1.0
     )
-    m.add_ee_layer(countries, {}, name="Country Boundaries")
+    m.add_ee_layer(countries, vis_params={}, name="Country Boundaries")
 
     m.add_layer_control()
     m.to_streamlit(height=700)
