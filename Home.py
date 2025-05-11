@@ -46,15 +46,18 @@ st.subheader("Timelapse of Satellite Imagery")
 row1_col1, row1_col2, row1_col3 = st.columns(3)
 with row1_col1:
     st.image("https://github.com/giswqs/data/raw/main/timelapse/spain.gif")
-    st.image("https://github.com/giswqs/data/raw/main/timelapse/las_vegas.gif")
+    st.image("https://www.tetratech.com/wp-content/uploads/2024/08/Nature-based-Solutions-Innovative-Approaches-to-Increase-Impact-and-Reduce-Risk-1.jpg")
+    
 
 with row1_col2:
     st.image("https://github.com/giswqs/data/raw/main/timelapse/goes.gif")
-    st.image("https://github.com/giswqs/data/raw/main/timelapse/fire.gif")
+    st.image("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA78JB3VdI-ruuThMIG4OUXIpxzFDU4P5Qy2If0t-Iyk0Nz81aYqZ8TcxDYnYX7PDzSDk&usqp=CAU")
+    
 
 with row1_col3:
-    st.image("https://www.tetratech.com/wp-content/uploads/2024/08/Nature-based-Solutions-Innovative-Approaches-to-Increase-Impact-and-Reduce-Risk-1.jpg")
-    st.image("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA78JB3VdI-ruuThMIG4OUXIpxzFDU4P5Qy2If0t-Iyk0Nz81aYqZ8TcxDYnYX7PDzSDk&usqp=CAU")
+    st.image("https://github.com/giswqs/data/raw/main/timelapse/las_vegas.gif")
+    st.image("https://github.com/giswqs/data/raw/main/timelapse/fire.gif")
+    
 
 
 st.markdown(
