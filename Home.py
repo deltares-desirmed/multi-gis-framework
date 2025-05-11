@@ -61,8 +61,8 @@ with row1_col2:
     st.image("https://github.com/giswqs/data/raw/main/timelapse/fire.gif")
 
 with row1_col3:
-    st.image("https://github.com/deltares-desirmed/multi-gis-framework/blob/main/img/nbs.png")
-    st.image("https://github.com/deltares-desirmed/multi-gis-framework/blob/main/img/nbs.png")
+    st.image("https://www.tetratech.com/wp-content/uploads/2024/08/Nature-based-Solutions-Innovative-Approaches-to-Increase-Impact-and-Reduce-Risk-1.jpg")
+    st.image("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA78JB3VdI-ruuThMIG4OUXIpxzFDU4P5Qy2If0t-Iyk0Nz81aYqZ8TcxDYnYX7PDzSDk&usqp=CAU")
 
 
 st.markdown(
