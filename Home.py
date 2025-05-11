@@ -102,6 +102,6 @@ st.markdown(hide_github_icon, unsafe_allow_html=True)
 
 import datetime
 current_year = datetime.datetime.now().year
-st.sidebar.markdown(f"© {current_year} Stictching Deltares")
+st.sidebar.markdown(f"© {current_year}  Stichting Deltares")
 last_updated = datetime.datetime.now().strftime("%B %d, %Y")
 st.sidebar.markdown(f"**Last Updated:** {last_updated}")
