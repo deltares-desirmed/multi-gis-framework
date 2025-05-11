@@ -36,7 +36,7 @@ nbserverproxy
 tropycal
 
 # AI & RAG (Commented out for now; uncomment if needed)
-openai
+openai>=1.74.0,<2.0.0
 # sentence-transformers==2.2.2
 # huggingface_hub==0.14.1
 # transformers==4.38.0
