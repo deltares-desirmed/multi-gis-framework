@@ -8,29 +8,29 @@ os.environ["MAPTILER_KEY"] = "iiyRi7eIx4NmHrMOEZsc"
 
 st.set_page_config(layout="wide")
 
-st.sidebar.title("Info")
-st.sidebar.info(
-    """
-    Deltares at [NbS Knowledge Hub](https://nbs-tutorials-and-tips) | 
-    [GitHub](https://github.com/deltares-desirmed) | 
-    [YouTube](https://youtube.com/@deltares) | 
-    [LinkedIn](https://www.linkedin.com/in/deltares)
-    """
-)
+# st.sidebar.title("Info")
+# st.sidebar.info(
+#     """
+#     Deltares at [NbS Knowledge Hub](https://nbs-tutorials-and-tips) | 
+#     [GitHub](https://github.com/deltares-desirmed) | 
+#     [YouTube](https://youtube.com/@deltares) | 
+#     [LinkedIn](https://www.linkedin.com/in/deltares)
+#     """
+# )
 
-st.title("Multi-GIS Viewer: Split Map and 3D Visualization")
+# st.title("Multi-GIS Viewer: Split Map and 3D Visualization")
 
-# === Split-panel Map ===
-st.header("🔀 Split-panel Map")
-with st.expander("See Split Map Source Code"):
-    with st.echo():
-        m = leafmap.Map()
-        m.split_map(
-            left_layer="ESA WorldCover 2020 S2 FCC", 
-            right_layer="ESA WorldCover 2020"
-        )
-        m.add_legend(title="ESA Land Cover", builtin_legend="ESA_WorldCover")
-m.to_streamlit(height=600)
+# # === Split-panel Map ===
+# st.header("🔀 Split-panel Map")
+# with st.expander("See Split Map Source Code"):
+#     with st.echo():
+#         m = leafmap.Map()
+#         m.split_map(
+#             left_layer="ESA WorldCover 2020 S2 FCC", 
+#             right_layer="ESA WorldCover 2020"
+#         )
+#         m.add_legend(title="ESA Land Cover", builtin_legend="ESA_WorldCover")
+# m.to_streamlit(height=600)
 
 # === 3D Visualization Section ===
 st.header("🌍 Data Visualization in 3D")
