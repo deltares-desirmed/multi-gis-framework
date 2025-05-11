@@ -103,18 +103,18 @@ model_links_hf ={
 
 
 model_links_groq ={
-      "Gemma-2-9B-it":{
-                      "inf_point":"https://api.groq.com/openai/v1",
-                      "link":"gemma2-9b-it",
-                      },
+    #   "Gemma-2-9B-it":{
+    #                   "inf_point":"https://api.groq.com/openai/v1",
+    #                   "link":"gemma2-9b-it",
+    #                   },
       "Meta-Llama-3.1-8B":{
                       "inf_point":"https://api.groq.com/openai/v1",
                       "link":"llama-3.1-8b-instant",
                       },
-      "Meta-Llama-4-Scout-17B": {
-      "inf_point": "https://api.groq.com/openai/v1",
-      "link": "meta-llama/llama-4-scout-17b-16e-instruct",
-},
+#       "Meta-Llama-4-Scout-17B": {
+#       "inf_point": "https://api.groq.com/openai/v1",
+#       "link": "meta-llama/llama-4-scout-17b-16e-instruct",
+# },
 
   }
 
