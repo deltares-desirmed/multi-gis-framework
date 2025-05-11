@@ -22,7 +22,7 @@ st.markdown(
 )
 
 
-st.sidebar.title("Contact")
+st.sidebar.title("Info")
 st.sidebar.info(
     """
     Deltares at [NbS Knowledge Hub](https://nbs-tutorials-and-tips) | [GitHub](https://github.com/deltares-desirmed) | [Twitter](https://twitter.com/deltares) | [YouTube](https://youtube.com/@deltares) | [LinkedIn](https://www.linkedin.com/in/deltares)
@@ -102,5 +102,5 @@ st.markdown(hide_github_icon, unsafe_allow_html=True)
 
 import datetime
 
-last_updated = datetime.datetime.now().strftime("%B %d, %Y")  # Example: May 11, 2025
+last_updated = datetime.datetime.now().strftime("%B %d, %Y")
 st.sidebar.markdown(f"**Last Updated:** {last_updated}")
