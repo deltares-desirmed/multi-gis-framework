@@ -1,5 +1,5 @@
 """ Simple Chatbot
-@Origina author: Nigel Gebodh
+@Original author: Nigel Gebodh
 Adapted and Modified: Desmond Lartey
 """
 import numpy as np
