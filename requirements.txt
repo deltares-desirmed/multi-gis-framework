@@ -1,11 +1,11 @@
 --find-links=https://girder.github.io/large_image_wheels GDAL
 
 # Core GIS Libraries
-folium==0.12.1.post1  # Compatible with leafmap split_map
+folium==0.14.0
+leafmap==0.30.0
 geemap[extra]
 geopandas
 fiona
-leafmap==0.30.0
 localtileserver
 owslib
 osmnx
