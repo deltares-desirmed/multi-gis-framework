@@ -27,8 +27,17 @@ with st.expander("See source code"):
     with st.echo():
         m = leafmap.Map()
         m.split_map(
-            left_layer="ESA WorldCover 2020 S2 FCC", right_layer="ESA WorldCover 2020"
+            left_layer="COPERNICUS/CORINE/V20/100m/2018",
+            right_layer="COPERNICUS/CORINE/V20/100m/2018"
         )
-        m.add_legend(title="ESA Land Cover", builtin_legend="ESA_WorldCover")
+        m.add_legend(
+            title="CORINE Land Cover 2018",
+            labels=[
+                "Artificial Surfaces", "Agricultural Areas", "Forest", 
+                "Wetlands", "Water Bodies"
+            ],
+            colors=["#FF0000", "#FFFF00", "#008000", "#00FFFF", "#0000FF"]
+        )
+
 
 m.to_streamlit(height=700)
