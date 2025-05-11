@@ -9,13 +9,13 @@ import utils_ee
 # Now safe to call Streamlit functions
 utils_ee.initialize_earth_engine()
 
-st.title("Multi-GIS Support Platform for Climate Resilience and NbS")
+st.title("Multi-GIS Support Platform")
 
 st.markdown(
     """
     This platform is developed by Deltares to support regional partners in advancing their work under the **DesirMED** (Tasks 4.1, 4.2, 4.4) and **NBRACER** (Tasks D5.1, D5.3, D5.5) projects. To fully understand the methodologies applied here, users are encouraged to consult the relevant project deliverables. This platform primarily serves to **visualize and demonstrate the operational frameworks** developed within these tasks.
 
-    The platform integrates **on-the-fly web-mapping and decision-support** based on globally recognized datasets. It provides practical demonstrations of methodologies adopted in the different Work-packages.  
+    The platform integrates **on-the-fly web-mapping and decision-support** based on globally recognized datasets.
     *Note: The datasets used here are coarser. For region-specific, higher-resolution customised analyses, please refer to the dedicated WebGIS and QuickScan tool.*
 
     **Key Applications:**
@@ -37,25 +37,10 @@ st.sidebar.info(
     """
 )
 
-# st.sidebar.title("Support")
-# st.sidebar.info(
-#     """
-#     If you want to reward my work, I'd love a cup of coffee from you. Thanks!
-#     [buymeacoffee.com/giswqs](http://buymeacoffee.com/giswqs)
-#     """
-# )
 
 
 
-st.markdown(
-    """
-    This multi-page web app demonstrates various interactive web apps created using [streamlit](https://streamlit.io) and open-source mapping libraries,
-    such as [leafmap](https://leafmap.org), [geemap](https://geemap.org), [pydeck](https://deckgl.readthedocs.io), and [kepler.gl](https://docs.kepler.gl/docs/keplergl-jupyter).
-    This is an open-source project and you are very welcome to contribute your comments, questions, resources, and apps as [issues](https://github.com/desirmed/multi-gis-support/issues) or
-    [pull requests](https://github.com/giswqs/multi-gis-support/pulls) to the [GitHub repository](https://github.com/desirmed/multi-gis-support).
 
-    """
-)
 
 st.info("Click on the left sidebar menu to navigate to the different apps.")
 
@@ -78,3 +63,28 @@ with row1_col2:
 with row1_col3:
     st.image("https://github.com/deltares-desirmed/multi-gis-framework/blob/main/img/nbs.png")
     st.image("https://github.com/deltares-desirmed/multi-gis-framework/blob/main/img/nbs.png")
+
+
+st.markdown(
+    """
+    **Key Applications:**
+    - **DesirMED Task 4.1:** Landscape Characterisation  
+    - **DesirMED Task 4.2:** Risk Assessment and Vulnerability Analysis  
+    - **DesirMED Task 4.4:** Balanced Portfolios and Adaptation Pathways  
+    - **NBRACER Task D5.1:** Conceptual Framework for NbS Design and Implementation  
+    - **NBRACER Task D5.3:** Tools for Biodiversity and Ecosystem Services Characterisation  
+    - **NBRACER Task D5.5:** Tools and Guidelines for Adaptation & Transformation Pathways  
+
+    """
+)
+
+
+st.markdown(
+    """
+    This multi-page web app demonstrates various interactive web apps created using [streamlit](https://streamlit.io) and open-source mapping libraries,
+    such as [leafmap](https://leafmap.org), [geemap](https://geemap.org), [pydeck](https://deckgl.readthedocs.io), and [kepler.gl](https://docs.kepler.gl/docs/keplergl-jupyter).
+    This is an open-source project and you are very welcome to contribute your comments, questions, resources, and apps as [issues](https://github.com/deltares-desirmed/multi-gis-support/issues) or
+    [pull requests](https://github.com/giswqs/multi-gis-support/pulls) to the [GitHub repository](https://github.com/deltares-desirmed/multi-gis-support).
+
+    """
+)
