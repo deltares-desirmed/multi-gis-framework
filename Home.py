@@ -36,7 +36,7 @@ st.sidebar.info(
 
 st.info("Click on the left sidebar menu to navigate to the different apps.")
 
-st.subheader("Timelapse of Satellite Imagery")
+# st.subheader("Timelapse of Satellite Imagery")
 # st.markdown(
 #     """
 #     The following timelapse animations were created using the Timelapse web app. Click `Timelapse` on the left sidebar menu to create your own timelapse for any location around the globe.
