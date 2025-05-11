@@ -88,3 +88,8 @@ st.markdown(
 
     """
 )
+
+
+logo = "https://www.informatiehuismarien.nl/publish/pages/113886/deltares-logo.jpg"
+st.sidebar.image(logo)
+
