@@ -36,7 +36,6 @@ import streamlit as st
 import os
 import ee
 import leafmap.foliumap as leafmap
-import leafmap.kepler as kepler  # For 3D visualization
 
 # Initialize Earth Engine
 if not ee.data._initialized:
