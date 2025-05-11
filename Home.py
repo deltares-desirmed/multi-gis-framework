@@ -16,15 +16,7 @@ st.markdown(
     This platform is developed by Deltares to support regional partners in advancing their work under the **DesirMED** (Tasks 4.1, 4.2, 4.4) and **NBRACER** (Tasks D5.1, D5.3, D5.5) projects. To fully understand the methodologies applied here, users are encouraged to consult the relevant project deliverables. This platform primarily serves to **visualize and demonstrate the operational frameworks** developed within these tasks.
 
     The platform integrates **on-the-fly web-mapping and decision-support** based on globally recognized datasets.
-    *Note: The datasets used here are coarser. For region-specific, higher-resolution customised analyses, please refer to the dedicated WebGIS and QuickScan tool.*
-
-    **Key Applications:**
-    - **DesirMED Task 4.1:** Landscape Characterisation  
-    - **DesirMED Task 4.2:** Risk Assessment and Vulnerability Analysis  
-    - **DesirMED Task 4.4:** Balanced Portfolios and Adaptation Pathways  
-    - **NBRACER Task D5.1:** Conceptual Framework for NbS Design and Implementation  
-    - **NBRACER Task D5.3:** Tools for Biodiversity and Ecosystem Services Characterisation  
-    - **NBRACER Task D5.5:** Tools and Guidelines for Adaptation & Transformation Pathways  
+    *Note: The datasets used here are coarser. For region-specific, higher-resolution customised analyses, please refer to the dedicated WebGIS and QuickScan tool.* 
 
     """
 )
@@ -33,7 +25,7 @@ st.markdown(
 st.sidebar.title("Contact")
 st.sidebar.info(
     """
-    Deltares at [NbS Knowledge Hub](https://nbs-tutorials-and-tips) | [GitHub](https://github.com/desirmed) | [Twitter](https://twitter.com/deltares) | [YouTube](https://youtube.com/@deltares) | [LinkedIn](https://www.linkedin.com/in/deltares)
+    Deltares at [NbS Knowledge Hub](https://nbs-tutorials-and-tips) | [GitHub](https://github.com/deltares-desirmed) | [Twitter](https://twitter.com/deltares) | [YouTube](https://youtube.com/@deltares) | [LinkedIn](https://www.linkedin.com/in/deltares)
     """
 )
 
@@ -67,7 +59,7 @@ with row1_col3:
 
 st.markdown(
     """
-    **Key Applications:**
+    **Relevant Workpackages:**
     - **DesirMED Task 4.1:** Landscape Characterisation  
     - **DesirMED Task 4.2:** Risk Assessment and Vulnerability Analysis  
     - **DesirMED Task 4.4:** Balanced Portfolios and Adaptation Pathways  
