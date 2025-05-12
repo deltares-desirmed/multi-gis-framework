@@ -1,8 +1,9 @@
 import streamlit as st
 import ee
 import leafmap.foliumap as leafmap
+import folium
 
-# Initialize Earth Engine (assuming you’ve already authenticated)
+# Initialize Earth Engine (assuming authenticated)
 ee.Initialize()
 
 st.set_page_config(layout="wide")
@@ -16,15 +17,28 @@ st.sidebar.info(
 
 st.title("CORINE Land Cover 2018 Visualization via Google Earth Engine")
 
+# ✅ Register add_ee_layer if not already registered
+def add_ee_layer(self, ee_image_object, vis_params, name):
+    map_id_dict = ee.Image(ee_image_object).getMapId(vis_params)
+    folium.raster_layers.TileLayer(
+        tiles=map_id_dict["tile_fetcher"].url_format,
+        attr="Google Earth Engine",
+        name=name,
+        overlay=True,
+        control=True,
+    ).add_to(self)
+
+folium.Map.add_ee_layer = add_ee_layer
+
 with st.expander("See source code"):
     with st.echo():
-        # Create Map Centered on Europe
+        # Centered on Europe
         m = leafmap.Map(center=[50, 10], zoom=5)
 
-        # Load CORINE Land Cover 2018 from GEE
+        # Load CORINE Data from GEE
         corine = ee.ImageCollection("COPERNICUS/CORINE/V20/100m/2018").first()
 
-        # Visualization Parameters
+        # Visualization Parameters for CORINE
         vis_params = {
             "bands": ["landcover"],
             "min": 1,
@@ -39,10 +53,9 @@ with st.expander("See source code"):
             ]
         }
 
-        # ✅ Correct method for adding EE Images
-        m.addLayer(corine, vis_params, "CORINE Land Cover 2018")
+        # ✅ Add CORINE Layer using the custom EE method
+        m.add_ee_layer(corine, vis_params, "CORINE Land Cover 2018")
 
-        # Add Layer Control and Render Map
         m.add_layer_control()
         m.to_streamlit(height=700)
 
