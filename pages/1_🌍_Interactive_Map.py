@@ -1,10 +1,14 @@
 import streamlit as st
 import leafmap.foliumap as leafmap
 
-markdown = """
-Web App URL: <https://geotemplate.streamlit.app>
-GitHub Repository: <https://github.com/giswqs/streamlit-multipage-template>
-"""
+
+st.sidebar.title("Info")
+st.sidebar.info(
+    """
+    Deltares at [NbS Knowledge Hub](https://nbs-tutorials-and-tips) | 
+    [GitHub](https://github.com/deltares-desirmed)
+    """
+)
 
 st.sidebar.title("About")
 st.sidebar.info(markdown)
