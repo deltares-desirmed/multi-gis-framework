@@ -31,9 +31,6 @@ st.sidebar.info(
 
 
 
-
-
-
 st.info("Click on the left sidebar menu to navigate to the different apps.")
 
 # st.subheader("Timelapse of Satellite Imagery")
