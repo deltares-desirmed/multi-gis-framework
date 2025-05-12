@@ -6,18 +6,19 @@ import folium
 # Initialize Earth Engine (already authenticated)
 ee.Initialize()
 
+# Streamlit App Config
 st.set_page_config(layout="wide")
-
 st.sidebar.title("Info")
 st.sidebar.info(
     """
-    Deltares at [NbS Knowledge Hub](https://nbs-tutorials-and-tips) | [GitHub](https://github.com/deltares-desirmed)
+    Deltares at [NbS Knowledge Hub](https://nbs-tutorials-and-tips) | 
+    [GitHub](https://github.com/deltares-desirmed)
     """
 )
 
 st.title("CORINE Land Cover 2018 Visualization via Google Earth Engine")
 
-# ✅ Register custom method to add EE Tile Layers
+# ✅ Register Custom Method to Add EE Tile Layers
 def add_ee_tile_layer(self, ee_image_object, vis_params, name):
     map_id_dict = ee_image_object.getMapId(vis_params)
     folium.TileLayer(
@@ -32,15 +33,15 @@ folium.Map.add_ee_tile_layer = add_ee_tile_layer
 
 with st.expander("See source code"):
     with st.echo():
-        # Create the Map centered on Europe
+        # 🌍 Initialize Map Centered on Europe
         m = leafmap.Map(center=[50, 10], zoom=5)
 
-        # ✅ Correct: Load CORINE Land Cover 2018 as ee.Image, NOT ImageCollection
+        # 📥 Load CORINE Land Cover 2018 Data from GEE
         corine = ee.Image("COPERNICUS/CORINE/V20/100m/2018")
 
-        # Visualization Parameters
+        # 🎨 Visualization Parameters
         vis_params = {
-            "bands": ["landcover"],  # Correct band name confirmed
+            "bands": ["landcover"],
             "min": 111,
             "max": 523,
             "palette": [
@@ -55,11 +56,10 @@ with st.expander("See source code"):
             ]
         }
 
-
-        # ✅ Correct way: Add EE Tile Layer using the registered method
+        # 🗺️ Add CORINE Layer to Map
         m.add_ee_tile_layer(corine, vis_params, "CORINE Land Cover 2018")
 
-
+        # 📚 Create Custom HTML Legend
         legend_html = """
         <div style="
             position: fixed; 
@@ -79,27 +79,25 @@ with st.expander("See source code"):
             "Road and rail networks", "Port areas", "Airports", "Mineral extraction sites",
             "Dump sites", "Construction sites", "Green urban areas", "Sport/leisure facilities",
             "Non-irrigated arable land", "Permanently irrigated land", "Rice fields",
-            "Vineyards", "Fruit trees and berry plantations", "Olive groves",
-            "Pastures", "Annual crops with permanent crops", 
-            "Complex cultivation patterns", "Agriculture + natural areas",
-            "Agro-forestry areas", "Broad-leaved forest", "Coniferous forest",
-            "Mixed forest", "Natural grassland", "Moors and heathland",
-            "Sclerophyllous vegetation", "Transitional woodland-shrub",
-            "Beaches, dunes, sands", "Bare rocks", "Sparsely vegetated areas",
-            "Burnt areas", "Glaciers and perpetual snow", "Inland wetlands",
-            "Peat bogs", "Salt marshes", "Salines", "Intertidal flats",
+            "Vineyards", "Fruit trees and berry plantations", "Olive groves", "Pastures",
+            "Annual crops with permanent crops", "Complex cultivation patterns",
+            "Agriculture + natural areas", "Agro-forestry areas", "Broad-leaved forest",
+            "Coniferous forest", "Mixed forest", "Natural grassland", "Moors and heathland",
+            "Sclerophyllous vegetation", "Transitional woodland-shrub", "Beaches, dunes, sands",
+            "Bare rocks", "Sparsely vegetated areas", "Burnt areas", "Glaciers and perpetual snow",
+            "Inland wetlands", "Peat bogs", "Salt marshes", "Salines", "Intertidal flats",
             "Water courses", "Water bodies", "Coastal lagoons", "Estuaries", "Sea and ocean"
         ]
 
         colors = [
             "#ff0000", "#e97419", "#a00000", "#ffff64", "#009900", "#006400",
-            "#00ff00", "#00a000", "#dcdcdc", "#c8c8c8", "#ff0000", "#ffff64",
-            "#ffff64", "#009900", "#009900", "#009900", "#009900", "#006400",
-            "#00ff00", "#00ff00", "#00a000", "#00a000", "#dcdcdc", "#c8c8c8",
-            "#ff0000", "#e97419", "#a00000", "#e5e5e5", "#70a3ba", "#0000ff",
-            "#0000a0", "#707070", "#00ff00", "#00a000", "#00ffff", "#00a0a0",
-            "#70a3ba", "#0000ff", "#0000a0", "#70a3ba", "#0000ff", "#0000a0",
-            "#707070"
+            "#00ff00", "#00a000", "#dcdcdc", "#c8c8c8", "#ff0000", "#ffffa8",
+            "#ffff00", "#e6e600", "#e68000", "#f2a64d", "#e6a600", "#e6e64d",
+            "#ffe6a6", "#ffe64d", "#e6cc4d", "#f2cca6", "#80ff00", "#00a600",
+            "#4dff00", "#ccf24d", "#a6ff80", "#a6e64d", "#a6f200", "#e6e6e6",
+            "#cccccc", "#ccffcc", "#000000", "#a6e6cc", "#a6a6ff", "#4d4dff",
+            "#ccccff", "#e6e6ff", "#a6a6e6", "#00ccf2", "#80f2e6", "#00ffa6",
+            "#a6ffe6", "#e6f2ff"
         ]
 
         for label, color in zip(labels, colors):
@@ -107,9 +105,10 @@ with st.expander("See source code"):
 
         legend_html += "</div>"
 
+        # ➕ Add Legend to Map
         m.get_root().html.add_child(folium.Element(legend_html))
 
-        # Add Layer Control and Display Map
+        # 🧩 Finalize Map Controls and Display
         m.add_layer_control()
         m.to_streamlit(height=700)
 
