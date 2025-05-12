@@ -5,11 +5,11 @@ import folium
 from utils_ee import initialize_earth_engine  # ✅ Import GEE Authentication Function
 
 st.set_page_config(layout="wide")
+
 # ✅ Initialize Earth Engine Using Cloud Secrets
 initialize_earth_engine()
 
-# Streamlit App Config
-
+# Streamlit Sidebar
 st.sidebar.title("Info")
 st.sidebar.info(
     """
@@ -18,7 +18,7 @@ st.sidebar.info(
     """
 )
 
-st.title("Function Units")
+st.title("Functional Units - CORINE Land Cover 2018")
 
 # ✅ Register Custom Method to Add EE Tile Layers
 def add_ee_tile_layer(self, ee_image_object, vis_params, name):
@@ -61,32 +61,7 @@ with st.expander("See source code"):
         # 🗺️ Add CORINE Layer to Map
         m.add_ee_tile_layer(corine, vis_params, "CORINE Land Cover 2018")
 
-        # 📚 Create the Legend as a Feature Group (Toggleable Layer)
-        legend_group = folium.FeatureGroup(name="Legend", show=False)  # Default OFF
-
-        legend_html = """
-        <div style="
-            position: fixed; 
-            bottom: 50px; left: 50px; width: 300px; height: 400px; 
-            overflow: auto; 
-            background-color: white; 
-            border:2px solid grey; 
-            z-index:9999; 
-            font-size:14px;
-            padding: 10px;">
-        <b>CORINE Land Cover 2018</b><br>
-        <hr>
-        """
-
-        for label, color in zip(labels, colors):
-            legend_html += f'<i style="background:{color};width:10px;height:10px;float:left;margin-right:8px;"></i>{label}<br>'
-
-        legend_html += "</div>"
-
-        legend_group.add_child(folium.Element(legend_html))
-        m.add_child(legend_group)
-
-
+        # 📚 Create Legend HTML Content
         labels = [
             "Continuous urban fabric", "Discontinuous urban fabric", "Industrial/Commercial units",
             "Road and rail networks", "Port areas", "Airports", "Mineral extraction sites",
@@ -113,18 +88,33 @@ with st.expander("See source code"):
             "#a6ffe6", "#e6f2ff"
         ]
 
+        legend_html = """
+        <div style="
+            position: fixed; 
+            bottom: 50px; left: 50px; width: 300px; height: 400px; 
+            overflow: auto; 
+            background-color: white; 
+            border:2px solid grey; 
+            z-index:9999; 
+            font-size:14px;
+            padding: 10px;">
+        <b>CORINE Land Cover 2018</b><br>
+        <hr>
+        """
+
         for label, color in zip(labels, colors):
             legend_html += f'<i style="background:{color};width:10px;height:10px;float:left;margin-right:8px;"></i>{label}<br>'
 
         legend_html += "</div>"
 
-        # ➕ Add Legend to Map
-        m.get_root().html.add_child(folium.Element(legend_html))
+        # ✅ Create a FeatureGroup for the Legend, so it can be toggled
+        legend_group = folium.FeatureGroup(name="Legend", show=False)
+        legend_group.add_child(folium.Element(legend_html))
+        m.add_child(legend_group)
 
         # 🧩 Finalize Map Controls and Display
         m.add_layer_control()
         m.to_streamlit(height=700)
-
 
 
 
