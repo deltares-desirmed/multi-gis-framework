@@ -175,19 +175,19 @@ model_info ={
 
 
 #Random dog images for error message
-random_dog = ["0f476473-2d8b-415e-b944-483768418a95.jpg",
-              "1bd75c81-f1d7-4e55-9310-a27595fa8762.jpg",
-              "526590d2-8817-4ff0-8c62-fdcba5306d02.jpg",
-              "1326984c-39b0-492c-a773-f120d747a7e2.jpg",
-              "42a98d03-5ed7-4b3b-af89-7c4876cb14c3.jpg",
-              "8b3317ed-2083-42ac-a575-7ae45f9fdc0d.jpg",
-              "ee17f54a-83ac-44a3-8a35-e89ff7153fb4.jpg",
-              "027eef85-ccc1-4a66-8967-5d74f34c8bb4.jpg",
-              "08f5398d-7f89-47da-a5cd-1ed74967dc1f.jpg",
-              "0fd781ff-ec46-4bdc-a4e8-24f18bf07def.jpg",
-              "0fb4aeee-f949-4c7b-a6d8-05bf0736bdd1.jpg",
-              "6edac66e-c0de-4e69-a9d6-b2e6f6f9001b.jpg",
-              "bfb9e165-c643-4993-9b3a-7e73571672a6.jpg"]
+# random_dog = ["0f476473-2d8b-415e-b944-483768418a95.jpg",
+#               "1bd75c81-f1d7-4e55-9310-a27595fa8762.jpg",
+#               "526590d2-8817-4ff0-8c62-fdcba5306d02.jpg",
+#               "1326984c-39b0-492c-a773-f120d747a7e2.jpg",
+#               "42a98d03-5ed7-4b3b-af89-7c4876cb14c3.jpg",
+#               "8b3317ed-2083-42ac-a575-7ae45f9fdc0d.jpg",
+#               "ee17f54a-83ac-44a3-8a35-e89ff7153fb4.jpg",
+#               "027eef85-ccc1-4a66-8967-5d74f34c8bb4.jpg",
+#               "08f5398d-7f89-47da-a5cd-1ed74967dc1f.jpg",
+#               "0fd781ff-ec46-4bdc-a4e8-24f18bf07def.jpg",
+#               "0fb4aeee-f949-4c7b-a6d8-05bf0736bdd1.jpg",
+#               "6edac66e-c0de-4e69-a9d6-b2e6f6f9001b.jpg",
+#               "bfb9e165-c643-4993-9b3a-7e73571672a6.jpg"]
 
 
 
