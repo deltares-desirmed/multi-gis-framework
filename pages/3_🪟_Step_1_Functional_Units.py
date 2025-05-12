@@ -2,9 +2,10 @@ import streamlit as st
 import ee
 import leafmap.foliumap as leafmap
 import folium
+from utils_ee import initialize_earth_engine  # ✅ Import GEE Authentication Function
 
-# Initialize Earth Engine (already authenticated)
-ee.Initialize()
+# ✅ Initialize Earth Engine Using Cloud Secrets
+initialize_earth_engine()
 
 # Streamlit App Config
 st.set_page_config(layout="wide")
@@ -111,6 +112,7 @@ with st.expander("See source code"):
         # 🧩 Finalize Map Controls and Display
         m.add_layer_control()
         m.to_streamlit(height=700)
+
 
 
 
