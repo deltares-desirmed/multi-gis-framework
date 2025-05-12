@@ -10,7 +10,7 @@ st.sidebar.info(
     """
 )
 
-st.title("Marker Cluster")
+st.title("Landscape Characters")
 
 with st.expander("See source code"):
     with st.echo():
