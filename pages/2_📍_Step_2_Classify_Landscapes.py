@@ -45,28 +45,34 @@ for system_name, filename in community_files.items():
         fg = folium.FeatureGroup(name=system_name, show=False)
         marker_cluster = MarkerCluster().add_to(fg)
 
-        # 📍 Plot each feature in the GeoJSON
-        for feature in geojson_data["features"]:
-            coords = feature["geometry"]["coordinates"]
-            lon, lat = coords[:2]  # Assuming Point Geometry
+        # 📍 Plot each feature in the GeoJSON safely
+        for feature in geojson_data.get("features", []):
+            geometry = feature.get("geometry")
+            if geometry and geometry.get("type") == "Point":
+                coords = geometry.get("coordinates")
+                if coords and len(coords) >= 2:
+                    lon, lat = coords[:2]  # GeoJSON always uses [lon, lat]
 
-            props = feature.get("properties", {})
-            name = props.get('hospital_name') or props.get('site_name') or 'N/A'
+                    props = feature.get("properties", {})
+                    name = props.get('hospital_name') or props.get('site_name') or 'N/A'
 
-            popup_info = f"""
-            <b>{system_name}</b><br>
-            Name: {name}<br>
-            Address: {props.get('address', 'N/A')}<br>
-            City: {props.get('city', 'N/A')}<br>
-            Capacity (Beds): {props.get('cap_beds', 'N/A')}<br>
-            Type: {props.get('facility_type', 'N/A')}
-            """
+                    popup_info = f"""
+                    <b>{system_name}</b><br>
+                    Name: {name}<br>
+                    Address: {props.get('address', 'N/A')}<br>
+                    City: {props.get('city', 'N/A')}<br>
+                    Capacity (Beds): {props.get('cap_beds', 'N/A')}<br>
+                    Type: {props.get('facility_type', 'N/A')}
+                    """
 
-            folium.Marker(
-                location=[lat, lon],  # GeoJSON uses [lon, lat]
-                popup=folium.Popup(popup_info, max_width=300),
-                icon=folium.Icon(color="blue", icon="info-sign"),
-            ).add_to(marker_cluster)
+                    folium.Marker(
+                        location=[lat, lon],
+                        popup=folium.Popup(popup_info, max_width=300),
+                        icon=folium.Icon(color="blue", icon="info-sign"),
+                    ).add_to(marker_cluster)
+            else:
+                # Optionally log skipped invalid or missing geometries if needed
+                continue
 
         m.add_child(fg)
 
@@ -76,6 +82,7 @@ for system_name, filename in community_files.items():
 # 🧩 Add Layer Control and Display Map
 m.add_layer_control()
 m.to_streamlit(height=700)
+
 
 
 
