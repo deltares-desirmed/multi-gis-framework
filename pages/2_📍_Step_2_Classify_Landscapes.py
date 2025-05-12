@@ -4,6 +4,7 @@ import folium
 import os
 import requests
 from folium.plugins import MarkerCluster
+import re
 
 st.set_page_config(layout="wide")
 
@@ -21,49 +22,44 @@ st.sidebar.info(
 
 st.title("Landscape Characters - Community Systems Explorer")
 
-# ✅ GitHub Raw Base URL for GeoJSON Files
+# ✅ GitHub Raw Base URL
 github_base_url = "https://raw.githubusercontent.com/deltares-desirmed/multi-gis-framework/main/database/"
 
-# 📚 Community Systems Files (Use GeoJSON Where Available)
-community_files = {
-    "Hospitals": "EU_healthservices.geojson",
-    # Add other converted files here, e.g., "Schools": "EU_education.geojson"
-}
+# 📚 List all GeoJSON files dynamically (Hardcoded here, but can be automated via GitHub API)
+geojson_files = ["EU_healthservices.geojson", "EU_education.geojson"]  # Add new files here or automate!
 
 # 🌍 Create Map Centered on Europe
 m = leafmap.Map(center=[50, 10], zoom=5)
 
-# 📥 Load and Add Community Systems Layers from GeoJSON
-for system_name, filename in community_files.items():
+# 📥 Load and Add Community Systems Layers Dynamically
+for filename in geojson_files:
+    system_name = re.sub(r'[_\.]', ' ', os.path.splitext(filename)[0]).title()  # Clean Layer Name
     geojson_url = os.path.join(github_base_url, filename)
+
     try:
         response = requests.get(geojson_url)
         response.raise_for_status()
         geojson_data = response.json()
 
-        # ✅ Create a Feature Group and Marker Cluster
         fg = folium.FeatureGroup(name=system_name, show=False)
         marker_cluster = MarkerCluster().add_to(fg)
 
-        # 📍 Plot each feature in the GeoJSON safely
         for feature in geojson_data.get("features", []):
             geometry = feature.get("geometry")
             if geometry and geometry.get("type") == "Point":
                 coords = geometry.get("coordinates")
                 if coords and len(coords) >= 2:
-                    lon, lat = coords[:2]  # GeoJSON always uses [lon, lat]
-
+                    lon, lat = coords[:2]
                     props = feature.get("properties", {})
-                    name = props.get('hospital_name') or props.get('site_name') or 'N/A'
 
-                    popup_info = f"""
-                    <b>{system_name}</b><br>
-                    Name: {name}<br>
-                    Address: {props.get('address', 'N/A')}<br>
-                    City: {props.get('city', 'N/A')}<br>
-                    Capacity (Beds): {props.get('cap_beds', 'N/A')}<br>
-                    Type: {props.get('facility_type', 'N/A')}
-                    """
+                    # 🧩 Dynamically build the popup content
+                    popup_lines = [f"<b>{system_name}</b><br>"]
+                    for key, value in props.items():
+                        if pd.notna(value) and value != '':
+                            # Format attribute key nicely: cap_beds → Capacity (Beds)
+                            key_clean = re.sub(r'[_\-]', ' ', key).title()
+                            popup_lines.append(f"{key_clean}: {value}<br>")
+                    popup_info = "".join(popup_lines)
 
                     folium.Marker(
                         location=[lat, lon],
@@ -71,7 +67,6 @@ for system_name, filename in community_files.items():
                         icon=folium.Icon(color="blue", icon="info-sign"),
                     ).add_to(marker_cluster)
             else:
-                # Optionally log skipped invalid or missing geometries if needed
                 continue
 
         m.add_child(fg)
@@ -82,6 +77,7 @@ for system_name, filename in community_files.items():
 # 🧩 Add Layer Control and Display Map
 m.add_layer_control()
 m.to_streamlit(height=700)
+
 
 
 
