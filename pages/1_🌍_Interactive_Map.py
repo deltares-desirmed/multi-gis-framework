@@ -10,10 +10,10 @@ st.sidebar.info(
     """
 )
 
-st.sidebar.title("About")
-st.sidebar.info(markdown)
-logo = "https://i.imgur.com/UbOXYAU.png"
-st.sidebar.image(logo)
+# st.sidebar.title("About")
+# st.sidebar.info(markdown)
+# logo = "https://i.imgur.com/UbOXYAU.png"
+# st.sidebar.image(logo)
 
 
 st.title("Interactive Map")

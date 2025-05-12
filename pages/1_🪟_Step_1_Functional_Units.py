@@ -61,7 +61,9 @@ with st.expander("See source code"):
         # 🗺️ Add CORINE Layer to Map
         m.add_ee_tile_layer(corine, vis_params, "CORINE Land Cover 2018")
 
-        # 📚 Create Custom HTML Legend
+        # 📚 Create the Legend as a Feature Group (Toggleable Layer)
+        legend_group = folium.FeatureGroup(name="Legend", show=False)  # Default OFF
+
         legend_html = """
         <div style="
             position: fixed; 
@@ -75,6 +77,15 @@ with st.expander("See source code"):
         <b>CORINE Land Cover 2018</b><br>
         <hr>
         """
+
+        for label, color in zip(labels, colors):
+            legend_html += f'<i style="background:{color};width:10px;height:10px;float:left;margin-right:8px;"></i>{label}<br>'
+
+        legend_html += "</div>"
+
+        legend_group.add_child(folium.Element(legend_html))
+        m.add_child(legend_group)
+
 
         labels = [
             "Continuous urban fabric", "Discontinuous urban fabric", "Industrial/Commercial units",
