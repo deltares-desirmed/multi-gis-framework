@@ -18,7 +18,7 @@ st.sidebar.info(
     """
 )
 
-st.title("CORINE Land Cover 2018 Visualization via Google Earth Engine")
+st.title("Function Units")
 
 # ✅ Register Custom Method to Add EE Tile Layers
 def add_ee_tile_layer(self, ee_image_object, vis_params, name):
