@@ -10,17 +10,10 @@ def ee_authenticate(token_name="EARTHENGINE_TOKEN"):
     geemap.ee_initialize(token_name=token_name)
 
 
+st.sidebar.title("Info")
 st.sidebar.info(
     """
-    - Web App URL: <https://streamlit.gishub.org>
-    - GitHub repository: <https://github.com/giswqs/streamlit-geospatial>
-    """
-)
-
-st.sidebar.title("Contact")
-st.sidebar.info(
-    """
-    Deltares at [wetlands.io](https://wetlands.io) | [GitHub](https://github.com/giswqs) | [Twitter](https://twitter.com/giswqs) | [YouTube](https://youtube.com/@giswqs) | [LinkedIn](https://www.linkedin.com/in/giswqs)
+    Deltares at [NbS Knowledge Hub](https://nbs-tutorials-and-tips) | [GitHub](https://github.com/deltares-desirmed) | [Twitter](https://twitter.com/deltares) | [YouTube](https://youtube.com/@deltares) | [LinkedIn](https://www.linkedin.com/in/deltares)
     """
 )
 
