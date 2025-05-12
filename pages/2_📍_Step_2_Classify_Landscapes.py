@@ -5,6 +5,7 @@ import os
 import requests
 from folium.plugins import MarkerCluster
 import re
+import pandas as pd
 
 st.set_page_config(layout="wide")
 
