@@ -40,18 +40,21 @@ with st.expander("See source code"):
 
         # Visualization Parameters
         vis_params = {
-            "bands": ["landcover"],
-            "min": 1,
-            "max": 44,
+            "bands": ["landcover"],  # Correct band name confirmed
+            "min": 111,
+            "max": 523,
             "palette": [
-                "#ffff64", "#ffff64", "#ffff64", "#ffff64", "#009900", "#009900", "#009900",
-                "#009900", "#006400", "#006400", "#006400", "#00ff00", "#00ff00", "#00ff00",
-                "#00ff00", "#00a000", "#00a000", "#00a000", "#dcdcdc", "#c8c8c8", "#ff0000",
-                "#ff0000", "#ff0000", "#e97419", "#e97419", "#e97419", "#a00000", "#a00000",
-                "#a00000", "#e5e5e5", "#e5e5e5", "#e5e5e5", "#70a3ba", "#70a3ba", "#70a3ba",
-                "#0000ff", "#0000ff", "#0000ff", "#0000a0", "#0000a0", "#0000a0", "#707070"
+                "#e6004d", "#ff0000", "#cc4df2", "#cc0000", "#e6cccc", "#e6cce6", 
+                "#a600cc", "#a64dcc", "#ff4dff", "#ffa6ff", "#ffe6ff", "#ffffa8", 
+                "#ffff00", "#e6e600", "#e68000", "#f2a64d", "#e6a600", "#e6e64d", 
+                "#ffe6a6", "#ffe64d", "#e6cc4d", "#f2cca6", "#80ff00", "#00a600", 
+                "#4dff00", "#ccf24d", "#a6ff80", "#a6e64d", "#a6f200", "#e6e6e6", 
+                "#cccccc", "#ccffcc", "#000000", "#a6e6cc", "#a6a6ff", "#4d4dff", 
+                "#ccccff", "#e6e6ff", "#a6a6e6", "#00ccf2", "#80f2e6", "#00ffa6", 
+                "#a6ffe6", "#e6f2ff"
             ]
         }
+
 
         # ✅ Correct way: Add EE Tile Layer using the registered method
         m.add_ee_tile_layer(corine, vis_params, "CORINE Land Cover 2018")
