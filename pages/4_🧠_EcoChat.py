@@ -291,7 +291,8 @@ client = OpenAI(
 ) 
 
 
-st.subheader(f'AI - {selected_model}')
+# st.subheader(f'AI - {selected_model}')
+st.subheader(f'Find out about Hazard related Ecosystem Services')
 
 # Set a default model
 if selected_model not in st.session_state:
