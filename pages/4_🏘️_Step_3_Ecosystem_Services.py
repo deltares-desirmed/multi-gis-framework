@@ -17,7 +17,7 @@ st.sidebar.info(
     """
 )
 
-st.title("Global Building Footprints")
+st.title("Biodiversity and Ecosystem Services")
 
 col1, col2 = st.columns([8, 2])
 

@@ -12,7 +12,7 @@ st.sidebar.info(
     """
 )
 
-st.title("Comparing Global Land Cover Maps")
+st.title("Climate Risk Imapct Assessment")
 
 col1, col2 = st.columns([4, 1])
 
