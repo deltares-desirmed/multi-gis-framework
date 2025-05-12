@@ -60,6 +60,37 @@ with st.expander("See source code"):
         m.add_layer_control()
         m.to_streamlit(height=700)
 
+# Add a manual legend for CORINE classes
+m.add_legend(
+    title="CORINE Land Cover 2018",
+    labels=[
+        "Continuous urban fabric", "Discontinuous urban fabric", "Industrial/Commercial units",
+        "Road and rail networks", "Port areas", "Airports", "Mineral extraction sites",
+        "Dump sites", "Construction sites", "Green urban areas", "Sport/leisure facilities",
+        "Non-irrigated arable land", "Permanently irrigated land", "Rice fields",
+        "Vineyards", "Fruit trees and berry plantations", "Olive groves",
+        "Pastures", "Annual crops associated with permanent crops", 
+        "Complex cultivation patterns", "Land principally occupied by agriculture",
+        "Agro-forestry areas", "Broad-leaved forest", "Coniferous forest",
+        "Mixed forest", "Natural grassland", "Moors and heathland",
+        "Sclerophyllous vegetation", "Transitional woodland-shrub",
+        "Beaches, dunes, sands", "Bare rocks", "Sparsely vegetated areas",
+        "Burnt areas", "Glaciers and perpetual snow", "Inland wetlands",
+        "Peat bogs", "Salt marshes", "Salines", "Intertidal flats",
+        "Water courses", "Water bodies", "Coastal lagoons", "Estuaries", "Sea and ocean"
+    ],
+    colors=[
+        "#ff0000", "#e97419", "#a00000", "#ffff64", "#009900", "#006400",
+        "#00ff00", "#00a000", "#dcdcdc", "#c8c8c8", "#ff0000", "#ffff64",
+        "#ffff64", "#009900", "#009900", "#009900", "#009900", "#006400",
+        "#00ff00", "#00ff00", "#00a000", "#00a000", "#dcdcdc", "#c8c8c8",
+        "#ff0000", "#e97419", "#a00000", "#e5e5e5", "#70a3ba", "#0000ff",
+        "#0000a0", "#707070", "#00ff00", "#00a000", "#00ffff", "#00a0a0",
+        "#70a3ba", "#0000ff", "#0000a0", "#70a3ba", "#0000ff", "#0000a0",
+        "#707070"
+    ]
+)
+
 
 # with st.expander("See source code"):
 #     with st.echo():
