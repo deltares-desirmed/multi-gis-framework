@@ -34,21 +34,32 @@ community_files = {
 # 🌍 Create Map Centered on Europe
 m = leafmap.Map(center=[50, 10], zoom=5)
 
+import io
+import requests
+
 # 📥 Load and Add Community Systems Layers with Marker Clustering
 for system_name, filename in community_files.items():
     csv_url = os.path.join(github_base_url, filename)
     try:
-        df = pd.read_csv(csv_url)
+        # 📦 Download CSV using requests and handle large files properly
+        response = requests.get(csv_url)
+        response.raise_for_status()
+
+        # 📖 Try UTF-8 first, fallback to ISO-8859-1 for special European characters
+        try:
+            df = pd.read_csv(io.StringIO(response.text), encoding='utf-8')
+        except UnicodeDecodeError:
+            df = pd.read_csv(io.StringIO(response.text), encoding='ISO-8859-1')
 
         # ✅ Coerce lat/lon to numeric, force NaN if invalid
         df['lat'] = pd.to_numeric(df['lat'], errors='coerce')
         df['lon'] = pd.to_numeric(df['lon'], errors='coerce')
 
-        # ⚠️ Optional sanity check: warn if lat/lon ranges are suspicious
+        # ⚠️ Sanity check for coordinate ranges
         if not df['lat'].between(-90, 90).any() or not df['lon'].between(-180, 180).any():
-            st.warning(f"⚠️ '{system_name}' appears to use non-WGS84 coordinates. You may need to reproject.")
+            st.warning(f"⚠️ '{system_name}' appears to use non-WGS84 coordinates. Consider reprojecting to EPSG:4326.")
 
-        # ✅ Filter valid points
+        # ✅ Filter valid records
         valid_df = df.dropna(subset=['lat', 'lon'])
         skipped = len(df) - len(valid_df)
 
@@ -79,10 +90,10 @@ for system_name, filename in community_files.items():
     except Exception as e:
         st.error(f"❌ Failed to load '{system_name}': {e}")
 
-
 # 🧩 Add Layer Control and Display Map
 m.add_layer_control()
 m.to_streamlit(height=700)
+
 
 
 
