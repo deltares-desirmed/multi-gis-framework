@@ -56,40 +56,60 @@ with st.expander("See source code"):
         # ✅ Correct way: Add EE Tile Layer using the registered method
         m.add_ee_tile_layer(corine, vis_params, "CORINE Land Cover 2018")
 
+
+        legend_html = """
+        <div style="
+            position: fixed; 
+            bottom: 50px; left: 50px; width: 300px; height: 400px; 
+            overflow: auto; 
+            background-color: white; 
+            border:2px solid grey; 
+            z-index:9999; 
+            font-size:14px;
+            padding: 10px;">
+        <b>CORINE Land Cover 2018</b><br>
+        <hr>
+        """
+
+        labels = [
+            "Continuous urban fabric", "Discontinuous urban fabric", "Industrial/Commercial units",
+            "Road and rail networks", "Port areas", "Airports", "Mineral extraction sites",
+            "Dump sites", "Construction sites", "Green urban areas", "Sport/leisure facilities",
+            "Non-irrigated arable land", "Permanently irrigated land", "Rice fields",
+            "Vineyards", "Fruit trees and berry plantations", "Olive groves",
+            "Pastures", "Annual crops with permanent crops", 
+            "Complex cultivation patterns", "Agriculture + natural areas",
+            "Agro-forestry areas", "Broad-leaved forest", "Coniferous forest",
+            "Mixed forest", "Natural grassland", "Moors and heathland",
+            "Sclerophyllous vegetation", "Transitional woodland-shrub",
+            "Beaches, dunes, sands", "Bare rocks", "Sparsely vegetated areas",
+            "Burnt areas", "Glaciers and perpetual snow", "Inland wetlands",
+            "Peat bogs", "Salt marshes", "Salines", "Intertidal flats",
+            "Water courses", "Water bodies", "Coastal lagoons", "Estuaries", "Sea and ocean"
+        ]
+
+        colors = [
+            "#ff0000", "#e97419", "#a00000", "#ffff64", "#009900", "#006400",
+            "#00ff00", "#00a000", "#dcdcdc", "#c8c8c8", "#ff0000", "#ffff64",
+            "#ffff64", "#009900", "#009900", "#009900", "#009900", "#006400",
+            "#00ff00", "#00ff00", "#00a000", "#00a000", "#dcdcdc", "#c8c8c8",
+            "#ff0000", "#e97419", "#a00000", "#e5e5e5", "#70a3ba", "#0000ff",
+            "#0000a0", "#707070", "#00ff00", "#00a000", "#00ffff", "#00a0a0",
+            "#70a3ba", "#0000ff", "#0000a0", "#70a3ba", "#0000ff", "#0000a0",
+            "#707070"
+        ]
+
+        for label, color in zip(labels, colors):
+            legend_html += f'<i style="background:{color};width:10px;height:10px;float:left;margin-right:8px;"></i>{label}<br>'
+
+        legend_html += "</div>"
+
+        m.get_root().html.add_child(folium.Element(legend_html))
+
         # Add Layer Control and Display Map
         m.add_layer_control()
         m.to_streamlit(height=700)
 
-# Add a manual legend for CORINE classes
-m.add_legend(
-    title="CORINE Land Cover 2018",
-    labels=[
-        "Continuous urban fabric", "Discontinuous urban fabric", "Industrial/Commercial units",
-        "Road and rail networks", "Port areas", "Airports", "Mineral extraction sites",
-        "Dump sites", "Construction sites", "Green urban areas", "Sport/leisure facilities",
-        "Non-irrigated arable land", "Permanently irrigated land", "Rice fields",
-        "Vineyards", "Fruit trees and berry plantations", "Olive groves",
-        "Pastures", "Annual crops associated with permanent crops", 
-        "Complex cultivation patterns", "Land principally occupied by agriculture",
-        "Agro-forestry areas", "Broad-leaved forest", "Coniferous forest",
-        "Mixed forest", "Natural grassland", "Moors and heathland",
-        "Sclerophyllous vegetation", "Transitional woodland-shrub",
-        "Beaches, dunes, sands", "Bare rocks", "Sparsely vegetated areas",
-        "Burnt areas", "Glaciers and perpetual snow", "Inland wetlands",
-        "Peat bogs", "Salt marshes", "Salines", "Intertidal flats",
-        "Water courses", "Water bodies", "Coastal lagoons", "Estuaries", "Sea and ocean"
-    ],
-    colors=[
-        "#ff0000", "#e97419", "#a00000", "#ffff64", "#009900", "#006400",
-        "#00ff00", "#00a000", "#dcdcdc", "#c8c8c8", "#ff0000", "#ffff64",
-        "#ffff64", "#009900", "#009900", "#009900", "#009900", "#006400",
-        "#00ff00", "#00ff00", "#00a000", "#00a000", "#dcdcdc", "#c8c8c8",
-        "#ff0000", "#e97419", "#a00000", "#e5e5e5", "#70a3ba", "#0000ff",
-        "#0000a0", "#707070", "#00ff00", "#00a000", "#00ffff", "#00a0a0",
-        "#70a3ba", "#0000ff", "#0000a0", "#70a3ba", "#0000ff", "#0000a0",
-        "#707070"
-    ]
-)
 
 
 # with st.expander("See source code"):
