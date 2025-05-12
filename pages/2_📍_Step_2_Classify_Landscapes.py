@@ -30,7 +30,7 @@ github_base_url = "https://raw.githubusercontent.com/deltares-desirmed/multi-gis
 geojson_files = ["EU_healthservices.geojson", "EU_education.geojson"]  # Add new files here or automate!
 
 # 🌍 Create Map Centered on Europe
-m = leafmap.Map(center=[50, 10], zoom=5)
+m = leafmap.Map(center=[50, 10], zoom=5) 
 
 # 📥 Load and Add Community Systems Layers Dynamically
 for filename in geojson_files:
