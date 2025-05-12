@@ -2,11 +2,10 @@ import streamlit as st
 import ee
 import leafmap.foliumap as leafmap
 import folium
-from utils_ee import initialize_earth_engine  # ✅ Import GEE Authentication Function
-
-st.set_page_config(layout="wide")
+from utils_ee import initialize_earth_engine
 
 # ✅ Initialize Earth Engine Using Cloud Secrets
+st.set_page_config(layout="wide")
 initialize_earth_engine()
 
 # Streamlit Sidebar
@@ -35,13 +34,10 @@ folium.Map.add_ee_tile_layer = add_ee_tile_layer
 
 with st.expander("See source code"):
     with st.echo():
-        # 🌍 Initialize Map Centered on Europe
         m = leafmap.Map(center=[50, 10], zoom=5)
 
-        # 📥 Load CORINE Land Cover 2018 Data from GEE
         corine = ee.Image("COPERNICUS/CORINE/V20/100m/2018")
 
-        # 🎨 Visualization Parameters
         vis_params = {
             "bands": ["landcover"],
             "min": 111,
@@ -58,7 +54,6 @@ with st.expander("See source code"):
             ]
         }
 
-        # 🗺️ Add CORINE Layer to Map
         m.add_ee_tile_layer(corine, vis_params, "CORINE Land Cover 2018")
 
         # 📚 Create Legend HTML Content
@@ -89,7 +84,7 @@ with st.expander("See source code"):
         ]
 
         legend_html = """
-        <div style="
+        <div id="map-legend" style="
             position: fixed; 
             bottom: 50px; left: 50px; width: 300px; height: 400px; 
             overflow: auto; 
@@ -97,7 +92,8 @@ with st.expander("See source code"):
             border:2px solid grey; 
             z-index:9999; 
             font-size:14px;
-            padding: 10px;">
+            padding: 10px;
+            display: none;">
         <b>CORINE Land Cover 2018</b><br>
         <hr>
         """
@@ -107,14 +103,40 @@ with st.expander("See source code"):
 
         legend_html += "</div>"
 
-        # ✅ Create a FeatureGroup for the Legend, so it can be toggled
-        legend_group = folium.FeatureGroup(name="Legend", show=False)
-        legend_group.add_child(folium.Element(legend_html))
-        m.add_child(legend_group)
+        # Inject Legend HTML
+        m.get_root().html.add_child(folium.Element(legend_html))
 
-        # 🧩 Finalize Map Controls and Display
+        # Inject JavaScript to Control Legend Visibility via Layer Control
+        js_toggle = """
+        <script>
+        var legend = document.getElementById('map-legend');
+        var checkExist = setInterval(function() {
+            var layers = document.querySelectorAll('.leaflet-control-layers-selector');
+            layers.forEach(function(layer) {
+                if (layer.nextSibling && layer.nextSibling.textContent.includes('Legend')) {
+                    layer.addEventListener('change', function() {
+                        if (layer.checked) {
+                            legend.style.display = 'block';
+                        } else {
+                            legend.style.display = 'none';
+                        }
+                    });
+                }
+            });
+            if (layers.length > 0) clearInterval(checkExist);
+        }, 500);
+        </script>
+        """
+        m.get_root().html.add_child(folium.Element(js_toggle))
+
+        # Add Legend as a Dummy Layer to Appear in the Layer Control
+        legend_layer = folium.FeatureGroup(name="Legend", show=False)
+        m.add_child(legend_layer)
+
+        # Finalize Map Display
         m.add_layer_control()
         m.to_streamlit(height=700)
+
 
 
 
