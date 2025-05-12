@@ -361,7 +361,7 @@ if prompt := st.chat_input(f"Hi, ask me a question about ecosystem services "):
                         \n\
                         \n Try again later. \
                         \n\
-                        \n Here's a random pic of a 🐶:"
+                        \n Sorry about that!"
                 st.write(response)
                 random_dog_pick = 'https://random.dog/'+ random_dog[np.random.randint(len(random_dog))]
                 st.image(random_dog_pick)
