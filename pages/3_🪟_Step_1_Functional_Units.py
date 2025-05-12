@@ -35,8 +35,8 @@ with st.expander("See source code"):
         # Create the Map centered on Europe
         m = leafmap.Map(center=[50, 10], zoom=5)
 
-        # Load CORINE Land Cover 2018 Image
-        corine = ee.ImageCollection("COPERNICUS/CORINE/V20/100m/2018").first()
+        # ✅ Correct: Load CORINE Land Cover 2018 as ee.Image, NOT ImageCollection
+        corine = ee.Image("COPERNICUS/CORINE/V20/100m/2018")
 
         # Visualization Parameters
         vis_params = {
