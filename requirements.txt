@@ -15,8 +15,8 @@ openpyxl
 psycopg2-binary
 pandas
 numpy
-keplergl
-leafmap[maplibre]==0.25.0
+# keplergl
+# leafmap[maplibre]==0.25.0
 # maplibre==1.0.2
 
 
