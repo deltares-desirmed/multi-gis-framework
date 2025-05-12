@@ -19,7 +19,7 @@ st.sidebar.info(
     """
 )
 
-st.title("Landscape Characters)
+st.title("Landscape Characters")
 
 # ✅ GitHub Raw Base URL for CSV Files
 github_base_url = "https://raw.githubusercontent.com/deltares-desirmed/multi-gis-framework/main/database/"
