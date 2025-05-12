@@ -2,11 +2,12 @@ import streamlit as st
 import leafmap.foliumap as leafmap
 import pandas as pd
 import folium
-import requests
 import os
+from folium.plugins import MarkerCluster
 
 st.set_page_config(layout="wide")
 
+# 📌 Sidebar Info
 st.sidebar.title("Info")
 st.sidebar.info(
     """
@@ -23,60 +24,66 @@ st.title("Landscape Characters")
 # ✅ GitHub Raw Base URL for CSV Files
 github_base_url = "https://raw.githubusercontent.com/deltares-desirmed/multi-gis-framework/main/database/"
 
-# 📚 List of Community Systems CSV Files (Add as Needed)
+# 📚 Community Systems CSV Files
 community_files = {
     "Hospitals": "EU_healthservices.csv",
     "Schools": "EU_education.csv",
-    # Add more categories and files as they become available
+    # Add more datasets as needed
 }
 
-# ✅ Create Map Centered on Europe (Adjust Center as Needed)
+# 🌍 Create Map Centered on Europe
 m = leafmap.Map(center=[50, 10], zoom=5)
 
-# 📥 Load and Add Community Systems Layers
+# 📥 Load and Add Community Systems Layers with Marker Clustering
 for system_name, filename in community_files.items():
     csv_url = os.path.join(github_base_url, filename)
     try:
-        # Load CSV Data
         df = pd.read_csv(csv_url)
 
-        if 'lat' in df.columns and 'lon' in df.columns:
-            # 🚨 Remove rows without valid lat/lon
-            valid_df = df.dropna(subset=['lat', 'lon'])
-            skipped = len(df) - len(valid_df)
+        # ✅ Coerce lat/lon to numeric, force NaN if invalid
+        df['lat'] = pd.to_numeric(df['lat'], errors='coerce')
+        df['lon'] = pd.to_numeric(df['lon'], errors='coerce')
 
-            # ✅ Create a Feature Group for Each System Type
-            fg = folium.FeatureGroup(name=system_name, show=False)
+        # ⚠️ Optional sanity check: warn if lat/lon ranges are suspicious
+        if not df['lat'].between(-90, 90).any() or not df['lon'].between(-180, 180).any():
+            st.warning(f"⚠️ '{system_name}' appears to use non-WGS84 coordinates. You may need to reproject.")
 
-            for _, row in valid_df.iterrows():
-                # Dynamically handle both hospital_name and site_name columns
-                name = row.get('hospital_name') or row.get('site_name') or 'N/A'
-                
-                popup_info = f"""
-                <b>{system_name}</b><br>
-                Name: {name}<br>
-                Address: {row.get('address', 'N/A')}<br>
-                City: {row.get('city', 'N/A')}<br>
-                Capacity (Beds): {row.get('cap_beds', 'N/A')}<br>
-                Type: {row.get('facility_type', 'N/A')}
-                """
+        # ✅ Filter valid points
+        valid_df = df.dropna(subset=['lat', 'lon'])
+        skipped = len(df) - len(valid_df)
 
-                folium.Marker(
-                    location=[row['lat'], row['lon']],
-                    popup=folium.Popup(popup_info, max_width=300),
-                    icon=folium.Icon(color="blue", icon="info-sign"),
-                ).add_to(fg)
+        fg = folium.FeatureGroup(name=system_name, show=False)
+        marker_cluster = MarkerCluster().add_to(fg)
 
-            m.add_child(fg)
+        for _, row in valid_df.iterrows():
+            name = row.get('hospital_name') or row.get('site_name') or 'N/A'
+            popup_info = f"""
+            <b>{system_name}</b><br>
+            Name: {name}<br>
+            Address: {row.get('address', 'N/A')}<br>
+            City: {row.get('city', 'N/A')}<br>
+            Capacity (Beds): {row.get('cap_beds', 'N/A')}<br>
+            Type: {row.get('facility_type', 'N/A')}
+            """
+            folium.Marker(
+                location=[row['lat'], row['lon']],
+                popup=folium.Popup(popup_info, max_width=300),
+                icon=folium.Icon(color="blue", icon="info-sign"),
+            ).add_to(marker_cluster)
 
-            if skipped > 0:
-                st.info(f"⚠️ {skipped} records without valid location skipped in '{system_name}' dataset.")
+        m.add_child(fg)
 
-        else:
-            st.warning(f"⚠️ '{system_name}' dataset missing required 'lat' and 'lon' columns.")
+        if skipped > 0:
+            st.info(f"⚠️ {skipped} records without valid location skipped in '{system_name}' dataset.")
 
     except Exception as e:
         st.error(f"❌ Failed to load '{system_name}': {e}")
+
+
+# 🧩 Add Layer Control and Display Map
+m.add_layer_control()
+m.to_streamlit(height=700)
+
 
 
 # 🌍 Add Base Layers (Optional)
