@@ -91,6 +91,3 @@ m.to_streamlit(height=700)
 # regions = "https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/us_regions.geojson"
 # m.add_geojson(regions, layer_name="US Regions")
 
-# 🧩 Add Layer Control and Display Map
-m.add_layer_control()
-m.to_streamlit(height=700)
