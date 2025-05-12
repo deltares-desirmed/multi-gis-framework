@@ -39,10 +39,10 @@ with st.expander("See source code"):
             ]
         }
 
-        # Add the CORINE Layer to the Map
-        m.add_ee_layer(corine, vis_params, "CORINE Land Cover 2018")
+        # ✅ Correct method for adding EE Images
+        m.addLayer(corine, vis_params, "CORINE Land Cover 2018")
 
-        # Add Layer Control and Legend (you can customize this legend if you want)
+        # Add Layer Control and Render Map
         m.add_layer_control()
         m.to_streamlit(height=700)
 
