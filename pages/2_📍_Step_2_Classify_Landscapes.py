@@ -25,8 +25,8 @@ github_base_url = "https://raw.githubusercontent.com/deltares-desirmed/multi-gis
 
 # 📚 List of Community Systems CSV Files (Add as Needed)
 community_files = {
-    "Hospitals": "hospital_data.csv",
-    "Schools": "education_facilities.csv",
+    "Hospitals": "EU_healthservices.csv",
+    "Schools": "EU_education.csv",
     # Add more categories and files as they become available
 }
 
