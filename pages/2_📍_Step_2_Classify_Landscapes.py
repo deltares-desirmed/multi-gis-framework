@@ -21,7 +21,7 @@ st.sidebar.info(
     """
 )
 
-st.title("Landscape Characters - Community Systems Explorer")
+st.title("Landscape Characters - 3-domain")
 
 # ✅ GitHub Raw Base URL
 github_base_url = "https://raw.githubusercontent.com/deltares-desirmed/multi-gis-framework/main/database/"
