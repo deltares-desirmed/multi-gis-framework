@@ -4,11 +4,12 @@ import leafmap.foliumap as leafmap
 import folium
 from utils_ee import initialize_earth_engine  # ✅ Import GEE Authentication Function
 
+st.set_page_config(layout="wide")
 # ✅ Initialize Earth Engine Using Cloud Secrets
 initialize_earth_engine()
 
 # Streamlit App Config
-st.set_page_config(layout="wide")
+
 st.sidebar.title("Info")
 st.sidebar.info(
     """
