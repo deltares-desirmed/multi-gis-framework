@@ -154,6 +154,10 @@ m.to_streamlit(height=700)
 #         m.add_legend(title="ESA Land Cover", builtin_legend="ESA_WorldCover")
 # m.to_streamlit(height=700)
 
+import streamlit as st
+import datetime
+from zoneinfo import ZoneInfo  # Requires Python 3.9+
+
 logo = "https://www.informatiehuismarien.nl/publish/pages/113886/deltares-logo.jpg"
 st.sidebar.image(logo)
 
