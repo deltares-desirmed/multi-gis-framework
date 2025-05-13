@@ -27,7 +27,7 @@ st.title("Landscape Characters - 3-domain")
 github_base_url = "https://raw.githubusercontent.com/deltares-desirmed/multi-gis-framework/main/database/"
 
 # 📚 List all GeoJSON files dynamically (Hardcoded here, but can be automated via GitHub API)
-geojson_files = ["EU_education2"]  # Add some new files here or automate!
+geojson_files = ["EU_education2_FeaturesToJSON"]  # Add some new files here or automate!
 
 # 🌍 Create Map Centered on Europe
 m = leafmap.Map(center=[50, 10], zoom=5) 
