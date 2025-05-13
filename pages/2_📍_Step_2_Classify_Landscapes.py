@@ -82,7 +82,35 @@ m.to_streamlit(height=700)
 
 
 
+logo = "https://www.informatiehuismarien.nl/publish/pages/113886/deltares-logo.jpg"
+st.sidebar.image(logo)
 
+# Custom CSS to hide GitHub icon and other elements
+# hide_github_icon = """
+#     <style>
+#         .css-1jc7ptx, .e1ewe7hr3, .viewerBadge_container__1QSob, 
+#         .styles_viewerBadge__1yB5_, .viewerBadge_link__1S137, 
+#         .viewerBadge_text__1JaDK { display: none; } 
+#         #MainMenu { visibility: hidden; } 
+#         footer { visibility: hidden; } 
+#         header { visibility: hidden; }
+#     </style>
+# """
+# st.markdown(hide_github_icon, unsafe_allow_html=True)
+
+# Amsterdam time
+amsterdam_time = datetime.datetime.now(ZoneInfo("Europe/Amsterdam"))
+
+# Footer content
+current_year = amsterdam_time.year
+st.sidebar.markdown(f"© {current_year}  Stichting Deltares")
+
+# Display date and time in Amsterdam timezone
+last_updated = amsterdam_time.strftime("%B %d, %Y")
+current_time = amsterdam_time.strftime("%H:%M:%S")
+
+st.sidebar.markdown(f"**Last Updated:** {last_updated} | {current_time}")
+# st.sidebar.markdown(f"**Local Time (Amsterdam):** {current_time}")
 
 # 🌍 Add Base Layers (Optional)
 # regions = "https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/us_regions.geojson"
