@@ -1,13 +1,11 @@
-import os
-import re
-import requests
-import pandas as pd
-import geopandas as gpd
-import folium
-from folium.plugins import MarkerCluster
-import leafmap.foliumap as leafmap
 import streamlit as st
-from io import BytesIO
+import leafmap.foliumap as leafmap
+import folium
+import os
+import requests
+from folium.plugins import MarkerCluster
+import re
+import pandas as pd
 
 st.set_page_config(layout="wide")
 
@@ -25,41 +23,24 @@ st.sidebar.info(
 
 st.title("Landscape Characters - 3-domain")
 
-
-
-# GitHub raw base URL
+# ✅ GitHub Raw Base URL
 github_base_url = "https://raw.githubusercontent.com/deltares-desirmed/multi-gis-framework/main/database/"
 
-# List of datasets hosted on GitHub (geojson or feather)
-layer_files = [
-    "EU_education.feather",
-    "EU_healthservices.geojson"
-    
-]
+# 📚 List all GeoJSON files dynamically (Hardcoded here, but can be automated via GitHub API)
+geojson_files = ["EU_healthservices", "EU_education_part1", "EU_education_part2", "EU_education_part3", "EU_education_part4"]  # Add some new files here or automate!
 
-# Create map centered on Europe
-m = leafmap.Map(center=[50, 10], zoom=5)
+# 🌍 Create Map Centered on Europe
+m = leafmap.Map(center=[50, 10], zoom=5) 
 
-# Load each layer from GitHub
-for filename in layer_files:
-    system_name = re.sub(r'[_\.]', ' ', os.path.splitext(filename)[0]).title()
-    url = github_base_url + filename
+# 📥 Load and Add Community Systems Layers Dynamically
+for filename in geojson_files:
+    system_name = re.sub(r'[_\.]', ' ', os.path.splitext(filename)[0]).title()  # Clean Layer Name
+    geojson_url = os.path.join(github_base_url, filename)
 
     try:
-        response = requests.get(url)
+        response = requests.get(geojson_url)
         response.raise_for_status()
-
-        if filename.endswith(".geojson"):
-            gdf = gpd.GeoDataFrame.from_features(response.json()["features"])
-
-        elif filename.endswith(".feather"):
-            gdf = gpd.read_feather(BytesIO(response.content))
-
-        else:
-            continue  # skip unsupported files
-
-        # Convert to __geo_interface__ to allow folium rendering
-        geojson_data = gdf.__geo_interface__
+        geojson_data = response.json()
 
         fg = folium.FeatureGroup(name=system_name, show=True)
         marker_cluster = MarkerCluster().add_to(fg)
@@ -72,9 +53,11 @@ for filename in layer_files:
                     lon, lat = coords[:2]
                     props = feature.get("properties", {})
 
+                    # 🧩 Dynamically build the popup content
                     popup_lines = [f"<b>{system_name}</b><br>"]
                     for key, value in props.items():
                         if pd.notna(value) and value != '':
+                            # Format attribute key nicely: cap_beds → Capacity (Beds)
                             key_clean = re.sub(r'[_\-]', ' ', key).title()
                             popup_lines.append(f"{key_clean}: {value}<br>")
                     popup_info = "".join(popup_lines)
@@ -84,16 +67,17 @@ for filename in layer_files:
                         popup=folium.Popup(popup_info, max_width=300),
                         icon=folium.Icon(color="blue", icon="info-sign"),
                     ).add_to(marker_cluster)
+            else:
+                continue
 
         m.add_child(fg)
 
     except Exception as e:
-        st.error(f"Failed to load '{system_name}': {e}")
+        st.error(f"❌ Failed to load '{system_name}': {e}")
 
-# Add layer controls and display
+# 🧩 Add Layer Control and Display Map
 m.add_layer_control()
 m.to_streamlit(height=700)
-
 
 
 
