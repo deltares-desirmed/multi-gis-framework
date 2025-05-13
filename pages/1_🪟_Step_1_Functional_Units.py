@@ -32,8 +32,8 @@ def add_ee_tile_layer(self, ee_image_object, vis_params, name):
 
 folium.Map.add_ee_tile_layer = add_ee_tile_layer
 
-# with st.expander("See source code"):
-with st.echo():
+with st.expander("See source code"):
+    with st.echo():
         m = leafmap.Map(center=[50, 10], zoom=5)
 
         corine = ee.Image("COPERNICUS/CORINE/V20/100m/2018")
