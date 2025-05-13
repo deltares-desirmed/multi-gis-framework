@@ -82,9 +82,12 @@ st.markdown(
 )
 
 
+import streamlit as st
+import datetime
+from zoneinfo import ZoneInfo  # Requires Python 3.9+
+
 logo = "https://www.informatiehuismarien.nl/publish/pages/113886/deltares-logo.jpg"
 st.sidebar.image(logo)
-
 
 # Custom CSS to hide GitHub icon and other elements
 hide_github_icon = """
@@ -99,9 +102,17 @@ hide_github_icon = """
 """
 st.markdown(hide_github_icon, unsafe_allow_html=True)
 
+# Amsterdam time
+amsterdam_time = datetime.datetime.now(ZoneInfo("Europe/Amsterdam"))
 
-import datetime
-current_year = datetime.datetime.now().year
+# Footer content
+current_year = amsterdam_time.year
 st.sidebar.markdown(f"© {current_year}  Stichting Deltares")
-last_updated = datetime.datetime.now().strftime("%B %d, %Y")
+
+# Display date and time in Amsterdam timezone
+last_updated = amsterdam_time.strftime("%B %d, %Y")
+current_time = amsterdam_time.strftime("%H:%M:%S")
+
 st.sidebar.markdown(f"**Last Updated:** {last_updated}")
+st.sidebar.markdown(f"**Local Time (Amsterdam):** {current_time}")
+
