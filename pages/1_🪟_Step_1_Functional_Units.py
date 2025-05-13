@@ -4,10 +4,12 @@ import folium
 import leafmap.foliumap as leafmap
 from utils_ee import initialize_earth_engine  #  Auth from secret config
 
+st.set_page_config(layout="wide")
+
 #  Initialize Earth Engine
 initialize_earth_engine()
 
-st.set_page_config(layout="wide")
+
 st.sidebar.title("Info")
 st.sidebar.info(
     """
