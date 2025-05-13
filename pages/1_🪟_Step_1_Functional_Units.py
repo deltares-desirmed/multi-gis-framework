@@ -18,7 +18,7 @@ st.sidebar.info(
     """
 )
 
-st.title("CORINE Land Cover 2018 Visualization via Google Earth Engine")
+st.title("Functional Unit - coRINE 2018")
 
 #  Add EE tile layer registration
 folium.Map.add_ee_tile_layer = lambda self, ee_img, vis_params, name: folium.TileLayer(
