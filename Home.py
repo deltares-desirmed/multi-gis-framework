@@ -16,7 +16,7 @@ st.markdown(
     This platform will support regional partners in advancing their work under the **DesirMED** (Tasks 4.1, 4.2, 4.4) and **NBRACER** (Tasks D5.1, D5.3, D5.5) projects. To fully understand the methodologies applied here, users are encouraged to consult the relevant project deliverables. This platform primarily serves to **visualize and demonstrate the operational frameworks** developed within these tasks.
 
     The platform integrates **on-the-fly web-mapping and decision-support** based on globally recognized datasets. 
-    *Note: The datasets used here are coarser. For region-specific, higher-resolution customised analyses and Pathways, please refer to the dedicated such as [WebGIS](https://github.com/deltares-desirmed), and [QuickScan tool](https://github.com/deltares-desirmed).
+    *Note: The datasets used here are coarser. For region-specific, higher-resolution customised analyses and Pathways, please refer to the dedicated tool such as [WebGIS](https://github.com/deltares-desirmed), and [QuickScan tool](https://github.com/deltares-desirmed).
 
     """
 )
