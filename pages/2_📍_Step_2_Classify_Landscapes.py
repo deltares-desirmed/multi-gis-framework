@@ -1,11 +1,13 @@
-import streamlit as st
-import leafmap.foliumap as leafmap
-import folium
 import os
-import requests
-from folium.plugins import MarkerCluster
 import re
+import requests
 import pandas as pd
+import geopandas as gpd
+import folium
+from folium.plugins import MarkerCluster
+import leafmap.foliumap as leafmap
+import streamlit as st
+from io import BytesIO
 
 st.set_page_config(layout="wide")
 
@@ -23,47 +25,40 @@ st.sidebar.info(
 
 st.title("Landscape Characters - 3-domain")
 
-import os
-import re
-import json
-import requests
-import pandas as pd
-import geopandas as gpd
-import folium
-from folium.plugins import MarkerCluster
-import leafmap.foliumap as leafmap
-import streamlit as st
 
-# GitHub Raw Base URL for GeoJSON files
+
+# GitHub raw base URL
 github_base_url = "https://raw.githubusercontent.com/deltares-desirmed/multi-gis-framework/main/database/"
-local_base_path = "https://raw.githubusercontent.com/deltares-desirmed/multi-gis-framework/main/database/"  # Folder for local .feather files
 
-# Automatically detect available files
-available_files = os.listdir(local_base_path)
-layer_files = [f for f in available_files if f.endswith((".geojson", ".feather"))]
+# List of datasets hosted on GitHub (geojson or feather)
+layer_files = [
+    "EU_education.feather",
+    "EU_healthservices.geojson"
+    
+]
 
-# Create the map
+# Create map centered on Europe
 m = leafmap.Map(center=[50, 10], zoom=5)
 
-# Load and add each community system layer
+# Load each layer from GitHub
 for filename in layer_files:
     system_name = re.sub(r'[_\.]', ' ', os.path.splitext(filename)[0]).title()
+    url = github_base_url + filename
 
     try:
-        if filename.endswith(".feather"):
-            filepath = os.path.join(local_base_path, filename)
-            gdf = gpd.read_feather(filepath)
+        response = requests.get(url)
+        response.raise_for_status()
 
-        elif filename.endswith(".geojson"):
-            geojson_url = os.path.join(github_base_url, filename)
-            response = requests.get(geojson_url)
-            response.raise_for_status()
+        if filename.endswith(".geojson"):
             gdf = gpd.GeoDataFrame.from_features(response.json()["features"])
 
-        else:
-            continue  # Unsupported format
+        elif filename.endswith(".feather"):
+            gdf = gpd.read_feather(BytesIO(response.content))
 
-        # Convert GeoDataFrame to __geo_interface__ for folium
+        else:
+            continue  # skip unsupported files
+
+        # Convert to __geo_interface__ to allow folium rendering
         geojson_data = gdf.__geo_interface__
 
         fg = folium.FeatureGroup(name=system_name, show=True)
@@ -95,9 +90,10 @@ for filename in layer_files:
     except Exception as e:
         st.error(f"Failed to load '{system_name}': {e}")
 
-# Add controls and display
+# Add layer controls and display
 m.add_layer_control()
 m.to_streamlit(height=700)
+
 
 
 
