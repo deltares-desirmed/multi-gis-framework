@@ -4,7 +4,7 @@ import leafmap.foliumap as leafmap
 import folium
 from utils_ee import initialize_earth_engine
 
-# ✅ Initialize Earth Engine Using Cloud Secrets
+#  Initialize Earth Engine Using Cloud Secrets
 st.set_page_config(layout="wide")
 initialize_earth_engine()
 
@@ -17,9 +17,9 @@ st.sidebar.info(
     """
 )
 
-st.title("Functional Units - CORINE Land Cover 2018")
+st.title("Functional Units-cORINE 2018")
 
-# ✅ Register Custom Method to Add EE Tile Layers
+#  Register Custom Method to Add EE Tile Layers
 def add_ee_tile_layer(self, ee_image_object, vis_params, name):
     map_id_dict = ee_image_object.getMapId(vis_params)
     folium.TileLayer(
@@ -32,8 +32,8 @@ def add_ee_tile_layer(self, ee_image_object, vis_params, name):
 
 folium.Map.add_ee_tile_layer = add_ee_tile_layer
 
-with st.expander("See source code"):
-    with st.echo():
+# with st.expander("See source code"):
+with st.echo():
         m = leafmap.Map(center=[50, 10], zoom=5)
 
         corine = ee.Image("COPERNICUS/CORINE/V20/100m/2018")
@@ -56,7 +56,7 @@ with st.expander("See source code"):
 
         m.add_ee_tile_layer(corine, vis_params, "CORINE Land Cover 2018")
 
-        # 📚 Create Legend HTML Content
+        #  Create Legend HTML Content
         labels = [
             "Continuous urban fabric", "Discontinuous urban fabric", "Industrial/Commercial units",
             "Road and rail networks", "Port areas", "Airports", "Mineral extraction sites",
