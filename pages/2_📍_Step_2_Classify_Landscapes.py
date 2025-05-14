@@ -6,6 +6,9 @@ import requests
 from folium.plugins import MarkerCluster
 import re
 import pandas as pd
+from utils_ee import initialize_earth_engine
+from utils_basins import get_european_basins_layer  # Add more as needed
+# from utils_landcover import get_land_cover_layer  # Example for next layer
 
 st.set_page_config(layout="wide")
 
@@ -75,7 +78,38 @@ for filename in geojson_files:
     except Exception as e:
         st.error(f"❌ Failed to load '{system_name}': {e}")
 
-# Add all EE layers to the map
+
+# === Initialize Streamlit ===
+st.set_page_config(layout="wide")
+initialize_earth_engine()
+
+# === Sidebar Info ===
+st.sidebar.title("Info")
+st.sidebar.info("""
+Deltares at [NbS Knowledge Hub](https://nbs-tutorials-and-tips) | 
+[GitHub](https://github.com/deltares-desirmed)
+""")
+
+st.title("Landscape Character Explorer")
+
+# === Create the map ===
+m = leafmap.Map(center=[50, 10], zoom=5)
+
+# ✅ Register EE tile support
+folium.Map.add_ee_tile_layer = lambda self, ee_img, vis_params, name: folium.TileLayer(
+    tiles=ee_img.getMapId(vis_params)["tile_fetcher"].url_format,
+    attr="Google Earth Engine",
+    name=name,
+    overlay=True,
+    control=True
+).add_to(self)
+
+# === Modular Earth Engine Layers ===
+ee_layers = [
+    get_european_basins_layer,
+    # get_land_cover_layer,  # Add future modules here
+]
+
 for get_layer in ee_layers:
     try:
         ee_obj, vis, name = get_layer()
@@ -83,12 +117,7 @@ for get_layer in ee_layers:
     except Exception as e:
         st.warning(f"⚠️ Could not add EE layer '{get_layer.__name__}': {e}")
 
-from utils_basins import get_european_basins_layer
-
-basins_layer = get_european_basins_layer()
-m.add_ee_layer(basins_layer["ee_object"], basins_layer["vis_params"], basins_layer["name"])
-
-# 🧩 Add Layer Control and Display Map
+# === Show Map ===
 m.add_layer_control()
 m.to_streamlit(height=700)
 
