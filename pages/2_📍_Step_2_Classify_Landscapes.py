@@ -109,6 +109,8 @@ folium.Map.add_ee_tile_layer = lambda self, ee_img, vis_params, name: folium.Til
 ).add_to(self)
 
 # === Modular Earth Engine Layers ===
+
+ee_layers = [get_european_basins_layer]
 ee_layers = [
     get_european_basins_layer,
     # get_land_cover_layer,  # Add future modules here
