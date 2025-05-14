@@ -87,7 +87,7 @@ for filename in geojson_files:
 
 
 # === Initialize Streamlit ===
-st.set_page_config(layout="wide")
+
 initialize_earth_engine()
 
 # === Sidebar Info ===
