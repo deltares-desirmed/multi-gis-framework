@@ -79,7 +79,10 @@ for filename in geojson_files:
 m.add_layer_control()
 m.to_streamlit(height=700)
 
+from utils_basins import get_european_basins_layer
 
+basins_layer = get_european_basins_layer()
+m.add_ee_layer(basins_layer["ee_object"], basins_layer["vis_params"], basins_layer["name"])
 
 import streamlit as st
 import datetime
