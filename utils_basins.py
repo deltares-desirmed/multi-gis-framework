@@ -28,6 +28,7 @@ def get_basins():
 
 
     layer_name = "EU River Basins"
+    european_basins = european_basins.limit(5000)
 
 
   # utils_basins.py should return this:
