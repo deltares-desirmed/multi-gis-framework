@@ -9,7 +9,7 @@ import pandas as pd
 import streamlit as st
 import ee
 from utils_ee import initialize_earth_engine
-from utils_basins import get_european_basins_layer
+from utils_basins import get_basins
 
 st.set_page_config(layout="wide")  # ✅ Must be first Streamlit command
 
@@ -113,7 +113,7 @@ folium.Map.add_ee_tile_layer = lambda self, ee_img, vis_params, name: folium.Til
 
 # === Modular Earth Engine Layers ===
 
-ee_layers = [get_european_basins_layer]
+ee_layers = [get_basins]
 # Make sure you're using add_ee_tile_layer, not add_ee_layer
 for get_layer in ee_layers:
     try:

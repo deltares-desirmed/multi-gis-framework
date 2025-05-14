@@ -2,7 +2,7 @@ import ee
 
 # Make sure Earth Engine is initialized elsewhere (e.g., in utils_ee)
 
-def get_european_basins_layer():
+def get_basins():
     """
     Loads HydroSHEDS basins dataset filtered to the European region.
 
