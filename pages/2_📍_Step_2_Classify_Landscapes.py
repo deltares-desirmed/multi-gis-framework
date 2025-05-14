@@ -9,13 +9,11 @@ import pandas as pd
 import streamlit as st
 import ee
 from utils_ee import initialize_earth_engine
-from utils_basins import get_basins
+from utils_basins import get_basins 
 
 st.set_page_config(layout="wide")  # ✅ Must be first Streamlit command
 
-
-
-# from utils_landcover import get_land_cover_layer  # Example for next layer
+initialize_earth_engine()
 
 
 
@@ -88,7 +86,7 @@ for filename in geojson_files:
 
 # === Initialize Streamlit ===
 
-initialize_earth_engine()
+
 
 # === Sidebar Info ===
 st.sidebar.title("Info")
@@ -113,8 +111,8 @@ folium.Map.add_ee_tile_layer = lambda self, ee_img, vis_params, name: folium.Til
 
 # === Modular Earth Engine Layers ===
 
-ee_layers = [get_basins]
-# Make sure you're using add_ee_tile_layer, not add_ee_layer
+ee_layers = [get_basins]  # Add more later e.g., get_land_cover_layer, etc.
+
 for get_layer in ee_layers:
     try:
         ee_obj, vis_params, name = get_layer()
@@ -126,8 +124,6 @@ for get_layer in ee_layers:
     except Exception as e:
         st.warning(f"⚠️ Could not add EE layer '{get_layer.__name__}': {e}")
 
-
-# === Show Map ===
 m.add_layer_control()
 m.to_streamlit(height=700)
 
