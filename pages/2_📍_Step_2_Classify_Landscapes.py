@@ -42,7 +42,7 @@ for filename in geojson_files:
         response.raise_for_status()
         geojson_data = response.json()
 
-        fg = folium.FeatureGroup(name=system_name, show=False)
+        fg = folium.FeatureGroup(name=system_name, show=True)
         marker_cluster = MarkerCluster().add_to(fg)
 
         for feature in geojson_data.get("features", []):
