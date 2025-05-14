@@ -114,17 +114,18 @@ folium.Map.add_ee_tile_layer = lambda self, ee_img, vis_params, name: folium.Til
 # === Modular Earth Engine Layers ===
 
 ee_layers = [get_european_basins_layer]
-ee_layers = [
-    get_european_basins_layer,
-    # get_land_cover_layer,  # Add future modules here
-]
-
+# Make sure you're using add_ee_tile_layer, not add_ee_layer
 for get_layer in ee_layers:
     try:
-        ee_obj, vis, name = get_layer()
-        m.add_ee_tile_layer(ee_obj.style(**vis), {}, name)
+        ee_obj, vis_params, name = get_layer()
+        if isinstance(ee_obj, ee.FeatureCollection):
+            styled_fc = ee_obj.style(**vis_params)
+            m.add_ee_tile_layer(styled_fc, {}, name)
+        else:
+            m.add_ee_tile_layer(ee_obj, vis_params, name)
     except Exception as e:
         st.warning(f"⚠️ Could not add EE layer '{get_layer.__name__}': {e}")
+
 
 # === Show Map ===
 m.add_layer_control()

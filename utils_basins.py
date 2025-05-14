@@ -30,5 +30,7 @@ def get_european_basins_layer():
     layer_name = "EU River Basins"
 
 
-    return european_basins.style(**vis_params), {}, "EU River Basins"
+  # utils_basins.py should return this:
+    return european_basins, {"color": "808080", "width": 1}, "European River Basins"
+
 
