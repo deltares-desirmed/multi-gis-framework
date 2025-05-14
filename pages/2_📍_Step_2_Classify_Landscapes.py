@@ -7,7 +7,7 @@ from folium.plugins import MarkerCluster
 import re
 import pandas as pd
 from utils_ee import initialize_earth_engine
-from utils_basins import get_european_basins_layer  # Add more as needed
+from utils_basins import get_river_basins_layer  # Add more as needed
 # from utils_landcover import get_land_cover_layer  # Example for next layer
 
 st.set_page_config(layout="wide")
