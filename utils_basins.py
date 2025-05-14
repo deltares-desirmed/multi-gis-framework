@@ -31,6 +31,7 @@ def get_basins():
 
 
   # utils_basins.py should return this:
-    return european_basins, {"color": "808080", "width": 1}, "European River Basins"
+    return european_basins, {"color": "808080"}, "River Basins"
+
 
 

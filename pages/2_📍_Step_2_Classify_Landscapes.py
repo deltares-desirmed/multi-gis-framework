@@ -119,6 +119,7 @@ for get_layer in ee_layers:
         if isinstance(ee_obj, ee.FeatureCollection):
             styled_fc = ee_obj.style(**vis_params)
             m.add_ee_tile_layer(styled_fc, {}, name)
+
         else:
             m.add_ee_tile_layer(ee_obj, vis_params, name)
     except Exception as e:
