@@ -6,10 +6,13 @@ import requests
 from folium.plugins import MarkerCluster
 import re
 import pandas as pd
+import streamlit as st
+import ee
 from utils_ee import initialize_earth_engine
 from utils_basins import get_european_basins_layer
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide")  # ✅ Must be first Streamlit command
+
 
 
 # from utils_landcover import get_land_cover_layer  # Example for next layer
@@ -94,7 +97,7 @@ Deltares at [NbS Knowledge Hub](https://nbs-tutorials-and-tips) |
 [GitHub](https://github.com/deltares-desirmed)
 """)
 
-st.title("Landscape Character Explorer")
+
 
 # === Create the map ===
 m = leafmap.Map(center=[50, 10], zoom=5)
