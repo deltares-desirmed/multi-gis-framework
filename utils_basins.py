@@ -23,8 +23,9 @@ def get_european_basins_layer():
     # Visualization settings
     vis_params = {
         "color": "808080",
-        "strokeWidth": 1
+        "width": 1
     }
+
 
     layer_name = "HydroSHEDS River Basins (Europe)"
 
