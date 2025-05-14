@@ -27,6 +27,8 @@ def get_european_basins_layer():
     }
 
 
-    layer_name = "HydroSHEDS River Basins (Europe)"
+    layer_name = "EU River Basins"
 
-    return european_basins, vis_params, layer_name
+
+    return european_basins.style(**vis_params), {}, "EU River Basins"
+
