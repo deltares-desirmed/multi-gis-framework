@@ -75,14 +75,24 @@ for filename in geojson_files:
     except Exception as e:
         st.error(f"❌ Failed to load '{system_name}': {e}")
 
-# 🧩 Add Layer Control and Display Map
-m.add_layer_control()
-m.to_streamlit(height=700)
+# Add all EE layers to the map
+for get_layer in ee_layers:
+    try:
+        ee_obj, vis, name = get_layer()
+        m.add_ee_tile_layer(ee_obj.style(**vis), {}, name)
+    except Exception as e:
+        st.warning(f"⚠️ Could not add EE layer '{get_layer.__name__}': {e}")
 
 from utils_basins import get_european_basins_layer
 
 basins_layer = get_european_basins_layer()
 m.add_ee_layer(basins_layer["ee_object"], basins_layer["vis_params"], basins_layer["name"])
+
+# 🧩 Add Layer Control and Display Map
+m.add_layer_control()
+m.to_streamlit(height=700)
+
+
 
 import streamlit as st
 import datetime

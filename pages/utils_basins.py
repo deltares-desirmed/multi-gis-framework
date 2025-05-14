@@ -1,30 +1,34 @@
 # file: pages/utils_basins.py
 
 import ee
-from utils_ee import add_ee_layer
 
-def get_european_basins_layer():
+# Make sure Earth Engine is initialized elsewhere (e.g., in utils_ee)
+
+
+def get_river_basins_layer():
     """
-    Returns a Google Earth Engine FeatureCollection layer of HydroSHEDS river basins filtered to Europe.
+    Loads HydroSHEDS basins dataset filtered to European region.
+
+    Returns:
+        tuple: (ee_object, vis_params, name)
     """
-    # Load HydroSHEDS Level 12 basins
-    basins = ee.FeatureCollection("WWF/HydroSHEDS/v1/Basins/hybas_12")
+    # Load global river basin dataset
+    dataset = ee.FeatureCollection("WWF/HydroSHEDS/v1/Basins/hybas_12")
 
-    # Load country boundaries and filter to Europe
-    europe = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017") \
-        .filter(ee.Filter.eq("wld_rgn", "Europe"))
+    # Load global region boundaries and filter to Europe
+    europe = ee.FeatureCollection("USDOS/LSIB_SIMPLE/2017").filter(
+        ee.Filter.eq("wld_rgn", "Europe")
+    )
 
-    # Filter basins to European region
-    europe_basins = basins.filterBounds(europe)
+    # Filter river basins that intersect Europe
+    european_basins = dataset.filterBounds(europe.geometry())
 
-    # Style visualization parameters
+    # Visualization settings
     vis_params = {
         "color": "808080",
         "strokeWidth": 1
     }
 
-    return {
-        "ee_object": europe_basins,
-        "vis_params": vis_params,
-        "name": "European River Basins"
-    }
+    layer_name = "HydroSHEDS River Basins (Europe)"
+
+    return european_basins, vis_params, layer_name
