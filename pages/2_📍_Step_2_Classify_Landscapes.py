@@ -5,17 +5,8 @@ import os
 import requests
 from folium.plugins import MarkerCluster
 import re
-import pandas as pd
-import streamlit as st
-import ee
-from utils_ee import initialize_earth_engine
 
-
-st.set_page_config(layout="wide")  # ✅ Must be first Streamlit command
-
-initialize_earth_engine()
-
-
+st.set_page_config(layout="wide")
 
 # 📌 Sidebar Info
 st.sidebar.title("Info")
@@ -29,13 +20,13 @@ st.sidebar.info(
     """
 )
 
-st.title("Landscape Characters")
+st.title("Landscape Characters - Community Systems Explorer")
 
 # ✅ GitHub Raw Base URL
 github_base_url = "https://raw.githubusercontent.com/deltares-desirmed/multi-gis-framework/main/database/"
 
 # 📚 List all GeoJSON files dynamically (Hardcoded here, but can be automated via GitHub API)
-geojson_files = ["EU_healthservices.geojson", "EU_education1.geojson", "EU_education2.geojson"]  # Add new files here or automate!
+geojson_files = ["EU_healthservices.geojson", "EU_education1.geojson"]  # Add new files here or automate!
 
 # 🌍 Create Map Centered on Europe
 m = leafmap.Map(center=[50, 10], zoom=5)
@@ -50,7 +41,7 @@ for filename in geojson_files:
         response.raise_for_status()
         geojson_data = response.json()
 
-        fg = folium.FeatureGroup(name=system_name, show=True)
+        fg = folium.FeatureGroup(name=system_name, show=False)
         marker_cluster = MarkerCluster().add_to(fg)
 
         for feature in geojson_data.get("features", []):
@@ -83,25 +74,9 @@ for filename in geojson_files:
     except Exception as e:
         st.error(f"❌ Failed to load '{system_name}': {e}")
 
-
-# === Initialize Streamlit ===
-
-
-# === Create the map ===
-m = leafmap.Map(center=[50, 10], zoom=5)
-
-# ✅ Register EE tile support
-folium.Map.add_ee_tile_layer = lambda self, ee_img, vis_params, name: folium.TileLayer(
-    tiles=ee_img.getMapId(vis_params)["tile_fetcher"].url_format,
-    attr="Google Earth Engine",
-    name=name,
-    overlay=True,
-    control=True
-).add_to(self)
-
+# 🧩 Add Layer Control and Display Map
 m.add_layer_control()
 m.to_streamlit(height=700)
-
 
 
 import streamlit as st
