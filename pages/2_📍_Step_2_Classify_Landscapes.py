@@ -6,10 +6,19 @@ import requests
 from folium.plugins import MarkerCluster
 import re
 import pandas as pd
+from utils_lst_explorer import show_lst_explorer
+
 
 st.set_page_config(layout="wide")
 
 # 📌 Sidebar Info
+
+st.sidebar.title("Tools")
+show_lst = st.sidebar.checkbox("📈 Explore LST by Basin")
+
+if show_lst:
+    show_lst_explorer()
+
 st.sidebar.title("Info")
 st.sidebar.info(
     """
@@ -20,6 +29,8 @@ st.sidebar.info(
     [LinkedIn](https://www.linkedin.com/in/deltares)
     """
 )
+
+
 
 st.title("Landscape Characters")
 
