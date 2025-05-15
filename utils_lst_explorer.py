@@ -67,43 +67,20 @@ def show_lst_explorer():
                 #     agree = st.checkbox('Yes', value='Yes', disabled=True)
                 # if agree == True:
             #st.session_state.dropdown_values['sub_name'] = sub_name
-            lst_df = None  # Initialize
             if col2.button('Discover the Land Surface Temperature data!'):
                 with col2:
                     with st.spinner("Collecting data using Google Earth Engine..."):
-                        try:
-                            aoi_json = json.loads(
-                                gdf.loc[gdf['SUB_NAME'] == sub_name, 'geometry'].to_json()
-                            )['features'][0]['geometry']
-                            aoi = ee.FeatureCollection(ee.Geometry(aoi_json)).geometry()
-
-                            lst = ee.ImageCollection('MODIS/061/MOD11A2') \
-                                .filterDate(date_range) \
-                                .select('LST_Day_1km')
-
-                            reduce_lst = gee.create_reduce_region_function(
-                                geometry=aoi,
-                                reducer=ee.Reducer.mean(),
-                                scale=1000,
-                                crs='EPSG:4326'
-                            )
-
-                            lst_stat_fc = ee.FeatureCollection(lst.map(reduce_lst)) \
-                                .filter(ee.Filter.notNull(lst.first().bandNames()))
-
-                            lst_dict = gee.fc_to_dict(lst_stat_fc).getInfo()
-
-                            if not lst_dict:
-                                st.warning("⚠️ No LST data found for the selected basin and time range.")
-                            else:
-                                lst_df = pd.DataFrame(lst_dict)
-                                lst_df['LST_Day_1km'] = (lst_df['LST_Day_1km'] * 0.02 - 273.5)
-                                lst_df = gee.add_date_info(lst_df)
-                                st.success("✅ LST data retrieved successfully.")
-
-                        except Exception as e:
-                            st.error(f"❌ Error while fetching LST data: {e}")
-
+                        # Defining the geometry from the selected basin.
+                        aoi_json = json.loads(gdf.loc[gdf['SUB_NAME'] == sub_name, 'geometry'].to_json())['features'][0]['geometry']
+                        aoi = ee.FeatureCollection(ee.Geometry(aoi_json)).geometry()
+                        # Getting LST data.
+                        lst = ee.ImageCollection('MODIS/061/MOD11A2').filterDate(date_range).select('LST_Day_1km')
+                        reduce_lst = gee.create_reduce_region_function(geometry=aoi, reducer=ee.Reducer.mean(), scale=1000, crs='EPSG:4326')
+                        lst_stat_fc = ee.FeatureCollection(lst.map(reduce_lst)).filter(ee.Filter.notNull(lst.first().bandNames()))
+                        lst_dict = gee.fc_to_dict(lst_stat_fc).getInfo()
+                        lst_df = pd.DataFrame(lst_dict)
+                        lst_df['LST_Day_1km'] = (lst_df['LST_Day_1km'] * 0.02 - 273.5)
+                        lst_df = gee.add_date_info(lst_df)
 
                         # Feature to preview the geometry.
                         with st.expander('Geometry Preview', expanded=False):
