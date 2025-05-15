@@ -89,11 +89,6 @@ for filename in geojson_files:
 
 
 # === Sidebar Info ===
-st.sidebar.title("Info")
-st.sidebar.info("""
-Deltares at [NbS Knowledge Hub](https://nbs-tutorials-and-tips) | 
-[GitHub](https://github.com/deltares-desirmed)
-""")
 
 
 
