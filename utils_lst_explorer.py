@@ -70,17 +70,44 @@ def show_lst_explorer():
             if col2.button('Discover the Land Surface Temperature data!'):
                 with col2:
                     with st.spinner("Collecting data using Google Earth Engine..."):
-                        # Defining the geometry from the selected basin.
-                        aoi_json = json.loads(gdf.loc[gdf['SUB_NAME'] == sub_name, 'geometry'].to_json())['features'][0]['geometry']
-                        aoi = ee.FeatureCollection(ee.Geometry(aoi_json)).geometry()
-                        # Getting LST data.
-                        lst = ee.ImageCollection('MODIS/061/MOD11A2').filterDate(date_range).select('LST_Day_1km')
-                        reduce_lst = gee.create_reduce_region_function(geometry=aoi, reducer=ee.Reducer.mean(), scale=1000, crs='EPSG:4326')
-                        lst_stat_fc = ee.FeatureCollection(lst.map(reduce_lst)).filter(ee.Filter.notNull(lst.first().bandNames()))
-                        lst_dict = gee.fc_to_dict(lst_stat_fc).getInfo()
-                        lst_df = pd.DataFrame(lst_dict)
-                        lst_df['LST_Day_1km'] = (lst_df['LST_Day_1km'] * 0.02 - 273.5)
-                        lst_df = gee.add_date_info(lst_df)
+                        try:
+                            # Defining the geometry from the selected basin.
+                            aoi_json = json.loads(gdf.loc[gdf['SUB_NAME'] == sub_name, 'geometry'].to_json())['features'][0]['geometry']
+                            aoi = ee.FeatureCollection(ee.Geometry(aoi_json)).geometry()
+
+                            # Getting LST data
+                            lst = ee.ImageCollection('MODIS/061/MOD11A2').filterDate(date_range).select('LST_Day_1km')
+                            reduce_lst = gee.create_reduce_region_function(
+                                geometry=aoi,
+                                reducer=ee.Reducer.mean(),
+                                scale=1000,
+                                crs='EPSG:4326'
+                            )
+                            lst_stat_fc = ee.FeatureCollection(lst.map(reduce_lst)).filter(
+                                ee.Filter.notNull(lst.first().bandNames())
+                            )
+
+                            lst_dict = gee.fc_to_dict(lst_stat_fc).getInfo()
+                            lst_df = pd.DataFrame(lst_dict)
+
+                            if not lst_df.empty and 'LST_Day_1km' in lst_df.columns:
+                                lst_df['LST_Day_1km'] = (lst_df['LST_Day_1km'] * 0.02 - 273.5)
+                                lst_df = gee.add_date_info(lst_df)
+
+                                with st.expander('Geometry Preview', expanded=False):
+                                    map_aoi = folium.Map(tiles="OpenStreetMap")
+                                    folium.Choropleth(geo_data=aoi_json, reset=True).add_to(map_aoi)
+                                    bounds = map_aoi.get_bounds()
+                                    map_aoi.fit_bounds(bounds)
+                                    st.warning("Sometimes the map does not zoom to the selected area most likely because of [this issue](https://github.com/randyzwitch/streamlit-folium/issues/152).")
+                                    folium_static(map_aoi)
+                            else:
+                                st.warning("⚠️ No LST data found for the selected basin and time range.")
+                                lst_df = pd.DataFrame()  # Safe fallback
+
+                        except Exception as e:
+                            st.error(f"❌ Failed to load LST data: {e}")
+
 
                         # Feature to preview the geometry.
                         with st.expander('Geometry Preview', expanded=False):
