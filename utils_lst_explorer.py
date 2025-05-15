@@ -48,7 +48,7 @@ def show_lst_explorer():
 
     region_name = col2.selectbox('Select the region.', ['Europe','USA', 'Australia and New Zealand', 'Near East', 'Southeast Asia'], key='region_name')
     if region_name:
-        filename = "data/basins_" + region_name.lower() + "_mult.geojson"
+        filename = "database/basins_" + region_name.lower() + "_mult.geojson"
         file = open(filename)
         gdf = gpd.read_file(file)
         maj_name = col2.selectbox('Select the major hydrological basin.', sorted(pd.unique(gdf['MAJ_NAME'])), key='maj_name')
