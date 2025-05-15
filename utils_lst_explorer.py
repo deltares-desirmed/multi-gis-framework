@@ -22,8 +22,8 @@ def show_lst_explorer():
     col2.image(MAP_EMOJI_URL, width=80)
     col2.markdown("""
         # Land Surface Temperature - River Basins
-        [![Follow](https://img.shields.io/twitter/follow/mykolakozyr?style=social)](https://www.twitter.com/mykolakozyr)
-        [![Follow](https://img.shields.io/badge/LinkedIn-blue?style=flat&logo=linkedin&labelColor=blue)](https://www.linkedin.com/in/mykolakozyr/)
+        [![Follow](https://img.shields.io/twitter/follow/deltares?style=social)](https://x.com/deltares)
+        [![Follow](https://img.shields.io/badge/LinkedIn-blue?style=flat&logo=linkedin&labelColor=blue)](https://www.linkedin.com/in/deltares/)
 
         ## Details
 
