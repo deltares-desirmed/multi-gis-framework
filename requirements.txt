@@ -18,7 +18,7 @@ numpy
 # keplergl
 # leafmap[maplibre]==0.25.0
 # maplibre==1.0.2
-# altair==4.2.0
+altair==4.2.0
 # earthengine-api==1.5.8
 # Fiona==1.8.21
 # folium==0.12.1.post1
