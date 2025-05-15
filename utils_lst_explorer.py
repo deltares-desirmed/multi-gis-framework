@@ -10,6 +10,8 @@ import ee
 from utils_ee import initialize_earth_engine
 import src.gee as gee
 
+# Moved chart rendering inline instead of importing
+
 def show_lst_explorer():
     initialize_earth_engine()
 
@@ -46,7 +48,7 @@ def show_lst_explorer():
 
     region_name = col2.selectbox('Select the region.', ['Europe','USA', 'Australia and New Zealand', 'Near East', 'Southeast Asia'], key='region_name')
     if region_name:
-        filename = "database/basins_" + region_name.lower() + "_mult.geojson"
+        filename = "data/basins_" + region_name.lower() + "_mult.geojson"
         file = open(filename)
         gdf = gpd.read_file(file)
         maj_name = col2.selectbox('Select the major hydrological basin.', sorted(pd.unique(gdf['MAJ_NAME'])), key='maj_name')
@@ -73,17 +75,59 @@ def show_lst_explorer():
                             st.warning("Sometimes the map does not zoom to the selected area most likely because of [this issue](https://github.com/randyzwitch/streamlit-folium/issues/152).")
                             folium_static(map_aoi)
 
-                from utils_lst_charts import render_lst_charts  # Extracted chart logic
-                render_lst_charts(lst_df, sub_name, aoi_json)
+                # Charts
+                col2.markdown("### 📊 Land Surface Temperature Time Series")
+                line_chart = alt.Chart(lst_df).mark_line(
+                    point=alt.OverlayMarkDef(color="red")
+                ).encode(
+                    alt.X("Timestamp"),
+                    alt.Y("LST_Day_1km", title='Land Surface Temperature, °C'),
+                ).interactive()
+                col2.altair_chart(line_chart, use_container_width=True)
 
-                col1, col2, col3 = st.columns([1, 4, 1])
+                # Data download
+                col1, col2, col3 = st.columns([1, 4, 1]) 
                 col2.markdown("""
                     ---
-                    ## References
-                    * Hydrological basins in Europe - [FAO Map Catalog.](https://data.apps.fao.org/map/catalog/srv/api/records/1849e279-67bd-4e6f-a789-9918925a11a1)
-                    * Watershed Boundary Dataset in the USA - [USGS.](https://www.usgs.gov/national-hydrography/watershed-boundary-dataset)
-                    * Hydrological basins in Australia and New Zealand - [FAO Map Catalog.](https://data.apps.fao.org/catalog/dataset/a1a0e9ee-5062-4950-a6b9-fdd2284b2607)
-                    * Hydrological basins in Near East - [FAO Map Catalog.](https://data.apps.fao.org/catalog/iso/7ae00a40-642b-4637-b1d3-ffacb13360db)
-                    * Hydrological basins in Southeast Asia - [FAO Map Catalog.](https://data.apps.fao.org/catalog/iso/ee616dc4-3118-4d67-ba05-6e93dd3e962f)
-                    * Land Surface Temperature - [MODIS via Google Earth Engine.](https://developers.google.com/earth-engine/datasets/catalog/MODIS_061_MOD11A2)
-                """)
+                    ## Data download
+                    """)
+                gdf_out = gpd.GeoDataFrame(lst_df, geometry=[shape(aoi_json)]*len(lst_df))
+                csv_data = convert_df(gdf_out)
+                geojson_data = convert_gdf(gdf_out)
+                with col2.container(border=True):
+                    cont1_1, cont1_2 = st.columns([1, 3])
+                    with cont1_1:
+                        st.download_button(
+                            label="Download CSV",
+                            data=csv_data,
+                            file_name=sub_name + "-LST.csv",
+                            mime="text/csv",
+                            key='download-csv'
+                        )
+                    with cont1_2:
+                        st.write("The CSV includes temperature data, dates, and geometry.")
+
+                with col2.container(border=True):
+                    cont2_1, cont2_2 = st.columns([1, 3])
+                    with cont2_1:
+                        st.download_button(
+                            label="Download GeoJSON",
+                            data=geojson_data,
+                            file_name=sub_name + "-LST.geojson",
+                            mime="application/json",
+                            key='download-geojson'
+                        )
+                    with cont2_2:
+                        st.write("The GeoJSON includes average LST per timestep.")
+
+col1, col2, col3 = st.columns([1, 4, 1])
+col2.markdown("""
+    ---
+    ## References
+    * Hydrological basins in Europe - [FAO Map Catalog.](https://data.apps.fao.org/map/catalog/srv/api/records/1849e279-67bd-4e6f-a789-9918925a11a1)
+    * Watershed Boundary Dataset in the USA - [USGS.](https://www.usgs.gov/national-hydrography/watershed-boundary-dataset)
+    * Hydrological basins in Australia and New Zealand - [FAO Map Catalog.](https://data.apps.fao.org/catalog/dataset/a1a0e9ee-5062-4950-a6b9-fdd2284b2607)
+    * Hydrological basins in Near East - [FAO Map Catalog.](https://data.apps.fao.org/catalog/iso/7ae00a40-642b-4637-b1d3-ffacb13360db)
+    * Hydrological basins in Southeast Asia - [FAO Map Catalog.](https://data.apps.fao.org/catalog/iso/ee616dc4-3118-4d67-ba05-6e93dd3e962f)
+    * Land Surface Temperature - [MODIS via Google Earth Engine.](https://developers.google.com/earth-engine/datasets/catalog/MODIS_061_MOD11A2)
+    """)
