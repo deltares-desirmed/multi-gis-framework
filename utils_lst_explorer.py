@@ -15,7 +15,7 @@ import src.gee as gee
 def show_lst_explorer():
     initialize_earth_engine()
 
-    MAP_EMOJI_URL = "https://em-content.zobj.net/source/apple/354/thermometer_1f321-fe0f.png"
+    MAP_EMOJI_URL = "https://pbs.twimg.com/profile_images/1206882243278462976/rr11Zc6-_400x400.jpg"
 
     col1, col2, col3 = st.columns([1, 4, 1])
     col2.markdown("<br>", unsafe_allow_html=True)
