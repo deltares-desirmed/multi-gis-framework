@@ -121,25 +121,26 @@ def show_lst_explorer():
 
                 
                 # Creating Charts
-            if not lst_df.empty and 'Timestamp' in lst_df.columns and 'LST_Day_1km' in lst_df.columns:
-                line_chart = alt.Chart(lst_df).mark_line(
-                    point=alt.OverlayMarkDef(color="red")
-                ).encode(
-                    alt.X("Timestamp:T"),  # Specify type explicitly
-                    alt.Y("LST_Day_1km", title='Land Surface Temperature, °C'),
-                ).interactive()
+            # if not lst_df.empty and 'Timestamp' in lst_df.columns and 'LST_Day_1km' in lst_df.columns:
+            #     line_chart = alt.Chart(lst_df).mark_line(
+            #         point=alt.OverlayMarkDef(color="red")
+            #     ).encode(
+            #         alt.X("Timestamp:T"),  # Specify type explicitly
+            #         alt.Y("LST_Day_1km", title='Land Surface Temperature, °C'),
+            #     ).interactive()
 
-                st.altair_chart(line_chart, use_container_width=True)
-            else:
-                st.info("📭 No chart to display yet. Please select a region and basin to load data.")
+            #     st.altair_chart(line_chart, use_container_width=True)
+            # else:
+            #     st.info("📭 No chart to display yet. Please select a region and basin to load data.")
 
+            lst_df = pd.DataFrame()
             # Line Chart with Points: https://altair-viz.github.io/gallery/line_chart_with_points.html
-            # line_chart = alt.Chart(lst_df).mark_line(
-            #     point=alt.OverlayMarkDef(color="red")
-            # ).encode(
-            #     alt.X("Timestamp"),
-            #     alt.Y("LST_Day_1km", title='Land Surface Temperature, °C'),
-            # ).interactive()
+            line_chart = alt.Chart(lst_df).mark_line(
+                point=alt.OverlayMarkDef(color="red")
+            ).encode(
+                alt.X("Timestamp"),
+                alt.Y("LST_Day_1km", title='Land Surface Temperature, °C'),
+            ).interactive()
 
             # Ridgeline plot Example: https://altair-viz.github.io/gallery/ridgeline_plot.html
             step = 16
