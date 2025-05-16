@@ -49,76 +49,72 @@ def show_lst_explorer():
 
     # Interface to select the area of interest.
     region_name = col2.selectbox('Select the region.', ['Europe','USA', 'Australia and New Zealand', 'Near East', 'Southeast Asia'], key='region_name')
-    # Select the region
-    if region_name:
-        #st.session_state.dropdown_values['region_name'] = region_name
-        # Defining the GeoDataFrame with a subset of areas with archive coverage.
-        filename = "database/basins_" + region_name.lower() + "_mult.geojson"
-        file = open(filename)
-        gdf = gpd.read_file(file)
-        maj_name = col2.selectbox('Select the major hydrological basin.', sorted(pd.unique(gdf['MAJ_NAME'])), key='maj_name')
-        # Select the major hydrological basin
-        if maj_name:
-            #st.session_state.dropdown_values['maj_name'] = maj_name
-            # Select the sub-basin.
-            sub_name = col2.selectbox('Select the river basin within the major one', sorted(gdf[gdf['MAJ_NAME'] == maj_name]['SUB_NAME']), key='sub_name')
-                # with col2.expander('Additional parameters', expanded=False):
-                #     st.text('How many charts do you want to create?')
-                #     agree = st.checkbox('Yes', value='Yes', disabled=True)
-                # if agree == True:
-            #st.session_state.dropdown_values['sub_name'] = sub_name
-            if col2.button('Discover the Land Surface Temperature data!'):
-                with col2:
-                    with st.spinner("Collecting data using Google Earth Engine..."):
-                        try:
-                            # Defining the geometry from the selected basin.
-                            aoi_json = json.loads(gdf.loc[gdf['SUB_NAME'] == sub_name, 'geometry'].to_json())['features'][0]['geometry']
-                            aoi = ee.FeatureCollection(ee.Geometry(aoi_json)).geometry()
 
-                            # Getting LST data
-                            lst = ee.ImageCollection('MODIS/061/MOD11A2').filterDate(date_range).select('LST_Day_1km')
-                            reduce_lst = gee.create_reduce_region_function(
-                                geometry=aoi,
-                                reducer=ee.Reducer.mean(),
-                                scale=1000,
-                                crs='EPSG:4326'
-                            )
-                            lst_stat_fc = ee.FeatureCollection(lst.map(reduce_lst)).filter(
-                                ee.Filter.notNull(lst.first().bandNames())
-                            )
+    # Defining the GeoDataFrame with a subset of areas with archive coverage.
+    filename = "database/basins_" + region_name.lower() + "_mult.geojson"
+    gdf = gpd.read_file(filename)
 
-                            lst_dict = gee.fc_to_dict(lst_stat_fc).getInfo()
-                            lst_df = pd.DataFrame(lst_dict)
+    maj_name = col2.selectbox('Select the major hydrological basin.', sorted(pd.unique(gdf['MAJ_NAME'])), key='maj_name')
+    sub_name = col2.selectbox('Select the river basin within the major one', sorted(gdf[gdf['MAJ_NAME'] == maj_name]['SUB_NAME']), key='sub_name')
 
-                            if not lst_df.empty and 'LST_Day_1km' in lst_df.columns:
-                                lst_df['LST_Day_1km'] = (lst_df['LST_Day_1km'] * 0.02 - 273.5)
-                                lst_df = gee.add_date_info(lst_df)
+    # Initialize lst_df
+    lst_df = pd.DataFrame()
 
-                                with st.expander('Geometry Preview', expanded=False):
-                                    map_aoi = folium.Map(tiles="OpenStreetMap")
-                                    folium.Choropleth(geo_data=aoi_json, reset=True).add_to(map_aoi)
-                                    bounds = map_aoi.get_bounds()
-                                    map_aoi.fit_bounds(bounds)
-                                    st.warning("Sometimes the map does not zoom to the selected area most likely because of [this issue](https://github.com/randyzwitch/streamlit-folium/issues/152).")
-                                    folium_static(map_aoi)
-                            else:
-                                st.warning("⚠️ No LST data found for the selected basin and time range.")
-                                lst_df = pd.DataFrame()  # Safe fallback
+    def load_lst_data(region, maj, sub):
+        try:
+            aoi_json = json.loads(gdf.loc[gdf['SUB_NAME'] == sub, 'geometry'].to_json())['features'][0]['geometry']
+            aoi = ee.FeatureCollection(ee.Geometry(aoi_json)).geometry()
 
-                        except Exception as e:
-                            st.error(f"❌ Failed to load LST data: {e}")
+            lst = ee.ImageCollection('MODIS/061/MOD11A2').filterDate(date_range).select('LST_Day_1km')
+            reduce_lst = gee.create_reduce_region_function(
+                geometry=aoi,
+                reducer=ee.Reducer.mean(),
+                scale=1000,
+                crs='EPSG:4326'
+            )
+            lst_stat_fc = ee.FeatureCollection(lst.map(reduce_lst)).filter(
+                ee.Filter.notNull(lst.first().bandNames())
+            )
 
+            lst_dict = gee.fc_to_dict(lst_stat_fc).getInfo()
+            df = pd.DataFrame(lst_dict)
 
-                        # Feature to preview the geometry.
-                        with st.expander('Geometry Preview', expanded=False):
-                            map_aoi = folium.Map(tiles="OpenStreetMap")
-                            folium.Choropleth(geo_data = aoi_json, reset=True).add_to(map_aoi)
-                            bounds = map_aoi.get_bounds()
-                            map_aoi.fit_bounds(bounds)
-                            # Not working properly for unknown reason. To be discovered.
-                            st.warning("Sometimes the map does not zoom to the selected area most likely because of [this issue](https://github.com/randyzwitch/streamlit-folium/issues/152).")
-                            folium_static(map_aoi)
+            if not df.empty and 'LST_Day_1km' in df.columns:
+                df['LST_Day_1km'] = (df['LST_Day_1km'] * 0.02 - 273.5)
+                df = gee.add_date_info(df)
+                return df, aoi_json
+            else:
+                st.warning("⚠️ No LST data found for the selected basin and time range.")
+                return pd.DataFrame(), aoi_json
 
+        except Exception as e:
+            st.error(f"❌ Failed to load LST data: {e}")
+            return pd.DataFrame(), None
+
+    # Load and render by default on initial view
+    lst_df, aoi_json = load_lst_data(region_name, maj_name, sub_name)
+
+    if not lst_df.empty:
+        st.success("LST data loaded successfully.")
+
+        with st.expander('Geometry Preview', expanded=False):
+            map_aoi = folium.Map(tiles="OpenStreetMap")
+            folium.Choropleth(geo_data=aoi_json, reset=True).add_to(map_aoi)
+            bounds = map_aoi.get_bounds()
+            map_aoi.fit_bounds(bounds)
+            st.warning("Sometimes the map does not zoom to the selected area most likely because of [this issue](https://github.com/randyzwitch/streamlit-folium/issues/152).")
+            folium_static(map_aoi)
+
+            # Sample line chart (replace or extend with full set)
+            chart = alt.Chart(lst_df).mark_line(point=alt.OverlayMarkDef(color="red")).encode(
+                alt.X("Timestamp:T"),
+                alt.Y("LST_Day_1km:Q", title="Land Surface Temperature (°C)")
+            ).interactive()
+
+            st.altair_chart(chart, use_container_width=True)
+
+        if col2.button('🔁 Refresh LST Data'):
+            lst_df, aoi_json = load_lst_data(region_name, maj_name, sub_name)
                 
                 # Creating Charts
             # Line Chart with Points: https://altair-viz.github.io/gallery/line_chart_with_points.html
