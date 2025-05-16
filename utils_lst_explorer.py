@@ -10,6 +10,7 @@ import ee
 from utils_ee import initialize_earth_engine
 import src.gee as gee
 
+
 # Moved chart rendering inline instead of importing
 
 def show_lst_explorer():
@@ -127,10 +128,17 @@ def show_lst_explorer():
                 # Creating Charts
             
             # Line Chart with Points: https://altair-viz.github.io/gallery/line_chart_with_points.html
+            # line_chart = alt.Chart(lst_df).mark_line(
+            #     point=alt.OverlayMarkDef(color="red")
+            # ).encode(
+            #     alt.X("Timestamp"),
+            #     alt.Y("LST_Day_1km", title='Land Surface Temperature, °C'),
+            # ).interactive()
+
             line_chart = alt.Chart(lst_df).mark_line(
-                point=alt.OverlayMarkDef(color="red")
+                point=True
             ).encode(
-                alt.X("Timestamp"),
+                alt.X("Timestamp:T"),
                 alt.Y("LST_Day_1km", title='Land Surface Temperature, °C'),
             ).interactive()
 
