@@ -81,7 +81,7 @@ def show_lst_explorer():
             #st.session_state.dropdown_values['sub_name'] = sub_name
             if col2.button('Discover the Land Surface Temperature data!'):
                 with col2:
-                    with st.spinner("Collecting data using Google Earth Engine..."):
+                    with st.spinner("Collecting data and Computing statistics..."):
                         # Defining the geometry from the selected basin.
                         aoi_json = json.loads(gdf.loc[gdf['SUB_NAME'] == sub_name, 'geometry'].to_json())['features'][0]['geometry']
                         aoi = ee.FeatureCollection(ee.Geometry(aoi_json)).geometry()
