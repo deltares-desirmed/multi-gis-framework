@@ -94,46 +94,39 @@ def show_lst_explorer():
                                 lst_df['LST_Day_1km'] = (lst_df['LST_Day_1km'] * 0.02 - 273.5)
                                 lst_df = gee.add_date_info(lst_df)
 
-                                with st.expander('Geometry Preview', expanded=False):
-                                    map_aoi = folium.Map(tiles="OpenStreetMap")
-                                    folium.Choropleth(geo_data=aoi_json, reset=True).add_to(map_aoi)
-                                    bounds = map_aoi.get_bounds()
-                                    map_aoi.fit_bounds(bounds)
-                                    st.warning("Sometimes the map does not zoom to the selected area most likely because of [this issue](https://github.com/randyzwitch/streamlit-folium/issues/152).")
-                                    folium_static(map_aoi)
+                                # Show chart only when valid data is present
+                                if 'Timestamp' in lst_df.columns:
+                                    line_chart = alt.Chart(lst_df).mark_line(
+                                        point=alt.OverlayMarkDef(color="red")
+                                    ).encode(
+                                        alt.X("Timestamp:T"),  # Explicit type
+                                        alt.Y("LST_Day_1km", title='Land Surface Temperature, °C'),
+                                    ).interactive()
+
+                                    st.altair_chart(line_chart, use_container_width=True)
+                                else:
+                                    st.warning("⚠️ The LST data is missing a valid Timestamp column.")
+
                             else:
                                 st.warning("⚠️ No LST data found for the selected basin and time range.")
-                                lst_df = pd.DataFrame()  # Safe fallback
+                                lst_df = pd.DataFrame()
 
                         except Exception as e:
                             st.error(f"❌ Failed to load LST data: {e}")
 
+                    # Feature to preview the geometry (optional duplication—only keep once if needed)
+                    with st.expander('Geometry Preview', expanded=False):
+                        map_aoi = folium.Map(tiles="OpenStreetMap")
+                        folium.Choropleth(geo_data=aoi_json, reset=True).add_to(map_aoi)
+                        bounds = map_aoi.get_bounds()
+                        map_aoi.fit_bounds(bounds)
+                        st.warning("Sometimes the map does not zoom to the selected area most likely because of [this issue](https://github.com/randyzwitch/streamlit-folium/issues/152).")
+                        folium_static(map_aoi)
 
-                        # Feature to preview the geometry.
-                        with st.expander('Geometry Preview', expanded=False):
-                            map_aoi = folium.Map(tiles="OpenStreetMap")
-                            folium.Choropleth(geo_data = aoi_json, reset=True).add_to(map_aoi)
-                            bounds = map_aoi.get_bounds()
-                            map_aoi.fit_bounds(bounds)
-                            # Not working properly for unknown reason. To be discovered.
-                            st.warning("Sometimes the map does not zoom to the selected area most likely because of [this issue](https://github.com/randyzwitch/streamlit-folium/issues/152).")
-                            folium_static(map_aoi)
 
                 
                 # Creating Charts
-            # if not lst_df.empty and 'Timestamp' in lst_df.columns and 'LST_Day_1km' in lst_df.columns:
-            #     line_chart = alt.Chart(lst_df).mark_line(
-            #         point=alt.OverlayMarkDef(color="red")
-            #     ).encode(
-            #         alt.X("Timestamp:T"),  # Specify type explicitly
-            #         alt.Y("LST_Day_1km", title='Land Surface Temperature, °C'),
-            #     ).interactive()
-
-            #     st.altair_chart(line_chart, use_container_width=True)
-            # else:
-            #     st.info("📭 No chart to display yet. Please select a region and basin to load data.")
-
-            lst_df = pd.DataFrame()
+            
             # Line Chart with Points: https://altair-viz.github.io/gallery/line_chart_with_points.html
             line_chart = alt.Chart(lst_df).mark_line(
                 point=alt.OverlayMarkDef(color="red")
