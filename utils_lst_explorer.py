@@ -65,7 +65,7 @@ def show_lst_explorer():
     if region_name:
         #st.session_state.dropdown_values['region_name'] = region_name
         # Defining the GeoDataFrame with a subset of areas with archive coverage.
-        filename = "data/basins_" + region_name.lower() + "_mult.geojson"
+        filename = "database/basins_" + region_name.lower() + "_mult.geojson"
         file = open(filename)
         gdf = gpd.read_file(file)
         maj_name = col2.selectbox('Select the major hydrological basin.', sorted(pd.unique(gdf['MAJ_NAME'])), key='maj_name')
