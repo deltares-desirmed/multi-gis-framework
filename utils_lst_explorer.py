@@ -70,13 +70,15 @@ def show_lst_explorer():
             #st.session_state.dropdown_values['sub_name'] = sub_name
             if col2.button('Discover the Land Surface Temperature data!'):
                 with col2:
-                    lst_df = pd.DataFrame()  # ✅ Always define it before usage
+                    lst_df = pd.DataFrame()  # ✅ Ensure variable is defined even if try fails
 
                     with st.spinner("Collecting data using Google Earth Engine..."):
                         try:
+                            # Defining the geometry from the selected basin.
                             aoi_json = json.loads(gdf.loc[gdf['SUB_NAME'] == sub_name, 'geometry'].to_json())['features'][0]['geometry']
                             aoi = ee.FeatureCollection(ee.Geometry(aoi_json)).geometry()
 
+                            # Getting LST data
                             lst = ee.ImageCollection('MODIS/061/MOD11A2').filterDate(date_range).select('LST_Day_1km')
                             reduce_lst = gee.create_reduce_region_function(
                                 geometry=aoi,
@@ -97,12 +99,11 @@ def show_lst_explorer():
 
                         except Exception as e:
                             st.error(f"❌ Failed to load LST data: {e}")
-                            lst_df = pd.DataFrame()  # fallback
 
-                    # ✅ Use lst_df safely here
+                    # ✅ Only render chart if valid data exists
                     if not lst_df.empty and 'Timestamp' in lst_df.columns and 'LST_Day_1km' in lst_df.columns:
                         line_chart = alt.Chart(lst_df).mark_line(
-                            point=True  # safer than OverlayMarkDef
+                            point=alt.OverlayMarkDef(color="red")
                         ).encode(
                             alt.X("Timestamp:T"),
                             alt.Y("LST_Day_1km", title='Land Surface Temperature, °C'),
@@ -112,14 +113,14 @@ def show_lst_explorer():
                     else:
                         st.info("📭 No chart to display yet or an error occurred.")
 
-                        # Optional geometry preview
-                        with st.expander('Geometry Preview', expanded=False):
-                            map_aoi = folium.Map(tiles="OpenStreetMap")
-                            folium.Choropleth(geo_data=aoi_json, reset=True).add_to(map_aoi)
-                            bounds = map_aoi.get_bounds()
-                            map_aoi.fit_bounds(bounds)
-                            st.warning("Sometimes the map does not zoom to the selected area most likely because of [this issue](https://github.com/randyzwitch/streamlit-folium/issues/152).")
-                            folium_static(map_aoi)
+                    # Optional geometry preview
+                    with st.expander('Geometry Preview', expanded=False):
+                        map_aoi = folium.Map(tiles="OpenStreetMap")
+                        folium.Choropleth(geo_data=aoi_json, reset=True).add_to(map_aoi)
+                        bounds = map_aoi.get_bounds()
+                        map_aoi.fit_bounds(bounds)
+                        st.warning("Sometimes the map does not zoom to the selected area most likely because of [this issue](https://github.com/randyzwitch/streamlit-folium/issues/152).")
+                        folium_static(map_aoi)
 
 
 
@@ -127,19 +128,14 @@ def show_lst_explorer():
                 # Creating Charts
             
             # Line Chart with Points: https://altair-viz.github.io/gallery/line_chart_with_points.html
-            line_chart = alt.Chart(lst_df).mark_line(
-                point=alt.OverlayMarkDef(color="red")
-            ).encode(
-                alt.X("Timestamp"),
-                alt.Y("LST_Day_1km", title='Land Surface Temperature, °C'),
-            ).interactive()
-
             # line_chart = alt.Chart(lst_df).mark_line(
-            #     point=True
+            #     point=alt.OverlayMarkDef(color="red")
             # ).encode(
-            #     alt.X("Timestamp:T"),
+            #     alt.X("Timestamp"),
             #     alt.Y("LST_Day_1km", title='Land Surface Temperature, °C'),
             # ).interactive()
+
+            
 
             # Ridgeline plot Example: https://altair-viz.github.io/gallery/ridgeline_plot.html
             step = 16
