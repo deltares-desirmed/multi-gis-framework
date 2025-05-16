@@ -127,19 +127,19 @@ def show_lst_explorer():
                 # Creating Charts
             
             # Line Chart with Points: https://altair-viz.github.io/gallery/line_chart_with_points.html
-            # line_chart = alt.Chart(lst_df).mark_line(
-            #     point=alt.OverlayMarkDef(color="red")
-            # ).encode(
-            #     alt.X("Timestamp"),
-            #     alt.Y("LST_Day_1km", title='Land Surface Temperature, °C'),
-            # ).interactive()
-
             line_chart = alt.Chart(lst_df).mark_line(
-                point=True
+                point=alt.OverlayMarkDef(color="red")
             ).encode(
-                alt.X("Timestamp:T"),
+                alt.X("Timestamp"),
                 alt.Y("LST_Day_1km", title='Land Surface Temperature, °C'),
             ).interactive()
+
+            # line_chart = alt.Chart(lst_df).mark_line(
+            #     point=True
+            # ).encode(
+            #     alt.X("Timestamp:T"),
+            #     alt.Y("LST_Day_1km", title='Land Surface Temperature, °C'),
+            # ).interactive()
 
             # Ridgeline plot Example: https://altair-viz.github.io/gallery/ridgeline_plot.html
             step = 16
