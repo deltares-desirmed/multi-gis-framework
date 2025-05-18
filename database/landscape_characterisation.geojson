@@ -1,0 +1,31 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.7103,
+          52.0111
+        ]
+      },
+      "properties": {
+        "Name": "Gouda Plaswijck",
+        "Type": "Urban Residential",
+        "Landscape_Description": "Post-war neighborhood with mid-density housing and green space.",
+        "Image_URL": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Example_image.jpg/800px-Example_image.jpg",
+        "ReadMore_URL": "https://example.com/more-info-gouda",
+        "Governance_Indicator1": "Local governance council active",
+        "Governance_Indicator2": "Community participation = High",
+        "Governance_Comments": "Regular town hall meetings and community feedback loops.",
+        "Socio_Indicator1": "Cultural center nearby",
+        "Socio_Indicator2": "Library and playground present",
+        "Socio_Comments": "Good access to cultural and social venues.",
+        "Economic_Indicator1": "Shops within 500m",
+        "Economic_Indicator2": "Public transport frequency: 10min",
+        "Economic_Comments": "Economically accessible with low vacancy rate."
+      }
+    }
+  ]
+}
