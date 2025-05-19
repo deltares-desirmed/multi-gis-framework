@@ -14,7 +14,7 @@
         "Name": "Gouda Plaswijck",
         "Type": "Urban Residential",
         "Landscape_Description": "Post-war neighborhood with mid-density housing and green space.",
-        "Image_URL": "https://cloud.funda.nl/valentina_media/207/275/663.jpg?options=width=716,height=478",
+        "Image_URL": "https://raw.githubusercontent.com/deltares-desirmed/multi-gis-framework/main/database/image.png",
         "ReadMore_URL": "https://nl.wikipedia.org/wiki/Plaswijck_(Gouda)",
         "Governance_Indicator1": "Local governance council active",
         "Governance_Indicator2": "Community participation = High",
