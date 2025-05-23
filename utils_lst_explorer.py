@@ -60,7 +60,7 @@ def show_lst_explorer():
     date_range = ee.DateRange('2017-01-01', today)
 
     # Interface to select the area of interest.
-    region_name = col2.selectbox('Select the region.', ['Croatia', 'Europe','USA', 'Australia and New Zealand', 'Near East', 'Southeast Asia'], key='region_name')
+    region_name = col2.selectbox('Select the region.', ['Europe','USA', 'Australia and New Zealand', 'Near East', 'Southeast Asia'], key='region_name')
     # Select the region
     if region_name:
         #st.session_state.dropdown_values['region_name'] = region_name
