@@ -97,7 +97,10 @@ Map.addLayer(final_aoi.style(**{
 
 Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
 # Create the map
-Map = geemap.Map(center=[51, 3], zoom=8)
+# Compute center coordinates dynamically
+aoi_centroid = final_aoi.geometry().centroid().coordinates().getInfo()
+Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=10)
+
 Map.addLayer(final_aoi.style(**{
     "color": "red", "fillColor": "00000000", "width": 2
 }), {}, "AOI Boundary")
@@ -172,19 +175,58 @@ with col1:
         task.start()
         st.success("Export to asset started.")
 
-with col2:
-    if st.button("Export to Drive (GeoTIFF)"):
-        task = ee.batch.Export.image.toDrive(
-            image=archetype_img,
-            description=export_base_name + "_Drive",
-            folder="nbracer",
-            fileNamePrefix=export_base_name,
-            region=final_aoi.geometry(),
-            scale=100,
-            maxPixels=1e13
-        )
-        task.start()
-        st.success("Export to Drive (GeoTIFF) started.")
+st.subheader("📤 Export Options")
+
+# Let user choose format and years
+export_format = st.radio("Select Export Format", ["GeoTIFF", "SHP"])
+selected_years = st.multiselect("Select CORINE Year(s)", ['2012', '2018'], default=['2012'])
+
+def vectorize(image, geom, year):
+    vectors = image.reduceToVectors(
+        geometry=geom,
+        geometryType='polygon',
+        scale=100,
+        reducer=ee.Reducer.countEvery(),
+        maxPixels=1e13
+    )
+    return vectors.map(lambda f: f.set('year', year))
+
+
+# Folder and file name prefix
+custom_prefix = st.text_input("File name prefix", value=export_base_name)
+export_folder = st.text_input("Drive folder name", value="nbracer")
+
+if st.button("Export Selected Years"):
+    for year in selected_years:
+        corine_img = CORINE_YEARS[year]
+        archetype_img = reclassify(corine_img).clip(final_aoi)
+        prefix = f"{custom_prefix}_{year}"
+
+        if export_format == "GeoTIFF":
+            task = ee.batch.Export.image.toDrive(
+                image=archetype_img,
+                description=prefix + "_GeoTIFF",
+                folder=export_folder,
+                fileNamePrefix=prefix,
+                region=final_aoi.geometry(),
+                scale=100,
+                maxPixels=1e13
+            )
+            task.start()
+            st.success(f"✅ GeoTIFF for {year} export started to Drive/{export_folder}/{prefix}.tif")
+
+        elif export_format == "SHP":
+            vector_fc = vectorize(archetype_img, final_aoi.geometry(), year)
+            task = ee.batch.Export.table.toDrive(
+                collection=vector_fc,
+                description=prefix + "_SHP",
+                folder=export_folder,
+                fileNamePrefix=prefix + "_Vector",
+                fileFormat='SHP'
+            )
+            task.start()
+            st.success(f"✅ SHP for {year} export started to Drive/{export_folder}/{prefix}_Vector.zip")
+
 
 # Vectorization and Export
 def vectorize(image, geom, year):
