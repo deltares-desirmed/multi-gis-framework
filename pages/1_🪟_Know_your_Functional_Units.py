@@ -29,10 +29,9 @@ subregions = admin2.filterBounds(region_geom).aggregate_array('shapeName').getIn
 selected_subregion = st.selectbox("Select Sub-region", sorted(subregions))
 aoi = admin2.filter(ee.Filter.eq('shapeName', selected_subregion))
 
-
 # Optional: Upload user AOI shapefile
 uploaded = st.file_uploader("Optional: Upload your own AOI shapefile (.zip)", type=["zip"])
-
+uploaded_aoi = None  # Define variable early to avoid NameError
 
 if uploaded:
     with zipfile.ZipFile(uploaded, 'r') as zf:
@@ -43,9 +42,9 @@ if uploaded:
     except Exception as e:
         st.error(f"Error reading shapefile: {e}")
 
-
 # AOI used: uploaded shapefile or dropdown
 final_aoi = uploaded_aoi if uploaded_aoi else aoi
+
 
 # Select CORINE year
 CORINE_YEARS = {
