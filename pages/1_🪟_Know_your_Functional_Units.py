@@ -31,12 +31,12 @@ selected_subregion = st.selectbox("Select Sub-region", sorted(subregions))
 aoi = admin2.filter(ee.Filter.eq('shapeName', selected_subregion))
 
 # Step 2: Optional upload of AOI shapefile
-uploaded = st.file_uploader("Optional: Upload your own AOI shapefile (.zip)", type=["zip"], key="aoi_upload")
 
 uploaded_aoi = None
 
 # Optional: Upload user AOI shapefile
-# uploaded = st.file_uploader("Optional: Upload your own AOI shapefile (.zip)", type=["zip"])
+uploaded = st.file_uploader("Optional: Upload your own AOI shapefile (.zip)", type=["zip"], key="aoi_upload")
+
 uploaded_aoi = None  # will hold ee.Geometry
 
 if uploaded:
