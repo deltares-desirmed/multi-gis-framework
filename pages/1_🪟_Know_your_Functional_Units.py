@@ -30,26 +30,48 @@ subregions = admin2.filterBounds(region_geom).aggregate_array('shapeName').getIn
 selected_subregion = st.selectbox("Select Sub-region", sorted(subregions))
 aoi = admin2.filter(ee.Filter.eq('shapeName', selected_subregion))  # FeatureCollection
 
-# Optional: Upload user AOI shapefile
+# --- Upload AOI Shapefile ---
 uploaded = st.file_uploader("Optional: Upload your own AOI shapefile (.zip)", type=["zip"], key="aoi_upload")
-uploaded_aoi = None  # This will be an ee.Geometry
+uploaded_aoi = None
 
 if uploaded:
     with zipfile.ZipFile(uploaded, 'r') as zf:
         zf.extractall("temp_shp")
     try:
-        uploaded_fc = geemap.shp_to_ee("temp_shp")   # FeatureCollection
-        uploaded_aoi = uploaded_fc.geometry()         # Convert to ee.Geometry
-        st.success("✅ AOI shapefile uploaded and used.")
+        uploaded_fc = geemap.shp_to_ee("temp_shp")
+        if uploaded_fc:
+            uploaded_aoi = uploaded_fc.geometry()
+            st.success("✅ AOI shapefile uploaded and used.")
+        else:
+            st.error("❌ Uploaded shapefile could not be parsed. Make sure it includes `.shp`, `.shx`, `.dbf`.")
     except Exception as e:
         st.error(f"❌ Error reading shapefile: {e}")
 
-# AOI used: uploaded shapefile (geometry) or dropdown AOI (converted to geometry)
+# --- Assign Final AOI ---
 try:
     final_aoi = uploaded_aoi if uploaded_aoi else aoi.geometry()
 except Exception as e:
     final_aoi = None
-    st.error("⚠️ No valid AOI found. Please select from dropdown or upload a valid shapefile.")
+    st.error("⚠️ No valid AOI found from either upload or dropdown.")
+
+# --- Map Visualization ---
+if final_aoi:
+    try:
+        aoi_centroid = final_aoi.centroid().coordinates().getInfo()
+        Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=10)
+
+        aoi_fc = ee.FeatureCollection([ee.Feature(final_aoi)])
+        Map.addLayer(aoi_fc.style(color='red', fillColor='00000000', width=2), {}, "AOI Boundary")
+
+        
+
+        Map.add_child(folium.LayerControl())
+        Map.to_streamlit(height=600)
+
+    except Exception as e:
+        st.error(f"❌ Error displaying map: {e}")
+else:
+    st.warning("⚠️ Please select or upload a valid AOI.")
 
 
 
@@ -101,7 +123,9 @@ Map = geemap.Map(center=[51, 3], zoom=8)
 # Map.addLayer(final_aoi.style(**{
 #     "color": "red", "fillColor": "00000000", "width": 2
 # }), {}, "AOI Boundary")
-
+Map.addLayer(archetype_img, {
+            "min": 1, "max": 14, "palette": palette
+        }, f"Archetypes {selected_year}")
 # Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
 # ✅ Only run map logic if final_aoi is valid
 if final_aoi:
