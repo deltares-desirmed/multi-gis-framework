@@ -113,9 +113,9 @@ Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archety
 aoi_centroid = final_aoi.geometry().centroid().coordinates().getInfo()
 Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=11)
 
-Map.addLayer(final_aoi.style(**{
-    "color": "red", "fillColor": "00000000", "width": 2
-}), {}, "AOI Boundary")
+# Map.addLayer(final_aoi.style(**{
+#     "color": "red", "fillColor": "00000000", "width": 2
+# }), {}, "AOI Boundary")
 Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
 
 # --- Custom Toggleable Legend (HTML + JS) ---
