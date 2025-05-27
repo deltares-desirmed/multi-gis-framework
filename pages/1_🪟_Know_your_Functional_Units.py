@@ -99,7 +99,7 @@ Map = geemap.Map(center=[51, 3], zoom=8)
 # Create the map
 # Compute center coordinates dynamically
 aoi_centroid = final_aoi.geometry().centroid().coordinates().getInfo()
-Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=10)
+Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=9)
 
 Map.addLayer(final_aoi.style(**{
     "color": "red", "fillColor": "00000000", "width": 2
