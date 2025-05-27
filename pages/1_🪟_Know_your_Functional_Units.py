@@ -1,7 +1,7 @@
 import streamlit as st
 import ee
 import geemap.foliumap as geemap 
-from utils_ee import initialize_earth_engine
+from utils_ee import initialize_earth_engine  #  Auth from secret config
 import zipfile
 import os
 
