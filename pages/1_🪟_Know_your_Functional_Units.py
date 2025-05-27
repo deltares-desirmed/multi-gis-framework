@@ -34,19 +34,32 @@ aoi = admin2.filter(ee.Filter.eq('shapeName', selected_subregion))
 uploaded = st.file_uploader("Optional: Upload your own AOI shapefile (.zip)", type=["zip"])
 uploaded_aoi = None
 
+uploaded_aoi = None
+final_aoi = None
+
+# Try uploaded shapefile
 if uploaded:
     with zipfile.ZipFile(uploaded, 'r') as zf:
         zf.extractall("temp_shp")
     try:
         uploaded_fc = geemap.shp_to_ee("temp_shp")
-        uploaded_geom = uploaded_fc.geometry()  # Convert to geometry for styling/clipping
-        uploaded_aoi = uploaded_geom
+        uploaded_aoi = uploaded_fc.geometry()
         st.success("✅ AOI shapefile uploaded and used.")
     except Exception as e:
         st.error(f"❌ Error reading shapefile: {e}")
 
-# Step 3: Set final AOI
-final_aoi = uploaded_aoi if uploaded_aoi else aoi.geometry()
+# Fallback to dropdown AOI
+if not uploaded_aoi:
+    try:
+        aoi = admin2.filter(ee.Filter.eq('shapeName', selected_subregion))
+        final_aoi = aoi.geometry()
+        st.success(f"✅ AOI selected from dropdown: {selected_subregion}")
+    except Exception as e:
+        st.error("⚠️ Error initializing dropdown AOI.")
+else:
+    final_aoi = uploaded_aoi
+
+
 
 # Select CORINE year
 CORINE_YEARS = {
