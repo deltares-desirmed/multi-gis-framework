@@ -30,39 +30,23 @@ subregions = admin2.filterBounds(region_geom).aggregate_array('shapeName').getIn
 selected_subregion = st.selectbox("Select Sub-region", sorted(subregions))
 aoi = admin2.filter(ee.Filter.eq('shapeName', selected_subregion))
 
-# Step 1: Let user choose AOI source
-aoi_source = st.radio("Select AOI source", ["Use dropdown", "Upload shapefile"])
-
-final_aoi = None
+# Step 2: Optional upload of AOI shapefile
+uploaded = st.file_uploader("Optional: Upload your own AOI shapefile (.zip)", type=["zip"])
 uploaded_aoi = None
 
-if aoi_source == "Upload shapefile":
-    uploaded = st.file_uploader("Upload your AOI shapefile (.zip)", type=["zip"])
-    if uploaded:
-        with zipfile.ZipFile(uploaded, 'r') as zf:
-            zf.extractall("temp_shp")
-        try:
-            uploaded_aoi = geemap.shp_to_ee("temp_shp")
-            final_aoi = uploaded_aoi
-            st.success("✅ AOI shapefile uploaded and used.")
-        except Exception as e:
-            st.error(f"Error reading shapefile: {e}")
-else:
-    # Dropdown AOI selection
-    countries = admin0.aggregate_array('shapeName').getInfo()
-    selected_country = st.selectbox("Select Country", sorted(countries))
-    country_geom = admin0.filter(ee.Filter.eq('shapeName', selected_country)).geometry()
+if uploaded:
+    with zipfile.ZipFile(uploaded, 'r') as zf:
+        zf.extractall("temp_shp")
+    try:
+        uploaded_fc = geemap.shp_to_ee("temp_shp")
+        uploaded_geom = uploaded_fc.geometry()  # Convert to geometry for styling/clipping
+        uploaded_aoi = uploaded_geom
+        st.success("✅ AOI shapefile uploaded and used.")
+    except Exception as e:
+        st.error(f"❌ Error reading shapefile: {e}")
 
-    regions = admin1.filterBounds(country_geom).aggregate_array('shapeName').getInfo()
-    selected_region = st.selectbox("Select Region", sorted(regions))
-    region_geom = admin1.filter(ee.Filter.eq('shapeName', selected_region)).geometry()
-
-    subregions = admin2.filterBounds(region_geom).aggregate_array('shapeName').getInfo()
-    selected_subregion = st.selectbox("Select Sub-region", sorted(subregions))
-    final_aoi = admin2.filter(ee.Filter.eq('shapeName', selected_subregion))
-
-    st.success(f"✅ AOI selected from dropdown: {selected_subregion}, {selected_region}, {selected_country}")
-
+# Step 3: Set final AOI
+final_aoi = uploaded_aoi if uploaded_aoi else aoi.geometry()
 
 # Select CORINE year
 CORINE_YEARS = {
