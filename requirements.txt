@@ -1,4 +1,4 @@
---find-links=https://girder.github.io/large_image_wheels GDAL
+# --find-links=https://girder.github.io/large_image_wheels GDAL
 
 # Core GIS Libraries
 folium==0.14.0
