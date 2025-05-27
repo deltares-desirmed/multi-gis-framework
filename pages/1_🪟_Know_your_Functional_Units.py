@@ -103,33 +103,18 @@ Map = geemap.Map(center=[51, 3], zoom=8)
 # }), {}, "AOI Boundary")
 
 # Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
-# ✅ Only run map logic if final_aoi is valid
+# Create the map
+# Compute center coordinates dynamically
+aoi_centroid = final_aoi.geometry().centroid().coordinates().getInfo()
+Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=10)
 if final_aoi:
-    try:
-        # Compute centroid and build map
-        aoi_centroid = final_aoi.centroid().coordinates().getInfo()
-        Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=10)
-
-        # Convert to FeatureCollection for styling
-        aoi_fc = ee.FeatureCollection([ee.Feature(final_aoi)])
-
-        # Add AOI boundary and archetype layer
-        Map.addLayer(aoi_fc.style({
-            "color": "red", "fillColor": "00000000", "width": 2
-        }), {}, "AOI Boundary")
-
-        Map.addLayer(archetype_img, {
-            "min": 1, "max": 14, "palette": palette
-        }, f"Archetypes {selected_year}")
-
-        Map.add_child(folium.LayerControl())
-        Map.to_streamlit(height=600)
-
-    except Exception as e:
-        st.error(f"❌ Error displaying map: {e}")
-else:
-    st.warning("⚠️ Please select a valid AOI (from dropdown or shapefile) before generating the map.")
-
+    Map.addLayer(final_aoi.style({
+        "color": "red", "fillColor": "00000000", "width": 2
+    }), {}, "AOI Boundary")
+Map.addLayer(final_aoi.style(**{
+    "color": "red", "fillColor": "00000000", "width": 2
+}), {}, "AOI Boundary")
+Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
 
 
 
