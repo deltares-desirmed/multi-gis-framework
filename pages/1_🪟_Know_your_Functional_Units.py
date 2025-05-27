@@ -113,6 +113,11 @@ Map.addLayer(final_aoi.style(**{
 }), {}, "AOI Boundary")
 Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
 
+if final_aoi:
+    Map.addLayer(final_aoi.style({
+        "color": "red", "fillColor": "00000000", "width": 2
+    }), {}, "AOI Boundary")
+
 # --- Custom Toggleable Legend (HTML + JS) ---
 
 # HTML for legend box
