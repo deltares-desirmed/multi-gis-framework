@@ -1,7 +1,7 @@
 {
 "type": "FeatureCollection",
 "name": "EU_education2",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+" crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
 "features": [
 { "type": "Feature", "properties": { "OBJECTID": 12367, "Shape": null, "id": "FR_0623758Y", "name": "ECOLE PRIMAIRE PRIVÉE SAINT ELOI-SAINTE ISBERGUE", "lat": 50.62052095, "lon": 2.456758108, "city": "ISBERGUES", "public_private": "PRIVATE" }, "geometry": { "type": "Point", "coordinates": [ 2.456758108000031, 50.620520950000071 ] } },
 { "type": "Feature", "properties": { "OBJECTID": 12368, "Shape": null, "id": "FR_0623769K", "name": "ECOLE PRIMAIRE HERVÉ CHARPENTIER - LES TOURTERELLES", "lat": 50.568906, "lon": 1.613624, "city": "CAMIERS", "public_private": "PUBLIC" }, "geometry": { "type": "Point", "coordinates": [ 1.613624, 50.568906 ] } },
