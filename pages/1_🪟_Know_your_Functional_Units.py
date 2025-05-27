@@ -99,7 +99,7 @@ Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archety
 # Create the map
 # Compute center coordinates dynamically
 aoi_centroid = final_aoi.geometry().centroid().coordinates().getInfo()
-Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=10)
+Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=12)
 
 Map.addLayer(final_aoi.style(**{
     "color": "red", "fillColor": "00000000", "width": 2
@@ -158,77 +158,17 @@ Map.add_child(folium.LayerControl())
 Map.to_streamlit(height=600)
 
 
-# Export Buttons
-col1, col2, col3, col4 = st.columns(4)
-export_base_name = f"Archetypes_{selected_subregion}_{selected_year}"
-
-with col1:
-    if st.button("Export to EE Asset"):
-        task = ee.batch.Export.image.toAsset(
-            image=archetype_img,
-            description=export_base_name + "_Asset",
-            assetId=f"projects/ee-desmond/assets/{export_base_name}",
-            region=final_aoi.geometry(),
-            scale=100,
-            maxPixels=1e13
-        )
-        task.start()
-        st.success("Export to asset started.")
-
 st.subheader("📤 Export Options")
 
 # Let user choose format and years
 export_format = st.radio("Select Export Format", ["GeoTIFF", "SHP"])
 selected_years = st.multiselect("Select CORINE Year(s)", ['2012', '2018'], default=['2012'])
 
-def vectorize(image, geom, year):
-    vectors = image.reduceToVectors(
-        geometry=geom,
-        geometryType='polygon',
-        scale=100,
-        reducer=ee.Reducer.countEvery(),
-        maxPixels=1e13
-    )
-    return vectors.map(lambda f: f.set('year', year))
-
-
 # Folder and file name prefix
-custom_prefix = st.text_input("File name prefix", value=export_base_name)
 export_folder = st.text_input("Drive folder name", value="nbracer")
+custom_prefix = st.text_input("File name prefix (base)", value="Archetypes")
 
-if st.button("Export Selected Years"):
-    for year in selected_years:
-        corine_img = CORINE_YEARS[year]
-        archetype_img = reclassify(corine_img).clip(final_aoi)
-        prefix = f"{custom_prefix}_{year}"
-
-        if export_format == "GeoTIFF":
-            task = ee.batch.Export.image.toDrive(
-                image=archetype_img,
-                description=prefix + "_GeoTIFF",
-                folder=export_folder,
-                fileNamePrefix=prefix,
-                region=final_aoi.geometry(),
-                scale=100,
-                maxPixels=1e13
-            )
-            task.start()
-            st.success(f"✅ GeoTIFF for {year} export started to Drive/{export_folder}/{prefix}.tif")
-
-        elif export_format == "SHP":
-            vector_fc = vectorize(archetype_img, final_aoi.geometry(), year)
-            task = ee.batch.Export.table.toDrive(
-                collection=vector_fc,
-                description=prefix + "_SHP",
-                folder=export_folder,
-                fileNamePrefix=prefix + "_Vector",
-                fileFormat='SHP'
-            )
-            task.start()
-            st.success(f"✅ SHP for {year} export started to Drive/{export_folder}/{prefix}_Vector.zip")
-
-
-# Vectorization and Export
+# Define the vectorization function
 def vectorize(image, geom, year):
     vectors = image.reduceToVectors(
         geometry=geom,
@@ -239,15 +179,58 @@ def vectorize(image, geom, year):
     )
     return vectors.map(lambda f: f.set('year', year))
 
-with col3:
-    if st.button("Export as Vector (SHP)"):
-        vector_fc = vectorize(archetype_img, final_aoi.geometry(), selected_year)
-        task = ee.batch.Export.table.toDrive(
-            collection=vector_fc,
-            description=export_base_name + "_Shapefile",
-            folder="nbracer",
-            fileNamePrefix=export_base_name + "_Vector",
-            fileFormat='SHP'
+# Columns for layout
+col1, col2 = st.columns(2)
+
+# EE Asset Export for one year (current dropdown selection)
+export_base_name = f"{custom_prefix}_{selected_subregion}_{selected_year}"
+with col1:
+    if st.button("Export to EE Asset"):
+        asset_id = f"projects/ee-desmond/assets/{export_base_name}"
+        task = ee.batch.Export.image.toAsset(
+            image=archetype_img,
+            description=export_base_name + "_Asset",
+            assetId=asset_id,
+            region=final_aoi.geometry(),
+            scale=100,
+            maxPixels=1e13
         )
         task.start()
-        st.success("Vector export (SHP) started.")
+        st.success(f"✅ Export to EE Asset started.\n📁 Asset ID: `{asset_id}`")
+
+# Drive Export (GeoTIFF or SHP) for multiple years
+with col2:
+    if st.button("Export Selected Years to Drive"):
+        for year in selected_years:
+            corine_img = CORINE_YEARS[year]
+            archetype_img = reclassify(corine_img).clip(final_aoi)
+            file_prefix = f"{custom_prefix}_{selected_subregion}_{year}"
+
+            if export_format == "GeoTIFF":
+                task = ee.batch.Export.image.toDrive(
+                    image=archetype_img,
+                    description=file_prefix + "_GeoTIFF",
+                    folder=export_folder,
+                    fileNamePrefix=file_prefix,
+                    region=final_aoi.geometry(),
+                    scale=100,
+                    maxPixels=1e13
+                )
+                task.start()
+                st.success(f"✅ GeoTIFF export for {year} started to Drive/{export_folder}/{file_prefix}.tif")
+
+            elif export_format == "SHP":
+                vector_fc = vectorize(archetype_img, final_aoi.geometry(), year)
+                task = ee.batch.Export.table.toDrive(
+                    collection=vector_fc,
+                    description=file_prefix + "_SHP",
+                    folder=export_folder,
+                    fileNamePrefix=file_prefix + "_Vector",
+                    fileFormat='SHP'
+                )
+                task.start()
+                st.success(f"✅ SHP export for {year} started to Drive/{export_folder}/{file_prefix}_Vector.zip")
+
+# Tip for checking task progress
+st.info("🕒 To check export progress, go to the [Earth Engine Code Editor](https://code.earthengine.google.com/) and click on the 'Tasks' tab.")
+
