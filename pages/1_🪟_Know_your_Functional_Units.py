@@ -107,16 +107,16 @@ Map = geemap.Map(center=[51, 3], zoom=8)
 # Compute center coordinates dynamically
 aoi_centroid = final_aoi.geometry().centroid().coordinates().getInfo()
 Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=10)
-
+if final_aoi:
+    Map.addLayer(final_aoi.style({
+        "color": "red", "fillColor": "00000000", "width": 2
+    }), {}, "AOI Boundary")
 Map.addLayer(final_aoi.style(**{
     "color": "red", "fillColor": "00000000", "width": 2
 }), {}, "AOI Boundary")
 Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
 
-if final_aoi:
-    Map.addLayer(final_aoi.style({
-        "color": "red", "fillColor": "00000000", "width": 2
-    }), {}, "AOI Boundary")
+
 
 # --- Custom Toggleable Legend (HTML + JS) ---
 
