@@ -111,7 +111,7 @@ Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archety
 # Create the map
 # Compute center coordinates dynamically
 # aoi_centroid = final_aoi.geometry().centroid().coordinates().getInfo()
-Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=11)
+# Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=11)
 
 # Map.addLayer(final_aoi.style(**{
 #     "color": "red", "fillColor": "00000000", "width": 2
