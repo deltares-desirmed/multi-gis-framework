@@ -28,23 +28,30 @@ region_geom = admin1.filter(ee.Filter.eq('shapeName', selected_region)).geometry
 
 subregions = admin2.filterBounds(region_geom).aggregate_array('shapeName').getInfo()
 selected_subregion = st.selectbox("Select Sub-region", sorted(subregions))
-aoi = admin2.filter(ee.Filter.eq('shapeName', selected_subregion))
+aoi = admin2.filter(ee.Filter.eq('shapeName', selected_subregion))  # FeatureCollection
 
 # Optional: Upload user AOI shapefile
-uploaded = st.file_uploader("Optional: Upload your own AOI shapefile (.zip)", type=["zip"])
-uploaded_aoi = None  # Define variable early to avoid NameError
+uploaded = st.file_uploader("Optional: Upload your own AOI shapefile (.zip)", type=["zip"], key="aoi_upload")
+uploaded_aoi = None  # This will be an ee.Geometry
 
 if uploaded:
     with zipfile.ZipFile(uploaded, 'r') as zf:
         zf.extractall("temp_shp")
     try:
-        uploaded_aoi = geemap.shp_to_ee("temp_shp")
-        st.success("AOI uploaded successfully.")
+        uploaded_fc = geemap.shp_to_ee("temp_shp")   # FeatureCollection
+        uploaded_aoi = uploaded_fc.geometry()         # Convert to ee.Geometry
+        st.success("✅ AOI shapefile uploaded and used.")
     except Exception as e:
-        st.error(f"Error reading shapefile: {e}")
+        st.error(f"❌ Error reading shapefile: {e}")
 
-# AOI used: uploaded shapefile or dropdown
-final_aoi = uploaded_aoi if uploaded_aoi else aoi
+# AOI used: uploaded shapefile (geometry) or dropdown AOI (converted to geometry)
+try:
+    final_aoi = uploaded_aoi if uploaded_aoi else aoi.geometry()
+except Exception as e:
+    final_aoi = None
+    st.error("⚠️ No valid AOI found. Please select from dropdown or upload a valid shapefile.")
+
+
 
 
 # Select CORINE year
