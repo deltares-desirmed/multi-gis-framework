@@ -33,31 +33,32 @@ aoi = admin2.filter(ee.Filter.eq('shapeName', selected_subregion))
 # Step 2: Optional upload of AOI shapefile
 uploaded = st.file_uploader("Optional: Upload your own AOI shapefile (.zip)", type=["zip"])
 uploaded_aoi = None
-
-uploaded_aoi = None
 final_aoi = None
 
-# Try uploaded shapefile
 if uploaded:
     with zipfile.ZipFile(uploaded, 'r') as zf:
         zf.extractall("temp_shp")
     try:
         uploaded_fc = geemap.shp_to_ee("temp_shp")
-        uploaded_aoi = uploaded_fc.geometry()
+        uploaded_aoi = uploaded_fc.geometry()  # Ensure it's geometry for styling
+        final_aoi = uploaded_aoi
         st.success("✅ AOI shapefile uploaded and used.")
     except Exception as e:
         st.error(f"❌ Error reading shapefile: {e}")
 
-# Fallback to dropdown AOI
-if not uploaded_aoi:
+# Fallback to dropdown AOI if no valid upload
+if final_aoi is None:
     try:
         aoi = admin2.filter(ee.Filter.eq('shapeName', selected_subregion))
         final_aoi = aoi.geometry()
         st.success(f"✅ AOI selected from dropdown: {selected_subregion}")
     except Exception as e:
-        st.error("⚠️ Error initializing dropdown AOI.")
-else:
-    final_aoi = uploaded_aoi
+        st.error("⚠️ Error initializing AOI from dropdown.")
+
+# Optional: show bounds or area
+if final_aoi:
+    bounds = final_aoi.bounds().getInfo()
+    st.write("🗺 AOI Bounds:", bounds)
 
 
 
