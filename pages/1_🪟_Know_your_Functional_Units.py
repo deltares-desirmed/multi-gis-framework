@@ -90,9 +90,69 @@ archetype_img = reclassify(corine_img).clip(final_aoi)
 # Map Display
 st.subheader(f"Reclassified Landscape Archetypes ({selected_year})")
 Map = geemap.Map(center=[51, 3], zoom=8)
+Map.addLayer(final_aoi.style(**{
+    "color": "red", "fillColor": "00000000", "width": 2
+}), {}, "AOI Boundary")
+
 Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
-Map.add_legend("Archetypes", legend_dict)
+# Create the map
+Map = geemap.Map(center=[51, 3], zoom=8)
+Map.addLayer(final_aoi.style(**{
+    "color": "red", "fillColor": "00000000", "width": 2
+}), {}, "AOI Boundary")
+Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
+
+# --- Custom Toggleable Legend (HTML + JS) ---
+
+# HTML for legend box
+legend_html = """
+<div id="map-legend" style="
+    position: fixed; 
+    bottom: 50px; left: 50px; width: 280px; 
+    background-color: white; 
+    border: 2px solid grey; 
+    z-index: 9999; 
+    font-size: 14px; 
+    padding: 10px; 
+    display: none;">
+<b>Landscape Archetypes</b><br><hr>
+"""
+
+for desc, color in legend_dict.items():
+    legend_html += f'<i style="background:{color};width:12px;height:12px;float:left;margin-right:8px;"></i>{desc}<br>'
+
+legend_html += "</div>"
+
+# Add legend to map
+Map.get_root().html.add_child(folium.Element(legend_html))
+
+# Toggle script for showing/hiding legend
+toggle_script = """
+<script>
+var legend = document.getElementById('map-legend');
+var checkExist = setInterval(function() {
+    var layers = document.querySelectorAll('.leaflet-control-layers-selector');
+    layers.forEach(function(layer) {
+        if (layer.nextSibling && layer.nextSibling.textContent.includes('Legend')) {
+            layer.addEventListener('change', function() {
+                legend.style.display = layer.checked ? 'block' : 'none';
+            });
+        }
+    });
+    if (layers.length > 0) clearInterval(checkExist);
+}, 500);
+</script>
+"""
+Map.get_root().html.add_child(folium.Element(toggle_script))
+
+# Add dummy layer to trigger legend toggle
+legend_layer = folium.FeatureGroup(name="Legend", show=False)
+Map.add_child(legend_layer)
+
+# Add controls and render map
+Map.add_child(folium.LayerControl())
 Map.to_streamlit(height=600)
+
 
 # Export Buttons
 col1, col2, col3, col4 = st.columns(4)
