@@ -35,7 +35,7 @@ uploaded = st.file_uploader("Optional: Upload your own AOI shapefile (.zip)", ty
 uploaded_aoi = None
 
 # Optional: Upload user AOI shapefile
-uploaded = st.file_uploader("Optional: Upload your own AOI shapefile (.zip)", type=["zip"])
+# uploaded = st.file_uploader("Optional: Upload your own AOI shapefile (.zip)", type=["zip"])
 uploaded_aoi = None  # will hold ee.Geometry
 
 if uploaded:
