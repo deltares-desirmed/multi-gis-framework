@@ -411,27 +411,52 @@ Map.add_child(legend_layer)
 Map.add_child(folium.LayerControl())
 Map.to_streamlit(height=600)
 
-# Prepare image and region
-selected_image = reclassify(CLIPPED_CORINE[selected_year]).clip(final_aoi)
-download_region = final_aoi if isinstance(final_aoi, ee.Geometry) else final_aoi.geometry()
-
-# Evaluate region to client-side GeoJSON string for download
-region_json = download_region.getInfo()  # This brings it to client side
-
-# Now generate download URL
-url = selected_image.getDownloadURL({
-    'scale': 100,
-    'crs': 'EPSG:3857',
-    'region': region_json,
-    'format': 'GeoTIFF'
-})
-
-# Display download link
+# --- Download Section for Displayed Layers ---
 st.subheader("🧷 Quick Download")
-st.markdown(
-    f"[📥 Click here to download clipped Archetypes ({selected_year}) as GeoTIFF]({url})",
-    unsafe_allow_html=True
-)
+
+# Use current AOI
+download_region = final_aoi if isinstance(final_aoi, ee.Geometry) else final_aoi.geometry()
+region_json = download_region.getInfo()  # Move to client-side for download
+
+# Helper: Generate download URL
+def get_download_url(image, label):
+    try:
+        url = image.getDownloadURL({
+            'scale': 100,
+            'crs': 'EPSG:3857',
+            'region': region_json,
+            'format': 'GeoTIFF'
+        })
+        st.markdown(
+            f"[📥 Download {label} ({selected_year}) as GeoTIFF]({url})",
+            unsafe_allow_html=True
+        )
+    except Exception as e:
+        st.error(f"❌ Could not generate download for {label}: {e}")
+
+# 1. CORINE (raw)
+corine_img = CLIPPED_CORINE[selected_year]
+get_download_url(corine_img, "CORINE Raw")
+
+# 2. Archetypes (reclassified)
+archetype_img = reclassify(corine_img).clip(download_region)
+get_download_url(archetype_img, "Landscape Archetypes")
+
+# 3. EUNIS (if reclassified image exists)
+try:
+    # Create a mapping function from CORINE to EUNIS if you have one (example placeholder)
+    def corine_to_eunis(image):
+        corine_to_eunis_dict = {
+            # ... your remap values ...
+        }
+        from_list = list(corine_to_eunis_dict.keys())
+        to_list = list(corine_to_eunis_dict.values())
+        return image.remap(from_list, to_list).rename('eunis')
+
+    eunis_img = corine_to_eunis(corine_img).clip(download_region)
+    get_download_url(eunis_img, "EUNIS Reclassified")
+except Exception:
+    st.info("ℹ️ EUNIS layer not configured or skipped.")
 
 # -------------------- Export Options --------------------
 st.subheader("📤 Export Options")
