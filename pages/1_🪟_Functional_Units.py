@@ -116,7 +116,7 @@ legend_html += "</div>"
 m.get_root().html.add_child(folium.Element(legend_html))
 
 
-# --- Archetype reclassification ---
+# --- Archetype reclassification with custom colors ---
 archetypes = {
     '1': [111,112,121,122],  # Urban
     '2': [123,124],          # Transport
@@ -135,11 +135,22 @@ archetypes = {
 }
 arch_from, arch_to = [], []
 
-# Distinct palette for 14 classes (define meaningfully)
+# Custom color palette for archetypes based on earlier example
 arch_palette = [
-    "#d73027", "#fc8d59", "#fee08b", "#d9ef8b", "#91cf60",
-    "#66bd63", "#1a9850", "#a6d96a", "#3288bd", "#5e4fa2",
-    "#abdda4", "#f46d43", "#fdae61", "#4575b4"
+    '#636363',  # Urban
+    '#969696',  # Transport
+    '#cccccc',  # Extraction
+    '#91d700',  # Greenspace
+    '#91d700',  # Arable land
+    '#df9f00',  # Permanent crops
+    '#80ff00',  # Forests
+    '#a63603',  # Sparse/Barren
+    '#78c679',  # Mosaic crops
+    '#ffcc99',  # Sand dunes
+    '#7fff00',  # Wetlands
+    '#a6e6ff',  # Inland wetlands
+    '#4da6ff',  # Rivers/Lakes
+    '#00bfff'   # Marine/coastal
 ]
 
 for k, v in archetypes.items():
@@ -161,7 +172,7 @@ eunis_map = {
 eunis_from = list(eunis_map.keys())
 eunis_to = list(eunis_map.values())
 
-# Palette from your earlier EUNIS color mapping
+# Your custom EUNIS palette
 eunis_palette = [
     "#a50026", "#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf",
     "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850", "#006837", "#d4eeff",
@@ -191,6 +202,7 @@ m.add_ee_tile_layer(archetype_img, {
 m.add_ee_tile_layer(eunis_img, {
     "min": 1, "max": 43, "palette": eunis_palette
 }, "EUNIS (43 Classes)")
+
 
 # Add toggle functionality
 toggle_script = """
