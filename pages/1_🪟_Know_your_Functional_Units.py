@@ -83,22 +83,17 @@ CLIPPED_CORINE = {
 # Year selection + retrieval of clipped image --> we can choose this or the other....full corine or only clipped to AOI
 # selected_year = st.selectbox("Select CORINE Year", ['2012', '2018'])
 # corine_img = CLIPPED_CORINE[selected_year]
-
-# CORINE year selection
+# Year selection
 selected_year = st.selectbox("Select CORINE Year", ['2012', '2018'])
 
-# Toggle to allow clipping
+# Optional clip toggle
 clip_toggle = st.checkbox("Clip CORINE to AOI", value=True)
 
-# Select original CORINE image
-raw_corine = CORINE_YEARS[selected_year]
-
-# Clip conditionally
-corine_img = raw_corine.clip(final_aoi) if clip_toggle else raw_corine
-
-# Reclassify (always clip for archetype logic)
-# archetype_img = reclassify(raw_corine).clip(final_aoi)
-
+# CORINE image (clipped or full)
+corine_img = (
+    CORINE_YEARS[selected_year].clip(final_aoi)
+    if clip_toggle else CORINE_YEARS[selected_year]
+)
 
 
 # Full CORINE class palette (44 values)
@@ -199,6 +194,16 @@ archetype_img = reclassify(corine_img).clip(final_aoi)
 # Map Display
 st.subheader(f"Reclassified Landscape Archetypes ({selected_year})")
 Map = geemap.Map(center=[51, 3], zoom=8)
+
+Map.addLayer(
+    corine_img,
+    {
+        "min": 111,
+        "max": 523,
+        "palette": corine_palette
+    },
+    f"CORINE {selected_year}"
+)
 # Map.addLayer(final_aoi.style(**{
 #     "color": "red", "fillColor": "00000000", "width": 2
 # }), {}, "AOI Boundary")
