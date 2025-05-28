@@ -30,34 +30,48 @@ subregions = admin2.filterBounds(region_geom).aggregate_array('shapeName').getIn
 selected_subregion = st.selectbox("Select Sub-region", sorted(subregions))
 aoi = admin2.filter(ee.Filter.eq('shapeName', selected_subregion))
 
-# Optional: Upload user AOI shapefile
+import geopandas as gpd
+import geemap
+import os
+
 uploaded = st.file_uploader("Optional: Upload your own AOI shapefile (.zip)", type=["zip"])
-uploaded_aoi_fc = None  # Full FeatureCollection
-uploaded_geom = None    # Geometry extracted from uploaded AOI
+uploaded_aoi_fc = None
+uploaded_geom = None
 
 if uploaded:
     with zipfile.ZipFile(uploaded, 'r') as zf:
         zf.extractall("temp_shp")
-    try:
-        uploaded_aoi_fc = geemap.shp_to_ee("temp_shp")  # Convert shapefile to ee.FeatureCollection
-        uploaded_geom = uploaded_aoi_fc.geometry()       # Extract ee.Geometry from it
-        st.success("AOI uploaded and converted successfully.")
-    except Exception as e:
-        st.error(f"Error reading or converting shapefile: {e}")
 
-# # AOI used: uploaded shapefile or dropdown
-# final_aoi = uploaded_geom if uploaded_geom else aoi.geometry()
+    # Find the .shp file
+    shp_files = [f for f in os.listdir("temp_shp") if f.endswith(".shp")]
+    if not shp_files:
+        st.error("❌ No .shp file found in the uploaded .zip.")
+    else:
+        shp_path = os.path.join("temp_shp", shp_files[0])
 
-# # Ensure selected_subregion is always defined
-# selected_subregion = "User_AOI" if uploaded_geom else selected_subregion
+        try:
+            # Read shapefile using geopandas
+            gdf = gpd.read_file(shp_path)
 
+            if gdf.empty:
+                st.error("❌ Shapefile is empty.")
+            elif not gdf.geom_type.isin(["Polygon", "MultiPolygon"]).any():
+                st.error("❌ Uploaded shapefile must contain Polygon geometries.")
+            else:
+                # Convert to EE FeatureCollection using geemap
+                uploaded_aoi_fc = geemap.gdf_to_ee(gdf)
+                uploaded_geom = uploaded_aoi_fc.geometry()
+                st.success("✅ AOI uploaded and converted successfully.")
+        except Exception as e:
+            st.error(f"❌ Error reading shapefile: {e}")
 
 # AOI used: uploaded shapefile or dropdown
-final_aoi = uploaded_aoi_fc if uploaded_aoi_fc else aoi  # for display (can style if FC)
-aoi_geom = final_aoi.geometry() if isinstance(final_aoi, ee.FeatureCollection) else final_aoi  # for clipping & centroid
+final_aoi = uploaded_aoi_fc if uploaded_aoi_fc else aoi
+aoi_geom = final_aoi.geometry() if isinstance(final_aoi, ee.FeatureCollection) else final_aoi
 
 # Ensure selected_subregion is always defined
 selected_subregion = "User_AOI" if uploaded_aoi_fc else selected_subregion
+
 
 
 # Select CORINE year
