@@ -44,7 +44,13 @@ if uploaded:
         st.error(f"Error reading shapefile: {e}")
 
 # AOI used: uploaded shapefile or dropdown
+# AOI used: uploaded shapefile or dropdown
 final_aoi = uploaded_aoi if uploaded_aoi else aoi
+
+# Ensure selected_subregion is always defined
+if uploaded_aoi:
+    selected_subregion = "User_AOI"
+
 
 
 # Select CORINE year
