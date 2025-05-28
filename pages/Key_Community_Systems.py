@@ -2,30 +2,8 @@ import streamlit as st
 import pandas as pd
 from streamlit_folium import st_folium
 import folium
-from folium.plugins import Draw
-import io
 from folium.plugins import Draw, Geocoder
-
-# Create base map
-m = folium.Map(location=[45, 10], zoom_start=4)
-
-# Add draw controls
-draw = Draw(
-    draw_options={
-        "polyline": False,
-        "polygon": False,
-        "circle": False,
-        "rectangle": False,
-        "circlemarker": False,
-        "marker": True
-    },
-    edit_options={"edit": True}
-)
-draw.add_to(m)
-
-# ✅ Add search bar (geocoder)
-Geocoder(collapsed=False, add_marker=True).add_to(m)
-
+import io
 
 st.set_page_config(layout="wide")
 st.title("🗺️ Community Systems Mapping Tool")
@@ -34,10 +12,10 @@ st.title("🗺️ Community Systems Mapping Tool")
 if "points" not in st.session_state:
     st.session_state.points = []
 
-# Create base map
+# ✅ Create base map once
 m = folium.Map(location=[45, 10], zoom_start=4)
 
-# Add drawing controls with predefined icons
+# ✅ Add drawing controls
 draw = Draw(
     draw_options={
         "polyline": False,
@@ -51,10 +29,13 @@ draw = Draw(
 )
 draw.add_to(m)
 
-# Display map
+# ✅ Add geocoding search bar
+Geocoder(collapsed=False, add_marker=True).add_to(m)
+
+# ✅ Display the map
 output = st_folium(m, height=500, width=1000, returned_objects=["last_clicked", "all_drawings"])
 
-# Category options with emojis for readability
+# Category options
 categories = {
     "School 🏫": "school",
     "Hospital 🏥": "hospital",
@@ -62,7 +43,7 @@ categories = {
     "Other Critical Site ⚠️": "other"
 }
 
-# Form to enter metadata if marker was placed
+# Metadata entry form
 if output["last_clicked"]:
     st.subheader("📍 Enter Details for Selected Point")
     with st.form("point_form"):
@@ -88,13 +69,13 @@ if output["last_clicked"]:
             st.session_state.points.append(point_data)
             st.success(f"Added: {name}")
 
-# Display table of added points
+# Display and download table
 if st.session_state.points:
     st.subheader("🗂️ Community Systems Table")
     df = pd.DataFrame(st.session_state.points)
     st.dataframe(df, use_container_width=True)
 
-    # Export as CSV
+    # Download as CSV
     st.download_button(
         label="📥 Download as CSV",
         data=df.to_csv(index=False).encode("utf-8"),
@@ -102,7 +83,7 @@ if st.session_state.points:
         mime="text/csv"
     )
 
-    # Export as Excel
+    # Download as Excel
     excel_buffer = io.BytesIO()
     with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
         df.to_excel(writer, index=False)
