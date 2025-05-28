@@ -283,35 +283,58 @@ with st.expander("CORINE Legend (44 classes)"):
 
 with st.expander("EUNIS Legend (43 classes)"):
 
-    # Build EUNIS legend in 2 columns
-    half = len(corine_to_eunis) // 2
-    items = list(corine_to_eunis.items())
-    
-    col1_html = ""
-    col2_html = ""
+    eunis_labels = {
+        1: "Urban buildings", 2: "Suburban housing", 3: "Low density build",
+        4: "Transport", 5: "Ports", 6: "Airports", 7: "Extractive industry",
+        8: "Waste deposits", 9: "Construction", 10: "Parks", 11: "Arable land",
+        12: "Crops (intensive)", 13: "Rice fields", 14: "Vineyards",
+        15: "Fruit shrubs", 16: "Olive trees", 17: "Grassland",
+        18: "Mixed crops", 19: "Garden crops", 20: "Low-intensity crops",
+        21: "Wooded grassland", 22: "Broadleaf forest", 23: "Conifer forest",
+        24: "Mixed woodland", 25: "Dry grasslands", 26: "Shrub heath",
+        27: "Medit. brush", 28: "Fringes/clearings", 29: "Beaches/dunes",
+        30: "Littoral rock", 31: "Sparse inland", 32: "Burnt land",
+        33: "Snow/Ice", 34: "Inland shore", 35: "Peat bogs",
+        36: "Salt marshes", 37: "Saline artificial", 38: "Littoral sand",
+        39: "Rivers", 40: "Lakes", 41: "Lagoons", 42: "Estuaries",
+        43: "Marine sand"
+    }
 
-    for i, (corine_code, eunis_code) in enumerate(items):
-        color = eunis_palette[eunis_code - 1]  # Palette index starts at 0
-        label = f"EUNIS {eunis_code} (from CORINE {corine_code})"
-        entry_html = (
+    eunis_palette = [
+        "#a50026", "#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf",
+        "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850", "#006837", "#d4eeff",
+        "#91bfdb", "#4575b4", "#313695", "#e6f598", "#ffffbf", "#fee08b",
+        "#fdae61", "#f46d43", "#d73027", "#a50026", "#7fcdbb", "#41b6c4",
+        "#1d91c0", "#225ea8", "#253494", "#081d58", "#d9f0a3", "#addd8e",
+        "#78c679", "#41ab5d", "#238443", "#006837", "#fcbba1", "#fc9272",
+        "#fb6a4a", "#ef3b2c", "#cb181d", "#a50f15", "#67000d", "#cccccc",
+        "#969696"
+    ]
+
+    col1_html, col2_html = "", ""
+    half = len(eunis_labels) // 2
+
+    for i in range(1, 44):
+        box = (
             f'<div style="display:flex;align-items:center;margin-bottom:4px;">'
-            f'<div style="width:12px;height:12px;background:{color};margin-right:6px;"></div>'
-            f'{label}</div>'
+            f'<div style="width:12px;height:12px;background:{eunis_palette[i-1]};margin-right:6px;"></div>'
+            f'{i}: {eunis_labels[i]}</div>'
         )
-        if i < half:
-            col1_html += entry_html
+        if i <= half:
+            col1_html += box
         else:
-            col2_html += entry_html
+            col2_html += box
 
-    # Display side-by-side columns using flexbox
-    legend_html = f"""
-    <div style="display: flex; justify-content: space-between;">
-        <div style="flex: 1; padding-right: 20px;">{col1_html}</div>
-        <div style="flex: 1;">{col2_html}</div>
-    </div>
-    """
+    st.markdown(
+        f"""
+        <div style="display: flex; justify-content: space-between;">
+            <div style="flex: 1; padding-right: 20px;">{col1_html}</div>
+            <div style="flex: 1;">{col2_html}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-    st.markdown(legend_html, unsafe_allow_html=True)
 
 # --- Custom Toggleable Legend (HTML + JS) ---
 legend_html = """
