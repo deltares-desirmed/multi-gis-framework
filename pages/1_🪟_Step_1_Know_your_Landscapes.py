@@ -238,6 +238,9 @@ st.subheader(f"Reclassified Landscape Archetypes ({selected_year})")
 aoi_geom_for_centroid = final_aoi if isinstance(final_aoi, ee.Geometry) else final_aoi.geometry()
 aoi_centroid = aoi_geom_for_centroid.centroid().coordinates().getInfo()
 
+# populations
+ghs_years = [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+
 # Center map and add layers
 Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=9)
 
@@ -269,6 +272,52 @@ Map.addLayer(
     CLIPPED_EUNIS[selected_year],
     {"min": 1, "max": 43, "palette": eunis_palette},
     f"EUNIS {selected_year}"
+)
+
+for year in ghs_years:
+    try:
+        ghs_pop = ee.Image(f"projects/sat-io/open-datasets/GHS/GHS_POP/GHS_POP_E{year}_GLOBE_R2023A_54009_100_V1_0").clip(final_aoi)
+        ghs_smod = ee.Image(f"projects/sat-io/open-datasets/GHS/GHS_SMOD/GHS_SMOD_E{year}_GLOBE_R2023A_54009_1000_V1_0").clip(final_aoi)
+
+        Map.addLayer(
+            ghs_pop,
+            {
+                "min": 0,
+                "max": 125,
+                "palette": ["#060606", "#337663", "#76c677", "#ffffff"]
+            },
+            f"GHS_POP: Population {year}",
+            False
+        )
+
+        Map.addLayer(
+            ghs_smod.mask(ghs_smod.neq(10)),
+            {
+                "min": 10,
+                "max": 30,
+                "palette": ['#7ab6f5', '#cdf57a', '#abcd66', '#375623', '#ffff00', '#a87000', '#732600', '#ff0000']
+            },
+            f"GHS_SMOD: Urbanization {year}",
+            False
+        )
+    except Exception as e:
+        st.warning(f"GHS data not available for {year}: {e}")
+
+worldpop = ee.ImageCollection('WorldPop/GP/100m/pop_age_sex')\
+    .filterBounds(final_aoi)\
+    .filterDate('2020-01-01', '2021-01-01')\
+    .mean()\
+    .clip(final_aoi)
+
+Map.addLayer(
+    worldpop.select('population'),
+    {
+        "min": 0,
+        "max": 200,
+        "palette": ['#f7fcf0', '#ccebc5', '#7bccc4', '#2b8cbe', '#084081']
+    },
+    "WorldPop Population 2020",
+    False
 )
 
 with st.expander("CORINE Legend (44 classes)"):
