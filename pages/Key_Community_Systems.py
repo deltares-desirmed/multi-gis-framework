@@ -3,9 +3,11 @@ import pandas as pd
 from streamlit_folium import st_folium
 import folium
 from folium.plugins import Draw
+from folium.plugins import Geocoder
+Geocoder().add_to(m)
 
 st.set_page_config(layout="wide")
-st.title("🗺️ Community Systems Mapping Tool")
+st.title(" Community Systems Mapping Tool")
 
 # Initialize session state to store point data
 if "points" not in st.session_state:
@@ -81,7 +83,15 @@ if st.session_state.points:
 
     st.download_button(
         label="📥 Download as Excel",
-        data=df.to_excel(index=False, engine="openpyxl"),
+        buffer = BytesIO()
+        df.to_excel(buffer, index=False, engine="openpyxl")
+        st.download_button(
+            label="Download Excel",
+            data=buffer.getvalue(),
+            file_name="key_community_systems.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
         file_name="community_systems.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )

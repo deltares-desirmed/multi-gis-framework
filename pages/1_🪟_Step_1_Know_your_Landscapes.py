@@ -428,7 +428,7 @@ def get_download_url(image, label):
             'format': 'GeoTIFF'
         })
         st.markdown(
-            f"[📥 Download {label} ({selected_year}) as GeoTIFF]({url})",
+            f"[📁 Download {label} ({selected_year}) as GeoTIFF]({url})",
             unsafe_allow_html=True
         )
     except Exception as e:
