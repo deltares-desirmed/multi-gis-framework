@@ -2,8 +2,7 @@ import streamlit as st
 import pandas as pd
 from streamlit_folium import st_folium
 import folium
-from folium.plugins import Draw, Geocoder
-from io import BytesIO
+from folium.plugins import Draw
 
 st.set_page_config(layout="wide")
 st.title("🗺️ Community Systems Mapping Tool")
@@ -15,10 +14,7 @@ if "points" not in st.session_state:
 # Create base map
 m = folium.Map(location=[45, 10], zoom_start=4)
 
-# Add search tool
-Geocoder().add_to(m)
-
-# Add drawing controls
+# Add drawing controls with predefined icons
 draw = Draw(
     draw_options={
         "polyline": False,
@@ -32,7 +28,7 @@ draw = Draw(
 )
 draw.add_to(m)
 
-# Display map and capture interactions
+# Display map
 output = st_folium(m, height=500, width=1000, returned_objects=["last_clicked", "all_drawings"])
 
 # Category options with emojis for readability
@@ -67,7 +63,7 @@ if output["last_clicked"]:
                 "Longitude": output["last_clicked"]["lng"]
             }
             st.session_state.points.append(point_data)
-            st.success(f"✅ Added: {name}")
+            st.success(f"Added: {name}")
 
 # Display table of added points
 if st.session_state.points:
@@ -75,7 +71,7 @@ if st.session_state.points:
     df = pd.DataFrame(st.session_state.points)
     st.dataframe(df, use_container_width=True)
 
-    # CSV Download
+    # Export option
     st.download_button(
         label="📥 Download as CSV",
         data=df.to_csv(index=False).encode("utf-8"),
@@ -83,15 +79,11 @@ if st.session_state.points:
         mime="text/csv"
     )
 
-    # Excel Download
-    buffer = BytesIO()
-    df.to_excel(buffer, index=False, engine="openpyxl")
-    buffer.seek(0)
     st.download_button(
         label="📥 Download as Excel",
-        data=buffer.getvalue(),
+        data=df.to_excel(index=False, engine="openpyxl"),
         file_name="community_systems.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 else:
-    st.info("👉 Drop a marker on the map and fill the form to begin collecting community system data.")
+    st.info("Drop a marker on the map and fill the form to begin collecting data.")
