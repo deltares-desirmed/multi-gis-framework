@@ -281,6 +281,38 @@ with st.expander("CORINE Legend (44 classes)"):
             unsafe_allow_html=True
         )
 
+with st.expander("EUNIS Legend (43 classes)"):
+
+    # Build EUNIS legend in 2 columns
+    half = len(corine_to_eunis) // 2
+    items = list(corine_to_eunis.items())
+    
+    col1_html = ""
+    col2_html = ""
+
+    for i, (corine_code, eunis_code) in enumerate(items):
+        color = eunis_palette[eunis_code - 1]  # Palette index starts at 0
+        label = f"EUNIS {eunis_code} (from CORINE {corine_code})"
+        entry_html = (
+            f'<div style="display:flex;align-items:center;margin-bottom:4px;">'
+            f'<div style="width:12px;height:12px;background:{color};margin-right:6px;"></div>'
+            f'{label}</div>'
+        )
+        if i < half:
+            col1_html += entry_html
+        else:
+            col2_html += entry_html
+
+    # Display side-by-side columns using flexbox
+    legend_html = f"""
+    <div style="display: flex; justify-content: space-between;">
+        <div style="flex: 1; padding-right: 20px;">{col1_html}</div>
+        <div style="flex: 1;">{col2_html}</div>
+    </div>
+    """
+
+    st.markdown(legend_html, unsafe_allow_html=True)
+
 # --- Custom Toggleable Legend (HTML + JS) ---
 legend_html = """
 <div id="map-legend" style="
