@@ -73,12 +73,33 @@ CORINE_YEARS = {
     '2018': ee.Image('COPERNICUS/CORINE/V20/100m/2018').select('landcover')
 }
 
+# Crosswalk mapping from CORINE classes to EUNIS numeric codes
+corine_to_eunis = {
+    111: 1, 112: 2, 121: 3, 122: 4, 123: 5, 124: 6, 131: 7, 132: 8, 133: 9,
+    141: 10, 142: 1, 211: 11, 212: 12, 213: 13, 221: 14, 222: 15, 223: 16,
+    231: 17, 241: 18, 242: 19, 243: 20, 244: 21, 311: 22, 312: 23, 313: 24,
+    321: 25, 322: 26, 323: 27, 324: 28, 331: 29, 332: 30, 333: 31, 334: 32,
+    335: 33, 411: 34, 412: 35, 421: 36, 422: 37, 423: 38, 511: 39, 512: 40,
+    521: 41, 522: 42, 523: 43
+}
+
+# EUNIS color palette (43 classes)
+eunis_palette = [
+    '#b22222', '#ff4500', '#ffa07a', '#8b4513', '#d2691e', '#808080', '#556b2f',
+    '#a0522d', '#d2b48c', '#deb887', '#32cd32', '#adff2f', '#ff7f50', '#8fbc8f',
+    '#228b22', '#f4a460', '#006400', '#ffe4b5', '#6b8e23', '#f0e68c', '#d2b48c',
+    '#008000', '#3cb371', '#20b2aa', '#7cfc00', '#8b0000', '#b0c4de', '#87cefa',
+    '#fa8072', '#add8e6', '#708090', '#d3d3d3', '#556b2f', '#4169e1', '#00bfff',
+    '#1e90ff', '#6495ed', '#ffdab9', '#87ceeb', '#2171b5', '#ffdab9', '#2171b5',
+    '#87cefa'
+]
 
 # Clip both CORINE layers immediately to final AOI
 CLIPPED_CORINE = {
     '2012': CORINE_YEARS['2012'].clip(final_aoi),
     '2018': CORINE_YEARS['2018'].clip(final_aoi)
 }
+
 
 # Year selection + retrieval of clipped image --> we can choose this or the other....full corine or only clipped to AOI
 # selected_year = st.selectbox("Select CORINE Year", ['2012', '2018'])
@@ -184,6 +205,16 @@ for k, v in landscape_archetypes.items():
     palette.append(v['color'])
     legend_dict[v['description']] = v['color']
 
+def reclassify_to_eunis(image):
+    from_list = list(corine_to_eunis.keys())
+    to_list = list(corine_to_eunis.values())
+    return image.remap(from_list, to_list).rename("eunis")
+
+CLIPPED_EUNIS = {
+    '2012': reclassify_to_eunis(CORINE_YEARS['2012']).clip(final_aoi),
+    '2018': reclassify_to_eunis(CORINE_YEARS['2018']).clip(final_aoi)
+}
+
 def reclassify(img):
     remapped = img.remap(from_list, to_list).rename('archetype')
     return remapped.updateMask(remapped.neq(0))
@@ -234,6 +265,11 @@ Map.addLayer(
     f"CORINE {selected_year}"
 )
 
+Map.addLayer(
+    CLIPPED_EUNIS[selected_year],
+    {"min": 1, "max": 43, "palette": eunis_palette},
+    f"EUNIS {selected_year}"
+)
 
 with st.expander("CORINE Legend (44 classes)"):
     for code, name in corine_classes.items():
