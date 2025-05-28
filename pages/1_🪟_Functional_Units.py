@@ -231,20 +231,17 @@ m.add_child(legend_layer)
 m.add_layer_control()
 m.to_streamlit(height=700)
 
-with st.expander("CORINE Legend (44 classes)"):
-
+with st.expander("EUNIS Legend (43 classes)"):
     col1_html, col2_html, col3_html = "", "", ""
-    corine_codes = list(corine_classes.keys())
-    corine_names = list(corine_classes.values())
-    per_col = (len(corine_classes) + 2) // 3  # Divide evenly into 3 columns
+    per_col = (len(eunis_palette) + 2) // 3
 
-    for idx, code in enumerate(corine_codes):
-        name = corine_classes[code]
-        color = corine_palette[idx]
+    for idx in range(43):
+        color = eunis_palette[idx]
+        label = f"{idx+1}"
         box = (
             f'<div style="display:flex;align-items:center;margin-bottom:4px;">'
             f'<div style="width:12px;height:12px;background:{color};margin-right:6px;"></div>'
-            f'{code}: {name}</div>'
+            f'{label}</div>'
         )
         if idx < per_col:
             col1_html += box
@@ -263,6 +260,7 @@ with st.expander("CORINE Legend (44 classes)"):
         """,
         unsafe_allow_html=True
     )
+
 
 
 # with st.expander("See source code"):
