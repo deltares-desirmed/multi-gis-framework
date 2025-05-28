@@ -174,6 +174,7 @@ landscape_archetypes = {
     '14': {'classes': [521,522,523], 'color': '#00bfff', 'description': 'Marine'}
 }
 
+
 from_list, to_list, palette = [], [], []
 legend_dict = {}
 
@@ -223,16 +224,49 @@ else:
 # Add archetype image
 Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
 
-Map.addLayer(
-    corine_img,
-    {
-        "min": 111,
-        "max": 523,
-        "palette": corine_palette
-    },
-    f"CORINE {selected_year}"
-)
+# Map.addLayer(
+#     corine_img,
+#     {
+#         "min": 111,
+#         "max": 523,
+#         "palette": corine_palette
+#     },
+#     f"CORINE {selected_year}"
+# )
 
+# --- CORINE Year Selection ---
+selected_year = st.selectbox("Select CORINE Year", ['2012', '2018'])
+raw_corine = CORINE_YEARS[selected_year]
+
+# --- Optional CLIP Toggle ---
+show_clipped = st.checkbox("Show CLIPPED CORINE", value=True)
+show_full = st.checkbox("Show FULL CORINE", value=False)
+
+# --- Derive Layers ---
+clipped_corine_img = raw_corine.clip(final_aoi)
+
+# --- Add Layers Conditionally ---
+if show_clipped:
+    Map.addLayer(
+        clipped_corine_img,
+        {
+            "min": 111,
+            "max": 523,
+            "palette": corine_palette
+        },
+        f"CORINE {selected_year} (Clipped)"
+    )
+
+if show_full:
+    Map.addLayer(
+        raw_corine,
+        {
+            "min": 111,
+            "max": 523,
+            "palette": corine_palette
+        },
+        f"CORINE {selected_year} (Full)"
+    )
 
 with st.expander("CORINE Legend (44 classes)"):
     for code, name in corine_classes.items():
