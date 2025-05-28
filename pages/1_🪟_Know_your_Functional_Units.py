@@ -45,13 +45,19 @@ if uploaded:
     except Exception as e:
         st.error(f"Error reading or converting shapefile: {e}")
 
+# # AOI used: uploaded shapefile or dropdown
+# final_aoi = uploaded_geom if uploaded_geom else aoi.geometry()
+
+# # Ensure selected_subregion is always defined
+# selected_subregion = "User_AOI" if uploaded_geom else selected_subregion
+
+
 # AOI used: uploaded shapefile or dropdown
-final_aoi = uploaded_geom if uploaded_geom else aoi.geometry()
+final_aoi = uploaded_aoi_fc if uploaded_aoi_fc else aoi  # for display (can style if FC)
+aoi_geom = final_aoi.geometry() if isinstance(final_aoi, ee.FeatureCollection) else final_aoi  # for clipping & centroid
 
 # Ensure selected_subregion is always defined
-selected_subregion = "User_AOI" if uploaded_geom else selected_subregion
-
-
+selected_subregion = "User_AOI" if uploaded_aoi_fc else selected_subregion
 
 
 # Select CORINE year
@@ -114,10 +120,18 @@ aoi_centroid = aoi_geom.centroid().coordinates().getInfo()
 # Create the map with dynamic center and zoom
 Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=9)
 
-Map.addLayer(final_aoi.style(**{
-    "color": "red", "fillColor": "00000000", "width": 2
-}), {}, "AOI Boundary")
-Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
+# Only apply .style() if final_aoi is a FeatureCollection
+if isinstance(final_aoi, ee.FeatureCollection):
+    Map.addLayer(final_aoi.style(**{
+        "color": "red", "fillColor": "00000000", "width": 2
+    }), {}, "AOI Boundary")
+else:
+    # For ee.Geometry (from uploaded shapefile), wrap in FeatureCollection to style
+    styled_geom = ee.FeatureCollection([ee.Feature(final_aoi)]).style(**{
+        "color": "red", "fillColor": "00000000", "width": 2
+    })
+    Map.addLayer(styled_geom, {}, "AOI Boundary")
+
 
 # --- Custom Toggleable Legend (HTML + JS) ---
 
