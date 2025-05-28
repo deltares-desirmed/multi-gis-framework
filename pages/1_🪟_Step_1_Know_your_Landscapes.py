@@ -514,8 +514,6 @@ except Exception:
 
 with st.expander("Check this out!"):
     st.markdown("""
-    ### 🧭 Explore Population and Demographic Dynamics in Your Region
-
     Curious about how **population**, **urbanization**, and **age structures** have changed over time?
 
     📍 **Use this interactive app** to:
