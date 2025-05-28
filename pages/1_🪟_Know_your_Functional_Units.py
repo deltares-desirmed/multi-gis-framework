@@ -42,22 +42,22 @@ if uploaded:
 
     shp_files = [f for f in os.listdir("temp_shp") if f.endswith(".shp")]
     if not shp_files:
-        st.error("❌ No .shp file found in the uploaded .zip.")
+        st.error(" No .shp file found in the uploaded .zip.")
     else:
         shp_path = os.path.join("temp_shp", shp_files[0])
 
         try:
             gdf = gpd.read_file(shp_path)
             if gdf.empty:
-                st.error("❌ Shapefile is empty.")
+                st.error(" Shapefile is empty.")
             elif not gdf.geom_type.isin(["Polygon", "MultiPolygon"]).any():
-                st.error("❌ Shapefile must contain polygon geometries.")
+                st.error(" Shapefile must contain polygon geometries.")
             else:
                 uploaded_aoi_fc = geemap.gdf_to_ee(gdf)
                 uploaded_geom = uploaded_aoi_fc.geometry()
-                st.success("✅ AOI uploaded and converted successfully.")
+                st.success(" AOI uploaded and converted successfully.")
         except Exception as e:
-            st.error(f"❌ Error reading shapefile: {e}")
+            st.error(f" Error reading shapefile: {e}")
 
 # AOI used: uploaded shapefile or dropdown
 # AOI used: uploaded shapefile or dropdown
@@ -222,7 +222,7 @@ with col1:
             maxPixels=1e13
         )
         task.start()
-        st.success(f"✅ Export to EE Asset started.\n📁 Asset ID: `{asset_id}`")
+        st.success(f" Export to EE Asset started.\n📁 Asset ID: `{asset_id}`")
 
 # Export to Drive
 with col2:
@@ -243,7 +243,7 @@ with col2:
                     maxPixels=1e13
                 )
                 task.start()
-                st.success(f"✅ GeoTIFF export for {year} started to Drive/{export_folder}/{file_prefix}.tif")
+                st.success(f" GeoTIFF export for {year} started to Drive/{export_folder}/{file_prefix}.tif")
 
             elif export_format == "SHP":
                 vector_fc = vectorize(archetype_img, region, year)
@@ -255,6 +255,6 @@ with col2:
                     fileFormat='SHP'
                 )
                 task.start()
-                st.success(f"✅ SHP export for {year} started to Drive/{export_folder}/{file_prefix}_Vector.zip")
+                st.success(f" SHP export for {year} started to Drive/{export_folder}/{file_prefix}_Vector.zip")
 
 st.info("🕒 To check export progress, go to the [Earth Engine Code Editor](https://code.earthengine.google.com/) and click on the 'Tasks' tab.")
