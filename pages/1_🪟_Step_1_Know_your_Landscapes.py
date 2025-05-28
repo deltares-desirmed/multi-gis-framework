@@ -239,7 +239,7 @@ aoi_geom_for_centroid = final_aoi if isinstance(final_aoi, ee.Geometry) else fin
 aoi_centroid = aoi_geom_for_centroid.centroid().coordinates().getInfo()
 
 # Center map and add layers
-Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=10)
+Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=8)
 
 # Style and add AOI boundary
 if isinstance(final_aoi_fc, ee.FeatureCollection):
