@@ -83,17 +83,22 @@ CLIPPED_CORINE = {
 # Year selection + retrieval of clipped image --> we can choose this or the other....full corine or only clipped to AOI
 # selected_year = st.selectbox("Select CORINE Year", ['2012', '2018'])
 # corine_img = CLIPPED_CORINE[selected_year]
-# Year selection
+
+# CORINE year selection
 selected_year = st.selectbox("Select CORINE Year", ['2012', '2018'])
 
-# Optional clip toggle
-# clip_toggle = st.checkbox("Clip CORINE to AOI", value=True)
+# Toggle to allow clipping
+clip_toggle = st.checkbox("Clip CORINE to AOI", value=True)
 
-# CORINE image (clipped or full)
-corine_img = (
-    CORINE_YEARS[selected_year].clip(final_aoi)
-    # if clip_toggle else CORINE_YEARS[selected_year]
-)
+# Select original CORINE image
+raw_corine = CORINE_YEARS[selected_year]
+
+# Clip conditionally
+corine_img = raw_corine.clip(final_aoi) if clip_toggle else raw_corine
+
+# Reclassify (always clip for archetype logic)
+archetype_img = reclassify(raw_corine).clip(final_aoi)
+
 
 
 # Full CORINE class palette (44 values)
