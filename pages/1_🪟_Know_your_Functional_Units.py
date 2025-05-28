@@ -210,6 +210,16 @@ Map.addLayer(
     f"CORINE {selected_year}"
 )
 
+with st.expander("CORINE Legend (44 classes)"):
+    for code, name in corine_classes.items():
+        color = corine_palette[list(corine_classes.keys()).index(code)]
+        st.markdown(
+            f'<div style="display:flex;align-items:center;">'
+            f'<div style="width:12px;height:12px;background:{color};margin-right:6px;"></div>'
+            f'{code}: {name}</div>',
+            unsafe_allow_html=True
+        )
+
 # --- Custom Toggleable Legend (HTML + JS) ---
 legend_html = """
 <div id="map-legend" style="
