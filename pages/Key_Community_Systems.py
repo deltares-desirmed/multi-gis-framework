@@ -8,15 +8,15 @@ import io
 st.set_page_config(layout="wide")
 st.title("🗺️ Community Systems Mapping Tool")
 
-# Initialize session state to store point data
+# Initialize session state
 if "points" not in st.session_state:
     st.session_state.points = []
 
-# ✅ Create base map once
+# ✅ Only create the map ONCE here
+m = folium.Map(location=[45, 10], zoom_start=4)
 
-
-# ✅ Add drawing controls
-draw = Draw(
+# Add tools
+Draw(
     draw_options={
         "polyline": False,
         "polygon": False,
@@ -26,14 +26,13 @@ draw = Draw(
         "marker": True
     },
     edit_options={"edit": True}
-)
-draw.add_to(m)
+).add_to(m)
 
-# ✅ Add geocoding search bar
 Geocoder(collapsed=False, add_marker=True).add_to(m)
 
-# ✅ Display the map
+# Display the map
 output = st_folium(m, height=600, width="100%", returned_objects=["last_clicked", "all_drawings"])
+
 
 # Category options
 categories = {
