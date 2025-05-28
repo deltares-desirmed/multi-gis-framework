@@ -97,7 +97,7 @@ raw_corine = CORINE_YEARS[selected_year]
 corine_img = raw_corine.clip(final_aoi) if clip_toggle else raw_corine
 
 # Reclassify (always clip for archetype logic)
-archetype_img = reclassify(raw_corine).clip(final_aoi)
+# archetype_img = reclassify(raw_corine).clip(final_aoi)
 
 
 
