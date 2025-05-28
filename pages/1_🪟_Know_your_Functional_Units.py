@@ -5,7 +5,6 @@ import geemap.foliumap as geemap
 from utils_ee import initialize_earth_engine  #  Auth from secret config
 import zipfile
 import os
-import geopandas as gpd
 
 # Initialize EE
 initialize_earth_engine()
@@ -31,46 +30,26 @@ subregions = admin2.filterBounds(region_geom).aggregate_array('shapeName').getIn
 selected_subregion = st.selectbox("Select Sub-region", sorted(subregions))
 aoi = admin2.filter(ee.Filter.eq('shapeName', selected_subregion))
 
-
-
-
+# Optional: Upload user AOI shapefile
 uploaded = st.file_uploader("Optional: Upload your own AOI shapefile (.zip)", type=["zip"])
-uploaded_aoi_fc = None
-uploaded_geom = None
+uploaded_aoi = None  # Define variable early to avoid NameError
 
 if uploaded:
     with zipfile.ZipFile(uploaded, 'r') as zf:
         zf.extractall("temp_shp")
-
-    shp_files = [f for f in os.listdir("temp_shp") if f.endswith(".shp")]
-    if not shp_files:
-        st.error("❌ No .shp file found in the uploaded .zip.")
-    else:
-        shp_path = os.path.join("temp_shp", shp_files[0])
-
-        try:
-            # Read shapefile
-            gdf = gpd.read_file(shp_path)
-
-            # Check it's valid and has polygons
-            if gdf.empty:
-                st.error("❌ Shapefile is empty.")
-            elif not gdf.geom_type.isin(["Polygon", "MultiPolygon"]).any():
-                st.error("❌ Shapefile must contain polygon geometries.")
-            else:
-                # Convert to Earth Engine FeatureCollection
-                uploaded_aoi_fc = geemap.gdf_to_ee(gdf)
-                uploaded_geom = uploaded_aoi_fc.geometry()
-                st.success("✅ AOI uploaded and converted successfully.")
-        except Exception as e:
-            st.error(f"❌ Error reading shapefile: {e}")
+    try:
+        uploaded_aoi = geemap.shp_to_ee("temp_shp")
+        st.success("AOI uploaded successfully.")
+    except Exception as e:
+        st.error(f"Error reading shapefile: {e}")
 
 # AOI used: uploaded shapefile or dropdown
-final_aoi = uploaded_aoi_fc if uploaded_aoi_fc else aoi
-aoi_geom = final_aoi.geometry() if isinstance(final_aoi, ee.FeatureCollection) else final_aoi
+# AOI used: uploaded shapefile or dropdown
+final_aoi = uploaded_aoi if uploaded_aoi else aoi
 
-# Ensure selected_subregion is defined for export/file naming
-selected_subregion = "User_AOI" if uploaded_aoi_fc else selected_subregion
+# Ensure selected_subregion is always defined
+if uploaded_aoi:
+    selected_subregion = "User_AOI"
 
 
 
@@ -125,27 +104,13 @@ Map = geemap.Map(center=[51, 3], zoom=8)
 # Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
 # Create the map
 # Compute center coordinates dynamically
-def get_geometry(aoi):
-    return aoi.geometry() if isinstance(aoi, ee.FeatureCollection) else aoi
-
-aoi_geom = get_geometry(final_aoi)
-aoi_centroid = aoi_geom.centroid().coordinates().getInfo()
-
-# Create the map with dynamic center and zoom
+aoi_centroid = final_aoi.geometry().centroid().coordinates().getInfo()
 Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=9)
 
-# Only apply .style() if final_aoi is a FeatureCollection
-if isinstance(final_aoi, ee.FeatureCollection):
-    Map.addLayer(final_aoi.style(**{
-        "color": "red", "fillColor": "00000000", "width": 2
-    }), {}, "AOI Boundary")
-else:
-    # For ee.Geometry (from uploaded shapefile), wrap in FeatureCollection to style
-    styled_geom = ee.FeatureCollection([ee.Feature(final_aoi)]).style(**{
-        "color": "red", "fillColor": "00000000", "width": 2
-    })
-    Map.addLayer(styled_geom, {}, "AOI Boundary")
-
+Map.addLayer(final_aoi.style(**{
+    "color": "red", "fillColor": "00000000", "width": 2
+}), {}, "AOI Boundary")
+Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
 
 # --- Custom Toggleable Legend (HTML + JS) ---
 
