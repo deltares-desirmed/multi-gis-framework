@@ -57,7 +57,7 @@ load_dotenv()
 #     # st.markdown("### 🤖 EcoChat's Response")
 #     # st.write(llm_response)
 
-#     st.success("✅ Response generated using local embedding search on ESS data.")
+#     st.success(" Response generated using local embedding search on ESS data.")
 
 
 
@@ -226,7 +226,7 @@ elif "Provided API Call" in client_select:
         if "API_token" not in st.session_state:
             st.session_state.API_token = None
 
-        # ✅ Use secrets safely here
+        #  Use secrets safely here
         st.session_state.API_token = st.secrets["GROQ_API_TOKEN"]
         model_links = model_links_groq
 

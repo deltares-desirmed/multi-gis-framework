@@ -432,7 +432,7 @@ def get_download_url(image, label):
             unsafe_allow_html=True
         )
     except Exception as e:
-        st.error(f"❌ Could not generate download for {label}: {e}")
+        st.error(f" Could not generate download for {label}: {e}")
 
 # 1. CORINE (raw)
 corine_raw = CLIPPED_CORINE[selected_year].toInt()

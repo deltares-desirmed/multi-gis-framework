@@ -12,7 +12,7 @@ st.title(" Community Systems Mapping Tool")
 if "points" not in st.session_state:
     st.session_state.points = []
 
-# ✅ Only create the map ONCE here
+#  Only create the map ONCE here
 m = folium.Map(location=[45, 10], zoom_start=4)
 
 # Add tools

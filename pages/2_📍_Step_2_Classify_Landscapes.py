@@ -11,7 +11,7 @@ from utils_lst_explorer import show_lst_explorer
 
 st.set_page_config(layout="wide")
 
-# 📌 Sidebar Info
+#  Sidebar Info
 
 st.sidebar.title("Tools")
 show_lst = st.sidebar.checkbox("📈 Explore LST by Basin")
@@ -35,16 +35,16 @@ st.sidebar.image(logo)
 
 st.title("Landscape Characters")
 
-# ✅ GitHub Raw Base URL
+#  GitHub Raw Base URL
 github_base_url = "https://raw.githubusercontent.com/deltares-desirmed/multi-gis-framework/main/database/"
 
-# 📚 List all GeoJSON files dynamically (Hardcoded here, but can be automated via GitHub API)
+#  List all GeoJSON files dynamically (Hardcoded here, but can be automated via GitHub API)
 geojson_files = ["EU_healthservices.geojson", "EU_education1.geojson", "EU_education2.geojson"]  # Add new files here or automate!
 
-# 🌍 Create Map Centered on Europe
+#  Create Map Centered on Europe
 m = leafmap.Map(center=[50, 10], zoom=5)
 
-# 📥 Load and Add Community Systems Layers Dynamically
+#  Load and Add Community Systems Layers Dynamically
 for filename in geojson_files:
     system_name = re.sub(r'[_\.]', ' ', os.path.splitext(filename)[0]).title()  # Clean Layer Name
     geojson_url = os.path.join(github_base_url, filename)
@@ -65,7 +65,7 @@ for filename in geojson_files:
                     lon, lat = coords[:2]
                     props = feature.get("properties", {})
 
-                    # 🧩 Dynamically build the popup content
+                    #  Dynamically build the popup content
                     popup_lines = [f"<b>{system_name}</b><br>"]
                     for key, value in props.items():
                         if pd.notna(value) and value != '':
@@ -85,9 +85,9 @@ for filename in geojson_files:
         m.add_child(fg)
 
     except Exception as e:
-        st.error(f"❌ Failed to load '{system_name}': {e}")
+        st.error(f" Failed to load '{system_name}': {e}")
 
-# 🧩 Add Layer Control and Display Map
+#  Add Layer Control and Display Map
 m.add_layer_control()
 m.to_streamlit(height=700)
 
@@ -125,7 +125,7 @@ current_time = amsterdam_time.strftime("%H:%M:%S")
 st.sidebar.markdown(f"**Last Updated:** {last_updated}")
 # st.sidebar.markdown(f"**Local Time (Amsterdam):** {current_time}")
 
-# 🌍 Add Base Layers (Optional)
+#  Add Base Layers (Optional)
 # regions = "https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/us_regions.geojson"
 # m.add_geojson(regions, layer_name="US Regions")
 
