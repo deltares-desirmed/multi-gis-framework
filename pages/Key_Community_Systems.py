@@ -33,7 +33,7 @@ draw.add_to(m)
 Geocoder(collapsed=False, add_marker=True).add_to(m)
 
 # ✅ Display the map
-output = st_folium(m, height=500, width=1000, returned_objects=["last_clicked", "all_drawings"])
+output = st_folium(m, height=600, width="100%", returned_objects=["last_clicked", "all_drawings"])
 
 # Category options
 categories = {
