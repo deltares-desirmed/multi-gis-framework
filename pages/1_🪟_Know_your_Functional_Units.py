@@ -5,7 +5,7 @@ import geemap.foliumap as geemap
 from utils_ee import initialize_earth_engine  #  Auth from secret config
 import zipfile
 import os
-import geopandas as gpd
+# import geopandas as gpd
 
 # Initialize EE
 initialize_earth_engine()
