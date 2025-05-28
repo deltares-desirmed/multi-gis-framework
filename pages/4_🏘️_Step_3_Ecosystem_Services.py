@@ -53,7 +53,7 @@ with col2:
     Map.add_basemap(basemap)
 
     country = st.selectbox(
-        "Select a country", country_names, index=country_names.index("USA")
+        "Select a country", country_names, index=country_names.index("Croatia")
     )
 
     if country == "USA":
