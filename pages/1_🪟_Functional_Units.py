@@ -232,6 +232,70 @@ m.add_child(legend_layer)
 m.add_layer_control()
 m.to_streamlit(height=700)
 
+corine_classes = {
+    111: 'Continuous Urban Fabric',
+    112: 'Discontinuous Urban Fabric',
+    121: 'Industrial/Commercial Units',
+    122: 'Road/rail networks',
+    123: 'Port areas',
+    124: 'Airports',
+    131: 'Mineral extraction sites',
+    132: 'Dump sites',
+    133: 'Construction sites',
+    141: 'Green urban areas',
+    142: 'Sport/leisure facilities',
+    211: 'Non-irrigated arable land',
+    212: 'Permanently irrigated land',
+    213: 'Rice fields',
+    221: 'Vineyards',
+    222: 'Fruit trees',
+    223: 'Olive groves',
+    231: 'Pastures',
+    241: 'Annual crops associated with permanent crops',
+    242: 'Complex cultivation patterns',
+    243: 'Agro-forestry',
+    244: 'Agro-natural mosaic',
+    311: 'Broad-leaved forest',
+    312: 'Coniferous forest',
+    313: 'Mixed forest',
+    321: 'Natural grasslands',
+    322: 'Moors/heathland',
+    323: 'Sclerophyllous vegetation',
+    324: 'Transitional woodland-shrub',
+    331: 'Beaches/dunes/sands',
+    332: 'Bare rocks',
+    333: 'Sparsely vegetated areas',
+    334: 'Burnt areas',
+    335: 'Glaciers and perpetual snow',
+    411: 'Inland marshes',
+    412: 'Peat bogs',
+    421: 'Salt marshes',
+    422: 'Salines',
+    423: 'Intertidal flats',
+    511: 'Water courses',
+    512: 'Water bodies',
+    521: 'Coastal lagoons',
+    522: 'Estuaries',
+    523: 'Sea and ocean'
+}
+
+eunis_labels = {
+    1: "Urban buildings", 2: "Suburban housing", 3: "Low density build",
+    4: "Transport", 5: "Ports", 6: "Airports", 7: "Extractive industry",
+    8: "Waste deposits", 9: "Construction", 10: "Parks", 11: "Arable land",
+    12: "Crops (intensive)", 13: "Rice fields", 14: "Vineyards",
+    15: "Fruit shrubs", 16: "Olive trees", 17: "Grassland",
+    18: "Mixed crops", 19: "Garden crops", 20: "Low-intensity crops",
+    21: "Wooded grassland", 22: "Broadleaf forest", 23: "Conifer forest",
+    24: "Mixed woodland", 25: "Dry grasslands", 26: "Shrub heath",
+    27: "Medit. brush", 28: "Fringes/clearings", 29: "Beaches/dunes",
+    30: "Littoral rock", 31: "Sparse inland", 32: "Burnt land",
+    33: "Snow/Ice", 34: "Inland shore", 35: "Peat bogs",
+    36: "Salt marshes", 37: "Saline artificial", 38: "Littoral sand",
+    39: "Rivers", 40: "Lakes", 41: "Lagoons", 42: "Estuaries",
+    43: "Marine sand"
+}
+
 with st.expander("CORINE Legend (44 classes)"):
     corine_codes = list(corine_classes.keys())
     corine_names = list(corine_classes.values())
