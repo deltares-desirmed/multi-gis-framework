@@ -411,23 +411,27 @@ Map.add_child(legend_layer)
 Map.add_child(folium.LayerControl())
 Map.to_streamlit(height=600)
 
-quick_format = st.radio("Download format", ["GeoTIFF", "SHP"], horizontal=True)
+# Prepare image and region
+selected_image = reclassify(CLIPPED_CORINE[selected_year]).clip(final_aoi)
+download_region = final_aoi if isinstance(final_aoi, ee.Geometry) else final_aoi.geometry()
 
-if quick_format == "GeoTIFF":
-    image_to_download = reclassify(CLIPPED_CORINE[selected_year]).clip(final_aoi)
-    url = image_to_download.getDownloadURL({
-        'scale': 100,
-        'crs': 'EPSG:3857',
-        'region': download_region.toGeoJSONString(),
-        'format': 'GeoTIFF'
-    })
-    st.markdown(
-        f"[📥 Download Archetypes ({selected_year}) as GeoTIFF]({url})",
-        unsafe_allow_html=True
-    )
-elif quick_format == "SHP":
-    # For SHP, direct download is not supported via getDownloadURL; fallback to export logic.
-    st.warning("⚠️ SHP direct download not supported — use the Export to Drive option above.")
+# Evaluate region to client-side GeoJSON string for download
+region_json = download_region.getInfo()  # This brings it to client side
+
+# Now generate download URL
+url = selected_image.getDownloadURL({
+    'scale': 100,
+    'crs': 'EPSG:3857',
+    'region': region_json,
+    'format': 'GeoTIFF'
+})
+
+# Display download link
+st.subheader("🧷 Quick Download")
+st.markdown(
+    f"[📥 Click here to download clipped Archetypes ({selected_year}) as GeoTIFF]({url})",
+    unsafe_allow_html=True
+)
 
 # -------------------- Export Options --------------------
 st.subheader("📤 Export Options")
