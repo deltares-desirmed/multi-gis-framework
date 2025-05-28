@@ -32,24 +32,25 @@ aoi = admin2.filter(ee.Filter.eq('shapeName', selected_subregion))
 
 # Optional: Upload user AOI shapefile
 uploaded = st.file_uploader("Optional: Upload your own AOI shapefile (.zip)", type=["zip"])
-uploaded_aoi = None  # Define variable early to avoid NameError
+uploaded_aoi_fc = None  # Full FeatureCollection
+uploaded_geom = None    # Geometry extracted from uploaded AOI
 
 if uploaded:
     with zipfile.ZipFile(uploaded, 'r') as zf:
         zf.extractall("temp_shp")
     try:
-        uploaded_aoi = geemap.shp_to_ee("temp_shp")
-        st.success("AOI uploaded successfully.")
+        uploaded_aoi_fc = geemap.shp_to_ee("temp_shp")  # Convert shapefile to ee.FeatureCollection
+        uploaded_geom = uploaded_aoi_fc.geometry()       # Extract ee.Geometry from it
+        st.success("AOI uploaded and converted successfully.")
     except Exception as e:
-        st.error(f"Error reading shapefile: {e}")
+        st.error(f"Error reading or converting shapefile: {e}")
 
 # AOI used: uploaded shapefile or dropdown
-# AOI used: uploaded shapefile or dropdown
-final_aoi = uploaded_aoi if uploaded_aoi else aoi
+final_aoi = uploaded_geom if uploaded_geom else aoi.geometry()
 
 # Ensure selected_subregion is always defined
-if uploaded_aoi:
-    selected_subregion = "User_AOI"
+selected_subregion = "User_AOI" if uploaded_geom else selected_subregion
+
 
 
 
