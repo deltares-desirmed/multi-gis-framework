@@ -73,14 +73,17 @@ CORINE_YEARS = {
     '2018': ee.Image('COPERNICUS/CORINE/V20/100m/2018').select('landcover')
 }
 
-# Clip both CORINE layers to final AOI immediately
+
+# Clip both CORINE layers immediately to final AOI
 CLIPPED_CORINE = {
     '2012': CORINE_YEARS['2012'].clip(final_aoi),
     '2018': CORINE_YEARS['2018'].clip(final_aoi)
 }
 
+# Year selection + retrieval of clipped image
 selected_year = st.selectbox("Select CORINE Year", ['2012', '2018'])
 corine_img = CLIPPED_CORINE[selected_year]
+
 
 # Full CORINE class palette (44 values)
 corine_classes = {
