@@ -195,15 +195,6 @@ archetype_img = reclassify(corine_img).clip(final_aoi)
 st.subheader(f"Reclassified Landscape Archetypes ({selected_year})")
 Map = geemap.Map(center=[51, 3], zoom=8)
 
-Map.addLayer(
-    corine_img,
-    {
-        "min": 111,
-        "max": 523,
-        "palette": corine_palette
-    },
-    f"CORINE {selected_year}"
-)
 # Map.addLayer(final_aoi.style(**{
 #     "color": "red", "fillColor": "00000000", "width": 2
 # }), {}, "AOI Boundary")
