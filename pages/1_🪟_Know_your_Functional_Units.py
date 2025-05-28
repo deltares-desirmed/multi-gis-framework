@@ -74,7 +74,7 @@ CORINE_YEARS = {
 }
 selected_year = st.selectbox("Select CORINE Year", ['2012', '2018'])
 
-# Reclassification logic
+# Reclassification logics
 landscape_archetypes = {
     '1': {'classes': [111,112,121,122], 'color': '#636363', 'description': 'Urban'},
     '2': {'classes': [123,124], 'color': '#969696', 'description': 'Coastal Urban'},
