@@ -16,7 +16,7 @@ admin1 = ee.FeatureCollection("projects/sat-io/open-datasets/geoboundaries/CGAZ_
 admin2 = ee.FeatureCollection("projects/sat-io/open-datasets/geoboundaries/CGAZ_ADM2")
 
 # UI setup
-st.title("Landscape Archetypes Classification (CORINE)")
+st.title("Know your landscapes")
 
 # Step 1: AOI selection via dropdowns
 countries = admin0.aggregate_array('shapeName').getInfo()
