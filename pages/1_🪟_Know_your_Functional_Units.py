@@ -224,46 +224,17 @@ else:
 # Add archetype image
 Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
 
-# Map.addLayer(
-#     corine_img,
-#     {
-#         "min": 111,
-#         "max": 523,
-#         "palette": corine_palette
-#     },
-#     f"CORINE {selected_year}"
-# )
+Map.addLayer(
+    corine_img,
+    {
+        "min": 111,
+        "max": 523,
+        "palette": corine_palette
+    },
+    f"CORINE {selected_year}"
+)
 
-# 5. --- Now add this --- 👇
-selected_year = st.selectbox("Select CORINE Year", ['2012', '2018'])
-raw_corine = CORINE_YEARS[selected_year]
 
-show_clipped = st.checkbox("Show CLIPPED CORINE", value=True)
-show_full = st.checkbox("Show FULL CORINE", value=False)
-
-clipped_corine_img = raw_corine.clip(final_aoi)
-
-if show_clipped:
-    Map.addLayer(
-        clipped_corine_img,
-        {
-            "min": 111,
-            "max": 523,
-            "palette": corine_palette
-        },
-        f"CORINE {selected_year} (Clipped)"
-    )
-
-if show_full:
-    Map.addLayer(
-        raw_corine,
-        {
-            "min": 111,
-            "max": 523,
-            "palette": corine_palette
-        },
-        f"CORINE {selected_year} (Full)"
-    )
 with st.expander("CORINE Legend (44 classes)"):
     for code, name in corine_classes.items():
         color = corine_palette[list(corine_classes.keys()).index(code)]
