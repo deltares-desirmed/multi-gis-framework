@@ -312,9 +312,9 @@ with st.expander("EUNIS Legend (43 classes)"):
     ]
 
     col1_html, col2_html = "", ""
-    half = len(eunis_labels) // 2
+    half = len(eunis_labels) // 3
 
-    for i in range(1, 44):
+    for i in range(1, 43):
         box = (
             f'<div style="display:flex;align-items:center;margin-bottom:4px;">'
             f'<div style="width:12px;height:12px;background:{eunis_palette[i-1]};margin-right:6px;"></div>'
