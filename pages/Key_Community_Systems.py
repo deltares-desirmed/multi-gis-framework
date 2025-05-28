@@ -2,16 +2,11 @@ import streamlit as st
 import pandas as pd
 from streamlit_folium import st_folium
 import folium
-from folium.plugins import Draw
-from folium.plugins import Geocoder
+from folium.plugins import Draw, Geocoder
 from io import BytesIO
 
-
-
-Geocoder().add_to(m)
-
 st.set_page_config(layout="wide")
-st.title(" Community Systems Mapping Tool")
+st.title("🗺️ Community Systems Mapping Tool")
 
 # Initialize session state to store point data
 if "points" not in st.session_state:
@@ -20,7 +15,10 @@ if "points" not in st.session_state:
 # Create base map
 m = folium.Map(location=[45, 10], zoom_start=4)
 
-# Add drawing controls with predefined icons
+# Add search tool
+Geocoder().add_to(m)
+
+# Add drawing controls
 draw = Draw(
     draw_options={
         "polyline": False,
@@ -34,7 +32,7 @@ draw = Draw(
 )
 draw.add_to(m)
 
-# Display map
+# Display map and capture interactions
 output = st_folium(m, height=500, width=1000, returned_objects=["last_clicked", "all_drawings"])
 
 # Category options with emojis for readability
@@ -69,7 +67,7 @@ if output["last_clicked"]:
                 "Longitude": output["last_clicked"]["lng"]
             }
             st.session_state.points.append(point_data)
-            st.success(f"Added: {name}")
+            st.success(f"✅ Added: {name}")
 
 # Display table of added points
 if st.session_state.points:
@@ -77,7 +75,7 @@ if st.session_state.points:
     df = pd.DataFrame(st.session_state.points)
     st.dataframe(df, use_container_width=True)
 
-    # Export option
+    # CSV Download
     st.download_button(
         label="📥 Download as CSV",
         data=df.to_csv(index=False).encode("utf-8"),
@@ -85,19 +83,15 @@ if st.session_state.points:
         mime="text/csv"
     )
 
+    # Excel Download
+    buffer = BytesIO()
+    df.to_excel(buffer, index=False, engine="openpyxl")
+    buffer.seek(0)
     st.download_button(
         label="📥 Download as Excel",
-        buffer = BytesIO()
-        df.to_excel(buffer, index=False, engine="openpyxl")
-        st.download_button(
-            label="Download Excel",
-            data=buffer.getvalue(),
-            file_name="key_community_systems.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-
+        data=buffer.getvalue(),
         file_name="community_systems.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 else:
-    st.info("Drop a marker on the map and fill the form to begin collecting data.")
+    st.info("👉 Drop a marker on the map and fill the form to begin collecting community system data.")
