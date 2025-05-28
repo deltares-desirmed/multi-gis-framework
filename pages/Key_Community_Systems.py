@@ -2,8 +2,6 @@ import streamlit as st
 import pandas as pd
 from streamlit_folium import st_folium
 import folium
-import ee
-import geemap.foliumap as geemap 
 from folium.plugins import Draw
 
 st.set_page_config(layout="wide")
