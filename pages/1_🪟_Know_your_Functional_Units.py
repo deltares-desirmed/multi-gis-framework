@@ -73,6 +73,67 @@ CORINE_YEARS = {
     '2018': ee.Image('COPERNICUS/CORINE/V20/100m/2018').select('landcover')
 }
 selected_year = st.selectbox("Select CORINE Year", ['2012', '2018'])
+corine_img = CORINE_YEARS[selected_year].clip(final_aoi)
+
+# Full CORINE class palette (44 values)
+corine_classes = {
+    111: 'Continuous Urban Fabric',
+    112: 'Discontinuous Urban Fabric',
+    121: 'Industrial/Commercial Units',
+    122: 'Road/rail networks',
+    123: 'Port areas',
+    124: 'Airports',
+    131: 'Mineral extraction sites',
+    132: 'Dump sites',
+    133: 'Construction sites',
+    141: 'Green urban areas',
+    142: 'Sport/leisure facilities',
+    211: 'Non-irrigated arable land',
+    212: 'Permanently irrigated land',
+    213: 'Rice fields',
+    221: 'Vineyards',
+    222: 'Fruit trees',
+    223: 'Olive groves',
+    231: 'Pastures',
+    241: 'Annual crops associated with permanent crops',
+    242: 'Complex cultivation patterns',
+    243: 'Agro-forestry',
+    244: 'Agro-natural mosaic',
+    311: 'Broad-leaved forest',
+    312: 'Coniferous forest',
+    313: 'Mixed forest',
+    321: 'Natural grasslands',
+    322: 'Moors/heathland',
+    323: 'Sclerophyllous vegetation',
+    324: 'Transitional woodland-shrub',
+    331: 'Beaches/dunes/sands',
+    332: 'Bare rocks',
+    333: 'Sparsely vegetated areas',
+    334: 'Burnt areas',
+    335: 'Glaciers and perpetual snow',
+    411: 'Inland marshes',
+    412: 'Peat bogs',
+    421: 'Salt marshes',
+    422: 'Salines',
+    423: 'Intertidal flats',
+    511: 'Water courses',
+    512: 'Water bodies',
+    521: 'Coastal lagoons',
+    522: 'Estuaries',
+    523: 'Sea and ocean'
+}
+
+corine_palette = [
+    "#ff0000", "#e6004d", "#cc4d00", "#cc0000", "#e6b3b3", "#a64d79",
+    "#ffe6cc", "#999966", "#cc99ff", "#33cc33", "#66ff66", "#ffff99",
+    "#ffcc99", "#ffffcc", "#ffcc66", "#f2f2f2", "#e6e600", "#c2f0c2",
+    "#b3ffcc", "#d9f2e6", "#e6ffe6", "#003300", "#006600", "#339966",
+    "#999933", "#cccc00", "#99cc00", "#669900", "#f2f2f2", "#cccccc",
+    "#999999", "#ffcccc", "#ccffff", "#cce6ff", "#e6e6e6", "#99ccff",
+    "#ccffff", "#9999ff", "#66cccc", "#6699ff", "#3333ff", "#0000cc",
+    "#6666ff", "#000099"
+]
+
 
 # Reclassification logics
 landscape_archetypes = {
@@ -138,6 +199,16 @@ else:
 
 # Add archetype image
 Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
+
+Map.addLayer(
+    corine_img,
+    {
+        "min": 111,
+        "max": 523,
+        "palette": corine_palette
+    },
+    f"CORINE {selected_year}"
+)
 
 # --- Custom Toggleable Legend (HTML + JS) ---
 legend_html = """
