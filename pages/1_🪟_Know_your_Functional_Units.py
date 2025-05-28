@@ -233,6 +233,7 @@ Map.addLayer(
     f"CORINE {selected_year}"
 )
 
+
 with st.expander("CORINE Legend (44 classes)"):
     for code, name in corine_classes.items():
         color = corine_palette[list(corine_classes.keys()).index(code)]
