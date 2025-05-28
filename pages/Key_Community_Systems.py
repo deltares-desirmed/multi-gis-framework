@@ -4,6 +4,10 @@ from streamlit_folium import st_folium
 import folium
 from folium.plugins import Draw
 from folium.plugins import Geocoder
+from io import BytesIO
+
+
+
 Geocoder().add_to(m)
 
 st.set_page_config(layout="wide")
