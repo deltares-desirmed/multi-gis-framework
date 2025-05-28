@@ -512,7 +512,7 @@ try:
 except Exception:
     st.info("ℹ️ EUNIS layer not configured or skipped.")
 
-with st.expander("Check this out!"):
+with st.expander("Check this Population out!"):
     st.markdown("""
     Curious about how **population**, **urbanization**, and **age structures** have changed over time?
 
