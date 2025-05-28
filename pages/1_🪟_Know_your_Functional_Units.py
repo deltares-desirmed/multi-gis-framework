@@ -176,7 +176,8 @@ def reclassify(img):
     remapped = img.remap(from_list, to_list).rename('archetype')
     return remapped.updateMask(remapped.neq(0))
 
-corine_img = CORINE_YEARS[selected_year]
+corine_img = CLIPPED_CORINE[selected_year]
+
 archetype_img = reclassify(corine_img).clip(final_aoi)
 
 # Map Display
@@ -319,7 +320,7 @@ with col1:
 with col2:
     if st.button("Export Selected Years to Drive"):
         for year in selected_years:
-            corine_img = CORINE_YEARS[year]
+            corine_img = CLIPPED_CORINE[year]
             archetype_img = reclassify(corine_img).clip(final_aoi)
             file_prefix = f"{custom_prefix}_{selected_subregion}_{year}"
 
