@@ -13,6 +13,15 @@ st.title("Multi-GIS Support Platform")
 
 st.markdown(
     """
+    Note that this platform is currently in **beta** and is under active development.
+
+    We will migrate most of these apps to an [interactively advanced platform](https://deltares-desirmed-multi-gis-support.hf.space) in the future.
+
+    """
+)
+
+st.markdown(
+    """
     This platform will support regional partners in advancing their work under the **DesirMED** (Tasks 4.1, 4.2, 4.4) and **NBRACER** (Tasks D5.1, D5.3, D5.5) projects. To fully understand the methodologies applied here, users are encouraged to consult the relevant project deliverables. This platform primarily serves to **visualize and demonstrate the operational frameworks** developed within these tasks.
 
     The platform integrates **on-the-fly web-mapping and decision-support** based on globally recognized datasets. 
