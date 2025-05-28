@@ -116,24 +116,40 @@ legend_html += "</div>"
 m.get_root().html.add_child(folium.Element(legend_html))
 
 
-# Reclassification rules
+# --- Archetype reclassification ---
 archetypes = {
-    '1': [111,112,121,122], '2': [123,124], '3': [131,132,133],
-    '4': [141,142], '5': [211,212,213], '6': [221,222,223,231],
-    '7': [311,312,313,321,322,323,324], '8': [332,333,334,335],
-    '9': [241,242,243,244], '10': [331], '11': [421,422,423],
-    '12': [411,412], '13': [511,512], '14': [521,522,523]
+    '1': [111,112,121,122],  # Urban
+    '2': [123,124],          # Transport
+    '3': [131,132,133],      # Extraction
+    '4': [141,142],          # Greenspace
+    '5': [211,212,213],      # Arable land
+    '6': [221,222,223,231],  # Permanent crops
+    '7': [311,312,313,321,322,323,324],  # Forests
+    '8': [332,333,334,335],  # Sparse/Barren
+    '9': [241,242,243,244],  # Mosaic crops
+    '10': [331],             # Sand dunes
+    '11': [421,422,423],     # Wetlands
+    '12': [411,412],         # Inland wetlands
+    '13': [511,512],         # Rivers/Lakes
+    '14': [521,522,523]      # Marine/coastal
 }
-arch_from, arch_to, arch_palette = [], [], []
+arch_from, arch_to = [], []
+
+# Distinct palette for 14 classes (define meaningfully)
+arch_palette = [
+    "#d73027", "#fc8d59", "#fee08b", "#d9ef8b", "#91cf60",
+    "#66bd63", "#1a9850", "#a6d96a", "#3288bd", "#5e4fa2",
+    "#abdda4", "#f46d43", "#fdae61", "#4575b4"
+]
+
 for k, v in archetypes.items():
     arch_from.extend(v)
     arch_to.extend([int(k)] * len(v))
-    arch_palette.append("#{:06x}".format(0x100000 + int(k)*123456 % 0xFFFFFF))  # simple varied colors
 
 def reclassify_archetype(img):
     return img.remap(arch_from, arch_to).rename("archetype")
 
-# CORINE to EUNIS mapping
+# --- EUNIS reclassification ---
 eunis_map = {
     111: 1, 112: 2, 121: 3, 122: 4, 123: 5, 124: 6, 131: 7, 132: 8, 133: 9,
     141: 10, 142: 1, 211: 11, 212: 12, 213: 13, 221: 14, 222: 15, 223: 16,
@@ -145,23 +161,35 @@ eunis_map = {
 eunis_from = list(eunis_map.keys())
 eunis_to = list(eunis_map.values())
 
+# Palette from your earlier EUNIS color mapping
+eunis_palette = [
+    "#a50026", "#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf",
+    "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850", "#006837", "#d4eeff",
+    "#91bfdb", "#4575b4", "#313695", "#e6f598", "#ffffbf", "#fee08b",
+    "#fdae61", "#f46d43", "#d73027", "#a50026", "#7fcdbb", "#41b6c4",
+    "#1d91c0", "#225ea8", "#253494", "#081d58", "#d9f0a3", "#addd8e",
+    "#78c679", "#41ab5d", "#238443", "#006837", "#fcbba1", "#fc9272",
+    "#fb6a4a", "#ef3b2c", "#cb181d", "#a50f15", "#67000d", "#cccccc",
+    "#969696"
+]
+
 def reclassify_eunis(img):
     return img.remap(eunis_from, eunis_to).rename("eunis")
 
-# CORINE base
+# --- Base CORINE 2018 image ---
 corine_2018 = ee.Image("COPERNICUS/CORINE/V20/100m/2018").select("landcover")
 
-# Reclassified images
+# --- Reclassify images ---
 archetype_img = reclassify_archetype(corine_2018)
 eunis_img = reclassify_eunis(corine_2018)
 
-# Add all to map
+# --- Add layers to map ---
 m.add_ee_tile_layer(archetype_img, {
     "min": 1, "max": 14, "palette": arch_palette
 }, "Archetypes (14 Classes)")
 
 m.add_ee_tile_layer(eunis_img, {
-    "min": 1, "max": 43, "palette": arch_palette  # You can customize this palette too
+    "min": 1, "max": 43, "palette": eunis_palette
 }, "EUNIS (43 Classes)")
 
 # Add toggle functionality
