@@ -13,8 +13,7 @@ st.title("Multi-GIS Support Platform")
 
 st.markdown(
     """
-    Note that this platform is currently in **beta** and is under active development.
-
+    Currently under development, JUST A PROOF OF CONCEPT.
     We will migrate most of these apps to an [interactively advanced platform](https://deltares-desirmed-multi-gis-support.hf.space) in the future.
 
     """
