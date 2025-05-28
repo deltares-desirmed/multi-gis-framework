@@ -87,12 +87,12 @@ CLIPPED_CORINE = {
 selected_year = st.selectbox("Select CORINE Year", ['2012', '2018'])
 
 # Optional clip toggle
-clip_toggle = st.checkbox("Clip CORINE to AOI", value=True)
+# clip_toggle = st.checkbox("Clip CORINE to AOI", value=True)
 
 # CORINE image (clipped or full)
 corine_img = (
     CORINE_YEARS[selected_year].clip(final_aoi)
-    if clip_toggle else CORINE_YEARS[selected_year]
+    # if clip_toggle else CORINE_YEARS[selected_year]
 )
 
 
