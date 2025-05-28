@@ -438,9 +438,8 @@ def get_download_url(image, label):
 corine_raw = CLIPPED_CORINE[selected_year].toInt()
 get_download_url(corine_raw, "CORINE Raw")
 
-
 # 2. Archetypes (reclassified)
-archetype_img = reclassify(corine_img).clip(download_region)
+archetype_img = reclassify(corine_raw).clip(download_region).toInt()
 get_download_url(archetype_img, "Landscape Archetypes")
 
 # 3. EUNIS (reclassified)
@@ -459,10 +458,11 @@ try:
         to_list = list(landCoverToEunisNumeric.values())
         return image.remap(from_list, to_list).rename('eunis')
 
-    eunis_img = corine_to_eunis(corine_img).clip(download_region)
+    eunis_img = corine_to_eunis(corine_raw).clip(download_region).toInt()
     get_download_url(eunis_img, "EUNIS Reclassified")
 except Exception:
     st.info("ℹ️ EUNIS layer not configured or skipped.")
+
 
 
 # -------------------- Export Options --------------------
