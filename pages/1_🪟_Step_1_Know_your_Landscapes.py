@@ -272,14 +272,38 @@ Map.addLayer(
 )
 
 with st.expander("CORINE Legend (44 classes)"):
-    for code, name in corine_classes.items():
-        color = corine_palette[list(corine_classes.keys()).index(code)]
-        st.markdown(
-            f'<div style="display:flex;align-items:center;">'
+
+    col1_html, col2_html, col3_html = "", "", ""
+    corine_codes = list(corine_classes.keys())
+    corine_names = list(corine_classes.values())
+    per_col = (len(corine_classes) + 2) // 3  # Divide evenly into 3 columns
+
+    for idx, code in enumerate(corine_codes):
+        name = corine_classes[code]
+        color = corine_palette[idx]
+        box = (
+            f'<div style="display:flex;align-items:center;margin-bottom:4px;">'
             f'<div style="width:12px;height:12px;background:{color};margin-right:6px;"></div>'
-            f'{code}: {name}</div>',
-            unsafe_allow_html=True
+            f'{code}: {name}</div>'
         )
+        if idx < per_col:
+            col1_html += box
+        elif idx < 2 * per_col:
+            col2_html += box
+        else:
+            col3_html += box
+
+    st.markdown(
+        f"""
+        <div style="display: flex; justify-content: space-between;">
+            <div style="flex: 1; padding-right: 20px;">{col1_html}</div>
+            <div style="flex: 1; padding-right: 20px;">{col2_html}</div>
+            <div style="flex: 1;">{col3_html}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 
 with st.expander("EUNIS Legend (43 classes)"):
 
