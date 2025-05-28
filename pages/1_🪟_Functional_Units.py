@@ -194,6 +194,74 @@ corine_2018 = ee.Image("COPERNICUS/CORINE/V20/100m/2018").select("landcover")
 archetype_img = reclassify_archetype(corine_2018)
 eunis_img = reclassify_eunis(corine_2018)
 
+# --- CORINE LEGEND ---
+with st.expander("CORINE Legend (44 classes)"):
+    corine_codes = list(corine_classes.keys())
+    corine_names = list(corine_classes.values())
+
+    col1_html, col2_html, col3_html = "", "", ""
+    per_col = (len(corine_classes) + 2) // 3
+
+    for idx, code in enumerate(corine_codes):
+        name = corine_names[idx]
+        color = corine_palette[idx]
+        box = (
+            f'<div style="display:flex;align-items:center;margin-bottom:4px;">'
+            f'<div style="width:12px;height:12px;background:{color};margin-right:6px;"></div>'
+            f'{name}</div>'
+        )
+        if idx < per_col:
+            col1_html += box
+        elif idx < 2 * per_col:
+            col2_html += box
+        else:
+            col3_html += box
+
+    st.markdown(
+        f"""
+        <div style="display: flex; justify-content: space-between;">
+            <div style="flex: 1; padding-right: 20px;">{col1_html}</div>
+            <div style="flex: 1; padding-right: 20px;">{col2_html}</div>
+            <div style="flex: 1;">{col3_html}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+# --- EUNIS LEGEND ---
+with st.expander("EUNIS Legend (43 classes)"):
+    eunis_ids = list(eunis_labels.keys())
+    eunis_names = list(eunis_labels.values())
+
+    col1_html, col2_html, col3_html = "", "", ""
+    per_col = (len(eunis_labels) + 2) // 3
+
+    for idx, eid in enumerate(eunis_ids):
+        name = eunis_names[idx]
+        color = eunis_palette[idx]
+        box = (
+            f'<div style="display:flex;align-items:center;margin-bottom:4px;">'
+            f'<div style="width:12px;height:12px;background:{color};margin-right:6px;"></div>'
+            f'{name}</div>'
+        )
+        if idx < per_col:
+            col1_html += box
+        elif idx < 2 * per_col:
+            col2_html += box
+        else:
+            col3_html += box
+
+    st.markdown(
+        f"""
+        <div style="display: flex; justify-content: space-between;">
+            <div style="flex: 1; padding-right: 20px;">{col1_html}</div>
+            <div style="flex: 1; padding-right: 20px;">{col2_html}</div>
+            <div style="flex: 1;">{col3_html}</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 # --- Add layers to map ---
 m.add_ee_tile_layer(archetype_img, {
     "min": 1, "max": 14, "palette": arch_palette
