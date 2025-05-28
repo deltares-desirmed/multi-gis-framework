@@ -411,6 +411,24 @@ Map.add_child(legend_layer)
 Map.add_child(folium.LayerControl())
 Map.to_streamlit(height=600)
 
+quick_format = st.radio("Download format", ["GeoTIFF", "SHP"], horizontal=True)
+
+if quick_format == "GeoTIFF":
+    image_to_download = reclassify(CLIPPED_CORINE[selected_year]).clip(final_aoi)
+    url = image_to_download.getDownloadURL({
+        'scale': 100,
+        'crs': 'EPSG:3857',
+        'region': download_region.toGeoJSONString(),
+        'format': 'GeoTIFF'
+    })
+    st.markdown(
+        f"[📥 Download Archetypes ({selected_year}) as GeoTIFF]({url})",
+        unsafe_allow_html=True
+    )
+elif quick_format == "SHP":
+    # For SHP, direct download is not supported via getDownloadURL; fallback to export logic.
+    st.warning("⚠️ SHP direct download not supported — use the Export to Drive option above.")
+
 # -------------------- Export Options --------------------
 st.subheader("📤 Export Options")
 
