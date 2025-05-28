@@ -4,6 +4,28 @@ from streamlit_folium import st_folium
 import folium
 from folium.plugins import Draw
 import io
+from folium.plugins import Draw, Geocoder
+
+# Create base map
+m = folium.Map(location=[45, 10], zoom_start=4)
+
+# Add draw controls
+draw = Draw(
+    draw_options={
+        "polyline": False,
+        "polygon": False,
+        "circle": False,
+        "rectangle": False,
+        "circlemarker": False,
+        "marker": True
+    },
+    edit_options={"edit": True}
+)
+draw.add_to(m)
+
+# ✅ Add search bar (geocoder)
+Geocoder(collapsed=False, add_marker=True).add_to(m)
+
 
 st.set_page_config(layout="wide")
 st.title("🗺️ Community Systems Mapping Tool")
