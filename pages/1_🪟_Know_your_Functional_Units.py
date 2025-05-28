@@ -44,13 +44,7 @@ if uploaded:
         st.error(f"Error reading shapefile: {e}")
 
 # AOI used: uploaded shapefile or dropdown
-# AOI used: uploaded shapefile or dropdown
 final_aoi = uploaded_aoi if uploaded_aoi else aoi
-
-# Ensure selected_subregion is always defined
-if uploaded_aoi:
-    selected_subregion = "User_AOI"
-
 
 
 # Select CORINE year
@@ -105,7 +99,7 @@ Map = geemap.Map(center=[51, 3], zoom=8)
 # Create the map
 # Compute center coordinates dynamically
 aoi_centroid = final_aoi.geometry().centroid().coordinates().getInfo()
-Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=9)
+Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=10)
 
 Map.addLayer(final_aoi.style(**{
     "color": "red", "fillColor": "00000000", "width": 2
