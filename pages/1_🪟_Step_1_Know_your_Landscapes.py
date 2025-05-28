@@ -471,7 +471,7 @@ st.subheader("📤 Export Options")
 export_format = st.radio("Select Export Format", ["GeoTIFF", "SHP"])
 selected_years = st.multiselect("Select CORINE Year(s)", ['2012', '2018'], default=['2012'])
 
-export_folder = st.text_input("Drive folder name", value="nbracer")
+export_folder = st.text_input("Drive folder name", value="desirmed/nbracer")
 custom_prefix = st.text_input("File name prefix (base)", value="Archetypes")
 
 def vectorize(image, geom, year):
