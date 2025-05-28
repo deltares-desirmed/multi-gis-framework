@@ -42,7 +42,6 @@ if uploaded:
     with zipfile.ZipFile(uploaded, 'r') as zf:
         zf.extractall("temp_shp")
 
-    # Find the .shp file
     shp_files = [f for f in os.listdir("temp_shp") if f.endswith(".shp")]
     if not shp_files:
         st.error("❌ No .shp file found in the uploaded .zip.")
@@ -50,15 +49,16 @@ if uploaded:
         shp_path = os.path.join("temp_shp", shp_files[0])
 
         try:
-            # Read shapefile using geopandas
+            # Read shapefile
             gdf = gpd.read_file(shp_path)
 
+            # Check it's valid and has polygons
             if gdf.empty:
                 st.error("❌ Shapefile is empty.")
             elif not gdf.geom_type.isin(["Polygon", "MultiPolygon"]).any():
-                st.error("❌ Uploaded shapefile must contain Polygon geometries.")
+                st.error("❌ Shapefile must contain polygon geometries.")
             else:
-                # Convert to EE FeatureCollection using geemap
+                # Convert to Earth Engine FeatureCollection
                 uploaded_aoi_fc = geemap.gdf_to_ee(gdf)
                 uploaded_geom = uploaded_aoi_fc.geometry()
                 st.success("✅ AOI uploaded and converted successfully.")
@@ -69,7 +69,7 @@ if uploaded:
 final_aoi = uploaded_aoi_fc if uploaded_aoi_fc else aoi
 aoi_geom = final_aoi.geometry() if isinstance(final_aoi, ee.FeatureCollection) else final_aoi
 
-# Ensure selected_subregion is always defined
+# Ensure selected_subregion is defined for export/file naming
 selected_subregion = "User_AOI" if uploaded_aoi_fc else selected_subregion
 
 
