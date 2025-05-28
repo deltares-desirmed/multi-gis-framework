@@ -239,7 +239,7 @@ aoi_geom_for_centroid = final_aoi if isinstance(final_aoi, ee.Geometry) else fin
 aoi_centroid = aoi_geom_for_centroid.centroid().coordinates().getInfo()
 
 # populations
-ghs_years = [1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030]
+ghs_years = [2015, 2020, 2025, 2030]
 
 # Center map and add layers
 Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=9)
