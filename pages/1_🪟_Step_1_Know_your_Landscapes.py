@@ -435,8 +435,9 @@ def get_download_url(image, label):
         st.error(f"❌ Could not generate download for {label}: {e}")
 
 # 1. CORINE (raw)
-corine_img = CLIPPED_CORINE[selected_year]
-get_download_url(corine_img, "CORINE Raw")
+corine_raw = CLIPPED_CORINE[selected_year].toInt()
+get_download_url(corine_raw, "CORINE Raw")
+
 
 # 2. Archetypes (reclassified)
 archetype_img = reclassify(corine_img).clip(download_region)
