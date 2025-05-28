@@ -115,6 +115,55 @@ for label, color in zip(labels, colors):
 legend_html += "</div>"
 m.get_root().html.add_child(folium.Element(legend_html))
 
+
+# Reclassification rules
+archetypes = {
+    '1': [111,112,121,122], '2': [123,124], '3': [131,132,133],
+    '4': [141,142], '5': [211,212,213], '6': [221,222,223,231],
+    '7': [311,312,313,321,322,323,324], '8': [332,333,334,335],
+    '9': [241,242,243,244], '10': [331], '11': [421,422,423],
+    '12': [411,412], '13': [511,512], '14': [521,522,523]
+}
+arch_from, arch_to, arch_palette = [], [], []
+for k, v in archetypes.items():
+    arch_from.extend(v)
+    arch_to.extend([int(k)] * len(v))
+    arch_palette.append("#{:06x}".format(0x100000 + int(k)*123456 % 0xFFFFFF))  # simple varied colors
+
+def reclassify_archetype(img):
+    return img.remap(arch_from, arch_to).rename("archetype")
+
+# CORINE to EUNIS mapping
+eunis_map = {
+    111: 1, 112: 2, 121: 3, 122: 4, 123: 5, 124: 6, 131: 7, 132: 8, 133: 9,
+    141: 10, 142: 1, 211: 11, 212: 12, 213: 13, 221: 14, 222: 15, 223: 16,
+    231: 17, 241: 18, 242: 19, 243: 20, 244: 21, 311: 22, 312: 23, 313: 24,
+    321: 25, 322: 26, 323: 27, 324: 28, 331: 29, 332: 30, 333: 31, 334: 32,
+    335: 33, 411: 34, 412: 35, 421: 36, 422: 37, 423: 38, 511: 39, 512: 40,
+    521: 41, 522: 42, 523: 43
+}
+eunis_from = list(eunis_map.keys())
+eunis_to = list(eunis_map.values())
+
+def reclassify_eunis(img):
+    return img.remap(eunis_from, eunis_to).rename("eunis")
+
+# CORINE base
+corine_2018 = ee.Image("COPERNICUS/CORINE/V20/100m/2018").select("landcover")
+
+# Reclassified images
+archetype_img = reclassify_archetype(corine_2018)
+eunis_img = reclassify_eunis(corine_2018)
+
+# Add all to map
+m.add_ee_tile_layer(archetype_img, {
+    "min": 1, "max": 14, "palette": arch_palette
+}, "Archetypes (14 Classes)")
+
+m.add_ee_tile_layer(eunis_img, {
+    "min": 1, "max": 43, "palette": arch_palette  # You can customize this palette too
+}, "EUNIS (43 Classes)")
+
 # Add toggle functionality
 toggle_script = """
 <script>
