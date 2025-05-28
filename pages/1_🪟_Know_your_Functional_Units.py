@@ -105,7 +105,10 @@ Map = geemap.Map(center=[51, 3], zoom=8)
 # Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
 # Create the map
 # Compute center coordinates dynamically
-aoi_centroid = final_aoi.geometry().centroid().coordinates().getInfo()
+# Handle both ee.Geometry and ee.FeatureCollection cases
+aoi_geom = final_aoi.geometry() if isinstance(final_aoi, ee.FeatureCollection) else final_aoi
+aoi_centroid = aoi_geom.centroid().coordinates().getInfo()
+
 Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=9)
 
 Map.addLayer(final_aoi.style(**{
