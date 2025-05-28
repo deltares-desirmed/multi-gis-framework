@@ -311,29 +311,33 @@ with st.expander("EUNIS Legend (43 classes)"):
         "#969696"
     ]
 
-    col1_html, col2_html = "", ""
-    half = len(eunis_labels) // 3
+    col1_html, col2_html, col3_html = "", "", ""
+    per_col = (len(eunis_labels) + 2) // 3  # Divide into 3 equal parts
 
-    for i in range(1, 43):
+    for idx, i in enumerate(range(1, 44)):
         box = (
             f'<div style="display:flex;align-items:center;margin-bottom:4px;">'
             f'<div style="width:12px;height:12px;background:{eunis_palette[i-1]};margin-right:6px;"></div>'
             f'{i}: {eunis_labels[i]}</div>'
         )
-        if i <= half:
+        if idx < per_col:
             col1_html += box
-        else:
+        elif idx < 2 * per_col:
             col2_html += box
+        else:
+            col3_html += box
 
     st.markdown(
         f"""
         <div style="display: flex; justify-content: space-between;">
             <div style="flex: 1; padding-right: 20px;">{col1_html}</div>
-            <div style="flex: 1;">{col2_html}</div>
+            <div style="flex: 1; padding-right: 20px;">{col2_html}</div>
+            <div style="flex: 1;">{col3_html}</div>
         </div>
         """,
         unsafe_allow_html=True
     )
+
 
 
 # --- Custom Toggleable Legend (HTML + JS) ---
