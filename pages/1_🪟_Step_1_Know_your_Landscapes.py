@@ -442,21 +442,27 @@ get_download_url(corine_img, "CORINE Raw")
 archetype_img = reclassify(corine_img).clip(download_region)
 get_download_url(archetype_img, "Landscape Archetypes")
 
-# 3. EUNIS (if reclassified image exists)
+# 3. EUNIS (reclassified)
 try:
-    # Create a mapping function from CORINE to EUNIS if you have one (example placeholder)
     def corine_to_eunis(image):
-        corine_to_eunis_dict = {
-            # ... your remap values ...
+        landCoverToEunisNumeric = {
+            111: 1, 112: 2, 121: 3, 122: 4, 123: 5, 124: 6,
+            131: 7, 132: 8, 133: 9, 141: 10, 142: 1, 211: 11, 212: 12, 213: 13,
+            221: 14, 222: 15, 223: 16, 231: 17, 241: 18, 242: 19, 243: 20,
+            244: 21, 311: 22, 312: 23, 313: 24, 321: 25, 322: 26, 323: 27,
+            324: 28, 331: 29, 332: 30, 333: 31, 334: 32, 335: 33, 411: 34,
+            412: 35, 421: 36, 422: 37, 423: 38, 511: 39, 512: 40, 521: 41,
+            522: 42, 523: 43
         }
-        from_list = list(corine_to_eunis_dict.keys())
-        to_list = list(corine_to_eunis_dict.values())
+        from_list = list(landCoverToEunisNumeric.keys())
+        to_list = list(landCoverToEunisNumeric.values())
         return image.remap(from_list, to_list).rename('eunis')
 
     eunis_img = corine_to_eunis(corine_img).clip(download_region)
     get_download_url(eunis_img, "EUNIS Reclassified")
 except Exception:
     st.info("ℹ️ EUNIS layer not configured or skipped.")
+
 
 # -------------------- Export Options --------------------
 st.subheader("📤 Export Options")
