@@ -3,6 +3,7 @@ import pandas as pd
 from streamlit_folium import st_folium
 import folium
 from folium.plugins import Draw
+import io
 
 st.set_page_config(layout="wide")
 st.title("🗺️ Community Systems Mapping Tool")
@@ -71,7 +72,7 @@ if st.session_state.points:
     df = pd.DataFrame(st.session_state.points)
     st.dataframe(df, use_container_width=True)
 
-    # Export option
+    # Export as CSV
     st.download_button(
         label="📥 Download as CSV",
         data=df.to_csv(index=False).encode("utf-8"),
@@ -79,9 +80,13 @@ if st.session_state.points:
         mime="text/csv"
     )
 
+    # Export as Excel
+    excel_buffer = io.BytesIO()
+    with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
+        df.to_excel(writer, index=False)
     st.download_button(
         label="📥 Download as Excel",
-        data=df.to_excel(index=False, engine="openpyxl"),
+        data=excel_buffer.getvalue(),
         file_name="community_systems.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
