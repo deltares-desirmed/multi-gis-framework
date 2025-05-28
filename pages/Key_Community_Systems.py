@@ -13,7 +13,7 @@ if "points" not in st.session_state:
     st.session_state.points = []
 
 # ✅ Create base map once
-m = folium.Map(location=[45, 10], zoom_start=4)
+
 
 # ✅ Add drawing controls
 draw = Draw(
