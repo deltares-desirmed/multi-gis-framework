@@ -18,7 +18,7 @@ st.sidebar.info(
     """
 )
 
-st.title("Functional Unit - coRINE 2018")
+st.title("Functional Units")
 
 #  Add EE tile layer registration
 folium.Map.add_ee_tile_layer = lambda self, ee_img, vis_params, name: folium.TileLayer(
