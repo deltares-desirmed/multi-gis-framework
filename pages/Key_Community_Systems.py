@@ -6,7 +6,7 @@ from folium.plugins import Draw, Geocoder
 import io
 
 st.set_page_config(layout="wide")
-st.title("🗺️ Community Systems Mapping Tool")
+st.title(" Community Systems Mapping Tool")
 
 # Initialize session state
 if "points" not in st.session_state:
@@ -30,8 +30,21 @@ Draw(
 
 Geocoder(collapsed=False, add_marker=True).add_to(m)
 
+st.markdown("""
+    <style>
+    .folium-map {
+        height: 600px !important;
+        margin-bottom: 0px !important;
+    }
+    iframe {
+        height: 600px !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # Display the map
 output = st_folium(m, height=600, width="100%", returned_objects=["last_clicked", "all_drawings"])
+
 
 
 # Category options
