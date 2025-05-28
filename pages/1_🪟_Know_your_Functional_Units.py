@@ -117,9 +117,14 @@ Map = geemap.Map(center=[51, 3], zoom=8)
 # Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
 # Create the map
 # Compute center coordinates dynamically
-aoi_centroid = final_aoi.geometry().centroid().coordinates().getInfo()
+# Handle both ee.Geometry and ee.FeatureCollection for centroid
+aoi_geom_for_centroid = final_aoi if isinstance(final_aoi, ee.Geometry) else final_aoi.geometry()
+aoi_centroid = aoi_geom_for_centroid.centroid().coordinates().getInfo()
+
+# Center map and add layers
 Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=10)
 
+# Style and add AOI boundary
 if isinstance(final_aoi_fc, ee.FeatureCollection):
     Map.addLayer(final_aoi_fc.style(**{
         "color": "red", "fillColor": "00000000", "width": 2
@@ -130,11 +135,10 @@ else:
     })
     Map.addLayer(styled_geom, {}, "AOI Boundary")
 
+# Add archetype image
 Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
 
 # --- Custom Toggleable Legend (HTML + JS) ---
-
-# HTML for legend box
 legend_html = """
 <div id="map-legend" style="
     position: fixed; 
@@ -153,10 +157,9 @@ for desc, color in legend_dict.items():
 
 legend_html += "</div>"
 
-# Add legend to map
 Map.get_root().html.add_child(folium.Element(legend_html))
 
-# Toggle script for showing/hiding legend
+# Toggle script
 toggle_script = """
 <script>
 var legend = document.getElementById('map-legend');
@@ -175,26 +178,22 @@ var checkExist = setInterval(function() {
 """
 Map.get_root().html.add_child(folium.Element(toggle_script))
 
-# Add dummy layer to trigger legend toggle
+# Dummy layer to toggle legend
 legend_layer = folium.FeatureGroup(name="Legend", show=False)
 Map.add_child(legend_layer)
 
-# Add controls and render map
 Map.add_child(folium.LayerControl())
 Map.to_streamlit(height=600)
 
-
+# -------------------- Export Options --------------------
 st.subheader("📤 Export Options")
 
-# Let user choose format and years
 export_format = st.radio("Select Export Format", ["GeoTIFF", "SHP"])
 selected_years = st.multiselect("Select CORINE Year(s)", ['2012', '2018'], default=['2012'])
 
-# Folder and file name prefix
 export_folder = st.text_input("Drive folder name", value="nbracer")
 custom_prefix = st.text_input("File name prefix (base)", value="Archetypes")
 
-# Define the vectorization function
 def vectorize(image, geom, year):
     vectors = image.reduceToVectors(
         geometry=geom,
@@ -205,11 +204,11 @@ def vectorize(image, geom, year):
     )
     return vectors.map(lambda f: f.set('year', year))
 
-# Columns for layout
+# Export to EE Asset
 col1, col2 = st.columns(2)
-
-# EE Asset Export for one year (current dropdown selection)
 export_base_name = f"{custom_prefix}_{selected_subregion}_{selected_year}"
+region = final_aoi if isinstance(final_aoi, ee.Geometry) else final_aoi.geometry()
+
 with col1:
     if st.button("Export to EE Asset"):
         asset_id = f"projects/ee-desmond/assets/{export_base_name}"
@@ -217,14 +216,14 @@ with col1:
             image=archetype_img,
             description=export_base_name + "_Asset",
             assetId=asset_id,
-            region=final_aoi.geometry(),
+            region=region,
             scale=100,
             maxPixels=1e13
         )
         task.start()
         st.success(f"✅ Export to EE Asset started.\n📁 Asset ID: `{asset_id}`")
 
-# Drive Export (GeoTIFF or SHP) for multiple years
+# Export to Drive
 with col2:
     if st.button("Export Selected Years to Drive"):
         for year in selected_years:
@@ -238,7 +237,7 @@ with col2:
                     description=file_prefix + "_GeoTIFF",
                     folder=export_folder,
                     fileNamePrefix=file_prefix,
-                    region=final_aoi.geometry(),
+                    region=region,
                     scale=100,
                     maxPixels=1e13
                 )
@@ -246,7 +245,7 @@ with col2:
                 st.success(f"✅ GeoTIFF export for {year} started to Drive/{export_folder}/{file_prefix}.tif")
 
             elif export_format == "SHP":
-                vector_fc = vectorize(archetype_img, final_aoi.geometry(), year)
+                vector_fc = vectorize(archetype_img, region, year)
                 task = ee.batch.Export.table.toDrive(
                     collection=vector_fc,
                     description=file_prefix + "_SHP",
@@ -257,6 +256,4 @@ with col2:
                 task.start()
                 st.success(f"✅ SHP export for {year} started to Drive/{export_folder}/{file_prefix}_Vector.zip")
 
-# Tip for checking task progress
 st.info("🕒 To check export progress, go to the [Earth Engine Code Editor](https://code.earthengine.google.com/) and click on the 'Tasks' tab.")
-
