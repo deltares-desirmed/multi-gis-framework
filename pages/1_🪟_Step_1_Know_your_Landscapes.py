@@ -512,6 +512,23 @@ try:
 except Exception:
     st.info("ℹ️ EUNIS layer not configured or skipped.")
 
+with st.expander("Check this out!"):
+    st.markdown("""
+    ### 🧭 Explore Population and Demographic Dynamics in Your Region
+
+    Curious about how **population**, **urbanization**, and **age structures** have changed over time?
+
+    📍 **Use this interactive app** to:
+
+    - 🗺️ **Visualize** population density and degree of urbanization from **1975 to 2030**
+    - 👥 Explore **WorldPop age and gender demographics** (2020)
+    - 📊 **Download** results as **Excel tables** or **graph summaries** for your custom area
+
+    🔧 **Note:** Use the **Draw Tool** on the map to outline your **Area of Interest (AOI)**. All statistics will be based on the area you draw.
+
+    👉 [**Click here to launch the app**](https://desirmed.projects.earthengine.app/view/explore-population-and-sex-dynamics)
+
+    """)
 
 
 # -------------------- Export Options --------------------
