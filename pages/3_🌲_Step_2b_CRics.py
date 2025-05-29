@@ -247,7 +247,7 @@ with col2:
         Map.add_legend(title=f"{legend} Depth Categories", legend_dict=legend_dict)
     elif legend.startswith("Population"):
         pop_legend_dict = {
-            "0–40,000": "#ffffcc",
+            "0–40": "#ffffcc",
             "41–80": "#a1dab4",
             "81–120": "#41b6c4",
             "121–199": "#2c7fb8",
