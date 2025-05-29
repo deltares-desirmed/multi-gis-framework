@@ -236,6 +236,16 @@ with col2:
             for i, (k, v) in enumerate(flood_depth_classes.items())
         }
         Map.add_legend(title=f"{legend} Depth Categories", legend_dict=legend_dict)
+    elif legend.startswith("Population"):
+        pop_legend_dict = {
+            "0–50,000": "#ffffcc",
+            "50,001–100,000": "#a1dab4",
+            "100,001–150,000": "#41b6c4",
+            "150,001–200,000": "#2c7fb8",
+            ">200,000": "#253494"
+        }
+        Map.add_legend(title=f"{legend}", legend_dict=pop_legend_dict)
+
 
     # Data Sources
     with st.expander("Data sources"):
