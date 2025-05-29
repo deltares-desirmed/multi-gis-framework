@@ -3,6 +3,7 @@ import ee
 import streamlit as st
 from utils_ee import initialize_earth_engine
 import geemap.foliumap as geemap
+import folium
 
 # Must be first Streamlit command
 st.set_page_config(layout="wide")
@@ -159,8 +160,30 @@ with col2:
     elif legend == "ESRI Land Cover":
         Map.add_legend(title="ESRI Land Cover", builtin_legend="ESRI_LandCover")
     elif legend.startswith("CORINE"):
-        legend_dict = {f"{k} - {v}": corine_palette[i] for i, (k, v) in enumerate(corine_classes.items())}
-        Map.add_legend(title=f"CORINE Land Cover {corine_year}", legend_dict=legend_dict)
+    # Build HTML for a 2-column legend
+        items = list(corine_classes.items())
+        col1 = items[:len(items)//2]
+        col2 = items[len(items)//2:]
+
+        def make_legend_column(data):
+            return "".join([
+                f'<div style="display: flex; align-items: center; margin-bottom: 4px;">'
+                f'<div style="background:{corine_palette[i]}; width: 12px; height: 12px; margin-right:6px;"></div>'
+                f'<span style="font-size: 11px;">{k} - {v}</span></div>'
+                for i, (k, v) in enumerate(data)
+            ])
+
+        html = f"""
+        <div style="background: white; padding: 10px; border: 1px solid lightgray; max-height: 300px; overflow-y: auto;">
+            <h4 style="margin-top: 0;">CORINE Land Cover {corine_year}</h4>
+            <div style="display: flex; gap: 20px;">
+                <div>{make_legend_column(col1)}</div>
+                <div>{make_legend_column(col2)}</div>
+            </div>
+        </div>
+        """
+
+        Map.add_child(folium.Element(html))
 
 
     # Data Sources
