@@ -1,16 +1,16 @@
 import datetime
 import ee
 import streamlit as st
-import geemap.foliumap as geemap
 from utils_ee import initialize_earth_engine
-import ee
+import geemap.foliumap as geemap
+
+# Must be first Streamlit command
 st.set_page_config(layout="wide")
-# Initialize EE
+
+# Initialize Earth Engine
 initialize_earth_engine()
 
-
-
-# Load flood FeatureCollections
+# Load Flood FeatureCollections
 floods_HP = ee.FeatureCollection("projects/ee-desmond/assets/desirmed/floods_HP_2019")
 floods_MP = ee.FeatureCollection("projects/ee-desmond/assets/desirmed/floods_MP_2019")
 floods_LP = ee.FeatureCollection("projects/ee-desmond/assets/desirmed/floods_LP_2019")
@@ -29,14 +29,15 @@ floods_hp_img = rasterize_floods(floods_HP)
 floods_mp_img = rasterize_floods(floods_MP)
 floods_lp_img = rasterize_floods(floods_LP)
 
-# Visualization palette
+# Visualization palette for flood depths
 flood_palette = ['blue', 'cyan', 'yellow', 'orange', 'red']
 flood_vis_params = {"min": 1, "max": 5, "palette": flood_palette}
 
-# Create tile layers
+# Create tile layers for floods
 hp_layer = geemap.ee_tile_layer(floods_hp_img, flood_vis_params, "Floods HP")
 mp_layer = geemap.ee_tile_layer(floods_mp_img, flood_vis_params, "Floods MP")
 lp_layer = geemap.ee_tile_layer(floods_lp_img, flood_vis_params, "Floods LP")
+
 
 # Add to dictionary for selection
 flood_layers = {
