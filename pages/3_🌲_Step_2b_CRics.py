@@ -165,33 +165,33 @@ with col2:
             col2 = items[len(items)//2:]
 
             col_a, col_b = st.columns(2)
-            with col_a:
-                for i, (k, v) in enumerate(col1):
-                    color = corine_palette[i]
-                    st.markdown(f'<div style="display: flex; align-items: center;">'
-                                f'<div style="width: 12px; height: 12px; background: {color}; '
-                                f'margin-right: 6px;"></div>'
-                                f'<span style="font-size: 12px;">{k} - {v}</span></div>',
-                                unsafe_allow_html=True)
-            with col_b:
-                for i, (k, v) in enumerate(col2):
-                    color = corine_palette[i + len(col1)]
-                    st.markdown(f'<div style="display: flex; align-items: center;">'
-                                f'<div style="width: 12px; height: 12px; background: {color}; '
-                                f'margin-right: 6px;"></div>'
-                                f'<span style="font-size: 12px;">{k} - {v}</span></div>',
-                                unsafe_allow_html=True)
+            for i, (k, v) in enumerate(col1):
+                color = corine_palette[i]
+                col_a.markdown(
+                    f'<div style="display: flex; align-items: center;">'
+                    f'<div style="width: 12px; height: 12px; background: {color}; margin-right: 6px;"></div>'
+                    f'<span style="font-size: 12px;">{k} - {v}</span></div>',
+                    unsafe_allow_html=True
+                )
+            for i, (k, v) in enumerate(col2):
+                color = corine_palette[i + len(col1)]
+                col_b.markdown(
+                    f'<div style="display: flex; align-items: center;">'
+                    f'<div style="width: 12px; height: 12px; background: {color}; margin-right: 6px;"></div>'
+                    f'<span style="font-size: 12px;">{k} - {v}</span></div>',
+                    unsafe_allow_html=True
+                )
 
 
-    # Data Sources
-    with st.expander("Data sources"):
-        st.markdown("""
-        - [Dynamic World Land Cover](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_DYNAMICWORLD_V1?hl=en)
-        - [ESA Global Land Cover](https://developers.google.com/earth-engine/datasets/catalog/ESA_WorldCover_v100)
-        - [ESRI Global Land Cover](https://samapriya.github.io/awesome-gee-community-datasets/projects/esrilc2020)
-        """)
+# Data Sources
+with st.expander("Data sources"):
+    st.markdown("""
+    - [Dynamic World Land Cover](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_DYNAMICWORLD_V1?hl=en)
+    - [ESA Global Land Cover](https://developers.google.com/earth-engine/datasets/catalog/ESA_WorldCover_v100)
+    - [ESRI Global Land Cover](https://samapriya.github.io/awesome-gee-community-datasets/projects/esrilc2020)
+    """)
 
-# Show map in main panel
+# ✅ This MUST come after the expander/legend logic
 with col1:
     Map.add_layer_control()
     Map.to_streamlit(height=750)
