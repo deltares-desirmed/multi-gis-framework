@@ -70,6 +70,41 @@ Map.add_basemap("ESA WorldCover 2020 S2 FCC")
 Map.add_basemap("ESA WorldCover 2020 S2 TCC")
 Map.add_basemap("HYBRID")
 
+# CORINE Land Cover
+CORINE_YEARS = {
+    '2012': ee.Image('COPERNICUS/CORINE/V20/100m/2012').select('landcover'),
+    '2018': ee.Image('COPERNICUS/CORINE/V20/100m/2018').select('landcover'),
+}
+
+# CORINE class name mapping and palette
+corine_classes = {
+    111: 'Continuous Urban Fabric', 112: 'Discontinuous Urban Fabric',
+    121: 'Industrial/Commercial Units', 122: 'Road/rail networks', 123: 'Port areas',
+    124: 'Airports', 131: 'Mineral extraction sites', 132: 'Dump sites', 133: 'Construction sites',
+    141: 'Green urban areas', 142: 'Sport/leisure facilities', 211: 'Non-irrigated arable land',
+    212: 'Permanently irrigated land', 213: 'Rice fields', 221: 'Vineyards', 222: 'Fruit trees',
+    223: 'Olive groves', 231: 'Pastures', 241: 'Annual crops with permanent crops',
+    242: 'Complex cultivation patterns', 243: 'Agro-forestry', 244: 'Agro-natural mosaic',
+    311: 'Broad-leaved forest', 312: 'Coniferous forest', 313: 'Mixed forest',
+    321: 'Natural grasslands', 322: 'Moors/heathland', 323: 'Sclerophyllous vegetation',
+    324: 'Transitional woodland-shrub', 331: 'Beaches/dunes/sands', 332: 'Bare rocks',
+    333: 'Sparsely vegetated areas', 334: 'Burnt areas', 335: 'Glaciers and snow',
+    411: 'Inland marshes', 412: 'Peat bogs', 421: 'Salt marshes', 422: 'Salines',
+    423: 'Intertidal flats', 511: 'Water courses', 512: 'Water bodies',
+    521: 'Coastal lagoons', 522: 'Estuaries', 523: 'Sea and ocean',
+}
+corine_palette = [
+    "#ff0000", "#e6004d", "#cc4d00", "#cc0000", "#e6b3b3", "#a64d79",
+    "#ffe6cc", "#999966", "#cc99ff", "#33cc33", "#66ff66", "#ffff99",
+    "#ffcc99", "#ffffcc", "#ffcc66", "#f2f2f2", "#e6e600", "#c2f0c2",
+    "#b3ffcc", "#d9f2e6", "#e6ffe6", "#003300", "#006600", "#339966",
+    "#999933", "#cccc00", "#99cc00", "#669900", "#f2f2f2", "#cccccc",
+    "#999999", "#ffcccc", "#ccffff", "#cce6ff", "#e6e6e6", "#99ccff",
+    "#ccffff", "#9999ff", "#66cccc", "#6699ff", "#3333ff", "#0000cc",
+    "#6666ff", "#000099"
+]
+
+
 # Sidebar controls
 with col2:
     # Fixed location center and zoom (Split, Croatia)
@@ -84,6 +119,14 @@ with col2:
     start_date = start.strftime("%Y-%m-%d")
     end_date = end.strftime("%Y-%m-%d")
 
+        # CORINE year selection
+    corine_year = st.selectbox("Select CORINE Year", list(CORINE_YEARS.keys()), index=1)
+    corine_img = CORINE_YEARS[corine_year]
+    corine_layer = geemap.ee_tile_layer(
+        corine_img, {"min": 111, "max": 523, "palette": corine_palette}, f"CORINE {corine_year}"
+    )
+
+
     # Set region for Dynamic World globally (you can later restrict this if needed)
     region = ee.Geometry.BBox(-179, -89, 179, 89)
     dw = geemap.dynamic_world(region, start_date, end_date, return_type="hillshade")
@@ -97,8 +140,11 @@ with col2:
         "Floods HP": hp_layer,
         "Floods MP": mp_layer,
         "Floods LP": lp_layer,
+        f"CORINE {corine_year}": corine_layer,
+
     }
 
+    
     options = list(layers.keys())
     left = st.selectbox("Select a left layer", options, index=1)
     right = st.selectbox("Select a right layer", options, index=0)
