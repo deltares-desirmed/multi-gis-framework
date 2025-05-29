@@ -86,7 +86,7 @@ pop_tile_layers = {
 # Define visualization parameters
 pop_vis = {
     "min": 0,
-    "max": 200,
+    "max": 2000,
     "palette": ["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]
 }
 
@@ -247,11 +247,11 @@ with col2:
         Map.add_legend(title=f"{legend} Depth Categories", legend_dict=legend_dict)
     elif legend.startswith("Population"):
         pop_legend_dict = {
-            "0–40": "#ffffcc",
-            "41–80": "#a1dab4",
-            "81–120": "#41b6c4",
-            "121–199": "#2c7fb8",
-            ">200": "#253494"
+            "0–400": "#ffffcc",
+            "400–800": "#a1dab4",
+            "800–1200": "#41b6c4",
+            "1200–1600": "#2c7fb8",
+            ">1600": "#253494"
         }
         Map.add_legend(title=f"{legend}", legend_dict=pop_legend_dict)
 
