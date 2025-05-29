@@ -128,13 +128,6 @@ with col2:
     start_date = start.strftime("%Y-%m-%d")
     end_date = end.strftime("%Y-%m-%d")
 
-        # CORINE year selection
-    # corine_year = st.selectbox("Select CORINE Year", list(CORINE_YEARS.keys()), index=1)
-    # corine_img = CORINE_YEARS[corine_year]
-    # corine_layer = geemap.ee_tile_layer(
-    #     corine_img, {"min": 111, "max": 523, "palette": corine_palette}, f"CORINE {corine_year}"
-    # )
-
 
     # Set region for Dynamic World globally (you can later restrict this if needed)
     region = ee.Geometry.BBox(-179, -89, 179, 89)
@@ -142,6 +135,14 @@ with col2:
 
 
     # Layer toggle and split map interface
+    # Add CORINE 2012 and 2018 directly to selectable layers
+    corine_2012 = geemap.ee_tile_layer(
+        CORINE_YEARS["2012"], {"min": 111, "max": 523, "palette": corine_palette}, "CORINE 2012"
+    )
+    corine_2018 = geemap.ee_tile_layer(
+        CORINE_YEARS["2018"], {"min": 111, "max": 523, "palette": corine_palette}, "CORINE 2018"
+    )
+
     layers = {
         "Dynamic World": geemap.ee_tile_layer(dw, {}, "Dynamic World Land Cover"),
         "ESA Land Cover": geemap.ee_tile_layer(esa, esa_vis, "ESA Land Cover"),
@@ -149,9 +150,10 @@ with col2:
         "Floods HP": hp_layer,
         "Floods MP": mp_layer,
         "Floods LP": lp_layer,
-        f"CORINE {corine_year}": corine_layer,
-
+        "CORINE 2012": corine_2012,
+        "CORINE 2018": corine_2018,
     }
+
 
     
     options = list(layers.keys())
