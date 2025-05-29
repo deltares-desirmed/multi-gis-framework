@@ -61,6 +61,31 @@ esri_vis = {
     ],
 }
 
+# Load population feature collection
+population_fc = ee.FeatureCollection("projects/ee-desmond/assets/desirmed/settlements_population_with_gender_age")
+
+# Define available population years to visualize
+pop_years = ["2011", "2021", "2025", "2030"]
+
+# User selection
+selected_pop_year = st.selectbox("Select Population Year", pop_years, index=1)
+pop_property = f"pop_{selected_pop_year}"
+
+# Convert to image
+population_img = population_fc.reduceToImage(
+    properties=[pop_property], reducer=ee.Reducer.first()
+).reproject(crs=eco_crs, scale=eco_scale)
+
+# Define visualization parameters
+pop_vis = {
+    "min": 0,
+    "max": 200000,
+    "palette": ["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]
+}
+
+# Add to map
+
+
 # UI Sidebar Info
 st.sidebar.title("Info")
 st.sidebar.info(
@@ -79,6 +104,7 @@ Map.add_basemap("ESA WorldCover 2020 S2 FCC")
 Map.add_basemap("ESA WorldCover 2020 S2 TCC")
 Map.add_basemap("HYBRID")
 
+Map.add_layer(population_img, pop_vis, f"Population {selected_pop_year}")
 # CORINE Land Cover
 CORINE_YEARS = {
     '2012': ee.Image('COPERNICUS/CORINE/V20/100m/2012').select('landcover'),
