@@ -250,8 +250,8 @@ with col2:
             "0–40,000": "#ffffcc",
             "41–80": "#a1dab4",
             "81–120": "#41b6c4",
-            "121–160,000": "#2c7fb8",
-            ">161": "#253494"
+            "121–199": "#2c7fb8",
+            ">200": "#253494"
         }
         Map.add_legend(title=f"{legend}", legend_dict=pop_legend_dict)
 
