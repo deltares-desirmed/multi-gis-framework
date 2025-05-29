@@ -34,7 +34,7 @@ flood_depth_classes = {
     2: "0.5 – 1.5 m",
     3: "1.5 – 2.5 m",
     4: "> 2.5 m",
-    5: "Large water bodies",
+    5: "Extreme depth",
 }
 flood_palette = ['blue', 'cyan', 'yellow', 'orange', 'red']
 
@@ -86,22 +86,54 @@ CORINE_YEARS = {
 }
 
 # CORINE class name mapping and palette
+# Full CORINE class palette (44 values)
 corine_classes = {
-    111: 'Continuous Urban Fabric', 112: 'Discontinuous Urban Fabric',
-    121: 'Industrial/Commercial Units', 122: 'Road/rail networks', 123: 'Port areas',
-    124: 'Airports', 131: 'Mineral extraction sites', 132: 'Dump sites', 133: 'Construction sites',
-    141: 'Green urban areas', 142: 'Sport/leisure facilities', 211: 'Non-irrigated arable land',
-    212: 'Permanently irrigated land', 213: 'Rice fields', 221: 'Vineyards', 222: 'Fruit trees',
-    223: 'Olive groves', 231: 'Pastures', 241: 'Annual crops with permanent crops',
-    242: 'Complex cultivation patterns', 243: 'Agro-forestry', 244: 'Agro-natural mosaic',
-    311: 'Broad-leaved forest', 312: 'Coniferous forest', 313: 'Mixed forest',
-    321: 'Natural grasslands', 322: 'Moors/heathland', 323: 'Sclerophyllous vegetation',
-    324: 'Transitional woodland-shrub', 331: 'Beaches/dunes/sands', 332: 'Bare rocks',
-    333: 'Sparsely vegetated areas', 334: 'Burnt areas', 335: 'Glaciers and snow',
-    411: 'Inland marshes', 412: 'Peat bogs', 421: 'Salt marshes', 422: 'Salines',
-    423: 'Intertidal flats', 511: 'Water courses', 512: 'Water bodies',
-    521: 'Coastal lagoons', 522: 'Estuaries', 523: 'Sea and ocean',
+    111: 'Continuous Urban Fabric',
+    112: 'Discontinuous Urban Fabric',
+    121: 'Industrial/Commercial Units',
+    122: 'Road/rail networks',
+    123: 'Port areas',
+    124: 'Airports',
+    131: 'Mineral extraction sites',
+    132: 'Dump sites',
+    133: 'Construction sites',
+    141: 'Green urban areas',
+    142: 'Sport/leisure facilities',
+    211: 'Non-irrigated arable land',
+    212: 'Permanently irrigated land',
+    213: 'Rice fields',
+    221: 'Vineyards',
+    222: 'Fruit trees',
+    223: 'Olive groves',
+    231: 'Pastures',
+    241: 'Annual crops associated with permanent crops',
+    242: 'Complex cultivation patterns',
+    243: 'Agro-forestry',
+    244: 'Agro-natural mosaic',
+    311: 'Broad-leaved forest',
+    312: 'Coniferous forest',
+    313: 'Mixed forest',
+    321: 'Natural grasslands',
+    322: 'Moors/heathland',
+    323: 'Sclerophyllous vegetation',
+    324: 'Transitional woodland-shrub',
+    331: 'Beaches/dunes/sands',
+    332: 'Bare rocks',
+    333: 'Sparsely vegetated areas',
+    334: 'Burnt areas',
+    335: 'Glaciers and perpetual snow',
+    411: 'Inland marshes',
+    412: 'Peat bogs',
+    421: 'Salt marshes',
+    422: 'Salines',
+    423: 'Intertidal flats',
+    511: 'Water courses',
+    512: 'Water bodies',
+    521: 'Coastal lagoons',
+    522: 'Estuaries',
+    523: 'Sea and ocean'
 }
+
 corine_palette = [
     "#ff0000", "#e6004d", "#cc4d00", "#cc0000", "#e6b3b3", "#a64d79",
     "#ffe6cc", "#999966", "#cc99ff", "#33cc33", "#66ff66", "#ffff99",
@@ -112,6 +144,7 @@ corine_palette = [
     "#ccffff", "#9999ff", "#66cccc", "#6699ff", "#3333ff", "#0000cc",
     "#6666ff", "#000099"
 ]
+
 
 
 # Sidebar controls
