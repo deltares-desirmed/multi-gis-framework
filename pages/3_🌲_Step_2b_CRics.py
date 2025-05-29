@@ -134,17 +134,16 @@ corine_classes = {
     523: 'Sea and ocean'
 }
 
-corine_palette = [
-    "#ff0000", "#e6004d", "#cc4d00", "#cc0000", "#e6b3b3", "#a64d79",
-    "#ffe6cc", "#999966", "#cc99ff", "#33cc33", "#66ff66", "#ffff99",
-    "#ffcc99", "#ffffcc", "#ffcc66", "#f2f2f2", "#e6e600", "#c2f0c2",
-    "#b3ffcc", "#d9f2e6", "#e6ffe6", "#003300", "#006600", "#339966",
-    "#999933", "#cccc00", "#99cc00", "#669900", "#f2f2f2", "#cccccc",
-    "#999999", "#ffcccc", "#ccffff", "#cce6ff", "#e6e6e6", "#99ccff",
-    "#ccffff", "#9999ff", "#66cccc", "#6699ff", "#3333ff", "#0000cc",
-    "#6666ff", "#000099"
-]
 
+corine_palette = [
+    "#ff0000", "#e97419", "#a00000", "#ffff64", "#009900", "#006400",
+    "#00ff00", "#00a000", "#dcdcdc", "#c8c8c8", "#ff0000", "#ffffa8",
+    "#ffff00", "#e6e600", "#e68000", "#f2a64d", "#e6a600", "#e6e64d",
+    "#ffe6a6", "#ffe64d", "#e6cc4d", "#f2cca6", "#80ff00", "#00a600",
+    "#4dff00", "#ccf24d", "#a6ff80", "#a6e64d", "#a6f200", "#e6e6e6",
+    "#cccccc", "#ccffcc", "#000000", "#a6e6cc", "#a6a6ff", "#4d4dff",
+    "#ccccff", "#e6e6ff", "#a6a6e6", "#00ccf2", "#80f2e6", "#00ffa6",
+    "#a6ffe6", "#e6f2ff"]
 
 
 # Sidebar controls
