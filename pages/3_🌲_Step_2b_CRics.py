@@ -29,6 +29,15 @@ floods_hp_img = rasterize_floods(floods_HP)
 floods_mp_img = rasterize_floods(floods_MP)
 floods_lp_img = rasterize_floods(floods_LP)
 
+flood_depth_classes = {
+    1: "< 0.5 m",
+    2: "0.5 – 1.5 m",
+    3: "1.5 – 2.5 m",
+    4: "> 2.5 m",
+    5: "Large water bodies",
+}
+flood_palette = ['blue', 'cyan', 'yellow', 'orange', 'red']
+
 # Flood visualization
 flood_palette = ['blue', 'cyan', 'yellow', 'orange', 'red']
 flood_vis = {"min": 1, "max": 5, "palette": flood_palette}
@@ -161,7 +170,12 @@ with col2:
     elif legend.startswith("CORINE"):
         legend_dict = {f"{k} - {v}": corine_palette[i] for i, (k, v) in enumerate(corine_classes.items())}
         Map.add_legend(title=f"CORINE Land Cover {corine_year}", legend_dict=legend_dict)
-
+    elif legend.startswith("Floods"):
+        legend_dict = {
+            f"{k} - {v}": flood_palette[i]
+            for i, (k, v) in enumerate(flood_depth_classes.items())
+        }
+        Map.add_legend(title=f"{legend} Depth Categories", legend_dict=legend_dict)
 
     # Data Sources
     with st.expander("Data sources"):
