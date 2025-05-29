@@ -70,7 +70,7 @@ pop_years = ["2011", "2021", "2025", "2030"]
 # Define visualization settings
 pop_vis = {
     "min": 0,
-    "max": 200000,
+    "max": 200,
     "palette": ["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]
 }
 
