@@ -79,7 +79,7 @@ population_img = population_fc.reduceToImage(
 # Define visualization parameters
 pop_vis = {
     "min": 0,
-    "max": 200000,
+    "max": 200,
     "palette": ["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]
 }
 
@@ -238,11 +238,11 @@ with col2:
         Map.add_legend(title=f"{legend} Depth Categories", legend_dict=legend_dict)
     elif legend.startswith("Population"):
         pop_legend_dict = {
-            "0–50,000": "#ffffcc",
-            "50,001–100,000": "#a1dab4",
-            "100,001–150,000": "#41b6c4",
-            "150,001–200,000": "#2c7fb8",
-            ">200,000": "#253494"
+            "0–40,000": "#ffffcc",
+            "41–80": "#a1dab4",
+            "81–120": "#41b6c4",
+            "121–160,000": "#2c7fb8",
+            ">161": "#253494"
         }
         Map.add_legend(title=f"{legend}", legend_dict=pop_legend_dict)
 
