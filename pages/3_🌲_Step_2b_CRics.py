@@ -8,6 +8,8 @@ import ee
 # Initialize EE
 initialize_earth_engine()
 
+st.set_page_config(layout="wide")
+
 # Load flood FeatureCollections
 floods_HP = ee.FeatureCollection("projects/ee-desmond/assets/desirmed/floods_HP_2019")
 floods_MP = ee.FeatureCollection("projects/ee-desmond/assets/desirmed/floods_MP_2019")
@@ -47,7 +49,7 @@ flood_layers = {
 flood_layer_choice = st.selectbox("Select flood layer to display", list(flood_layers.keys()), index=0)
 
 
-st.set_page_config(layout="wide")
+
 
 st.sidebar.title("Info")
 st.sidebar.info(
