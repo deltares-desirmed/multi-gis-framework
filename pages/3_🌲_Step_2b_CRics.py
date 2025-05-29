@@ -74,7 +74,6 @@ pop_vis = {
     "palette": ["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]
 }
 
-# Convert each year to a visualized tile layer
 pop_tile_layers = {
     f"Population {year}": geemap.ee_tile_layer(
         population_fc.reduceToImage([f"pop_{year}"], ee.Reducer.first()).reproject(crs=eco_crs, scale=eco_scale),
@@ -83,13 +82,6 @@ pop_tile_layers = {
     )
     for year in pop_years
 }
-
-
-
-# Convert to image
-population_img = population_fc.reduceToImage(
-    properties=[pop_property], reducer=ee.Reducer.first()
-).reproject(crs=eco_crs, scale=eco_scale)
 
 # Define visualization parameters
 pop_vis = {
