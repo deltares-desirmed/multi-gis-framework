@@ -224,7 +224,7 @@ corine_img = CLIPPED_CORINE[selected_year]
 archetype_img = reclassify(corine_img).clip(final_aoi)
 
 # Map Display
-st.subheader(f"Reclassified Landscape Archetypes ({selected_year})")
+st.subheader(f"Check out and inspect Biophysical archetypes ({selected_year})")
 # Map = geemap.Map(center=[51, 3], zoom=8)
 
 # Map.addLayer(final_aoi.style(**{
