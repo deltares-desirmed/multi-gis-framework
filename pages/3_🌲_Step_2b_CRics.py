@@ -72,8 +72,11 @@ Map.add_basemap("HYBRID")
 
 # Sidebar controls
 with col2:
-    # Fixed center on Split-Dalmatia (e.g., Split, Croatia)
-    Map.setCenter(16.4402, 43.0886, 11)
+    # Fixed location center and zoom (Split, Croatia)
+    longitude = 16.4402
+    latitude = 43.5081
+    zoom = 11
+    Map.setCenter(longitude, latitude, zoom)
 
     # Dynamic World time range
     start = st.date_input("Start Date for Dynamic World", datetime.date(2020, 1, 1))
@@ -81,40 +84,9 @@ with col2:
     start_date = start.strftime("%Y-%m-%d")
     end_date = end.strftime("%Y-%m-%d")
 
+    # Set region for Dynamic World globally (you can later restrict this if needed)
     region = ee.Geometry.BBox(-179, -89, 179, 89)
     dw = geemap.dynamic_world(region, start_date, end_date, return_type="hillshade")
-
-    # Combine all selectable layers (land cover + floods)
-    layers = {
-        "Dynamic World": geemap.ee_tile_layer(dw, {}, "Dynamic World Land Cover"),
-        "ESA Land Cover": geemap.ee_tile_layer(esa, esa_vis, "ESA Land Cover"),
-        "ESRI Land Cover": geemap.ee_tile_layer(esri, esri_vis, "ESRI Land Cover"),
-        "Floods HP": hp_layer,
-        "Floods MP": mp_layer,
-        "Floods LP": lp_layer,
-    }
-
-    options = list(layers.keys())
-    left = st.selectbox("Select a left layer", options, index=1)
-    right = st.selectbox("Select a right layer", options, index=0)
-
-    Map.split_map(layers[left], layers[right])
-
-    # Dynamic legend
-    legend = st.selectbox("Select a legend", options, index=options.index(right))
-    if legend == "Dynamic World":
-        Map.add_legend(title="Dynamic World Land Cover", builtin_legend="Dynamic_World")
-    elif legend == "ESA Land Cover":
-        Map.add_legend(title="ESA Land Cover", builtin_legend="ESA_WorldCover")
-    elif legend == "ESRI Land Cover":
-        Map.add_legend(title="ESRI Land Cover", builtin_legend="ESRI_LandCover")
-
-    with st.expander("Data sources"):
-        st.markdown("""
-        - [Dynamic World Land Cover](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_DYNAMICWORLD_V1?hl=en)
-        - [ESA Global Land Cover](https://developers.google.com/earth-engine/datasets/catalog/ESA_WorldCover_v100)
-        - [ESRI Global Land Cover](https://samapriya.github.io/awesome-gee-community-datasets/projects/esrilc2020)
-        """)
 
 
     # Layer toggle and split map interface
