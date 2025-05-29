@@ -159,39 +159,19 @@ with col2:
     elif legend == "ESRI Land Cover":
         Map.add_legend(title="ESRI Land Cover", builtin_legend="ESRI_LandCover")
     elif legend.startswith("CORINE"):
-        with st.expander(f"CORINE Land Cover {corine_year} Legend"):
-            items = list(corine_classes.items())
-            col1 = items[:len(items)//2]
-            col2 = items[len(items)//2:]
-
-            col_a, col_b = st.columns(2)
-            for i, (k, v) in enumerate(col1):
-                color = corine_palette[i]
-                col_a.markdown(
-                    f'<div style="display: flex; align-items: center;">'
-                    f'<div style="width: 12px; height: 12px; background: {color}; margin-right: 6px;"></div>'
-                    f'<span style="font-size: 12px;">{k} - {v}</span></div>',
-                    unsafe_allow_html=True
-                )
-            for i, (k, v) in enumerate(col2):
-                color = corine_palette[i + len(col1)]
-                col_b.markdown(
-                    f'<div style="display: flex; align-items: center;">'
-                    f'<div style="width: 12px; height: 12px; background: {color}; margin-right: 6px;"></div>'
-                    f'<span style="font-size: 12px;">{k} - {v}</span></div>',
-                    unsafe_allow_html=True
-                )
+        legend_dict = {f"{k} - {v}": corine_palette[i] for i, (k, v) in enumerate(corine_classes.items())}
+        Map.add_legend(title=f"CORINE Land Cover {corine_year}", legend_dict=legend_dict)
 
 
-# Data Sources
-with st.expander("Data sources"):
-    st.markdown("""
-    - [Dynamic World Land Cover](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_DYNAMICWORLD_V1?hl=en)
-    - [ESA Global Land Cover](https://developers.google.com/earth-engine/datasets/catalog/ESA_WorldCover_v100)
-    - [ESRI Global Land Cover](https://samapriya.github.io/awesome-gee-community-datasets/projects/esrilc2020)
-    """)
+    # Data Sources
+    with st.expander("Data sources"):
+        st.markdown("""
+        - [Dynamic World Land Cover](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_DYNAMICWORLD_V1?hl=en)
+        - [ESA Global Land Cover](https://developers.google.com/earth-engine/datasets/catalog/ESA_WorldCover_v100)
+        - [ESRI Global Land Cover](https://samapriya.github.io/awesome-gee-community-datasets/projects/esrilc2020)
+        """)
 
-# ✅ This MUST come after the expander/legend logic
+# Show map in main panel
 with col1:
     Map.add_layer_control()
     Map.to_streamlit(height=750)
