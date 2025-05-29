@@ -61,15 +61,30 @@ esri_vis = {
     ],
 }
 
-# Load population feature collection
+# Load the FeatureCollection once
 population_fc = ee.FeatureCollection("projects/ee-desmond/assets/desirmed/settlements_population_with_gender_age")
 
-# Define available population years to visualize
+# Define years to visualize
 pop_years = ["2011", "2021", "2025", "2030"]
 
-# User selection
-selected_pop_year = st.selectbox("Select Population Year", pop_years, index=1)
-pop_property = f"pop_{selected_pop_year}"
+# Define visualization settings
+pop_vis = {
+    "min": 0,
+    "max": 200000,
+    "palette": ["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"]
+}
+
+# Convert each year to a visualized tile layer
+pop_tile_layers = {
+    f"Population {year}": geemap.ee_tile_layer(
+        population_fc.reduceToImage([f"pop_{year}"], ee.Reducer.first()).reproject(crs=eco_crs, scale=eco_scale),
+        pop_vis,
+        f"Population {year}"
+    )
+    for year in pop_years
+}
+
+
 
 # Convert to image
 population_img = population_fc.reduceToImage(
@@ -104,7 +119,7 @@ Map.add_basemap("ESA WorldCover 2020 S2 FCC")
 Map.add_basemap("ESA WorldCover 2020 S2 TCC")
 Map.add_basemap("HYBRID")
 
-Map.add_layer(population_img, pop_vis, f"Population {selected_pop_year}")
+
 # CORINE Land Cover
 CORINE_YEARS = {
     '2012': ee.Image('COPERNICUS/CORINE/V20/100m/2012').select('landcover'),
@@ -202,15 +217,17 @@ with col2:
     )
 
     layers = {
-        "Dynamic World": geemap.ee_tile_layer(dw, {}, "Dynamic World Land Cover"),
-        "ESA Land Cover": geemap.ee_tile_layer(esa, esa_vis, "ESA Land Cover"),
-        "ESRI Land Cover": geemap.ee_tile_layer(esri, esri_vis, "ESRI Land Cover"),
-        "Floods HP": hp_layer,
-        "Floods MP": mp_layer,
-        "Floods LP": lp_layer,
-        "CORINE 2012": corine_2012,
-        "CORINE 2018": corine_2018,
-    }
+    "Dynamic World": geemap.ee_tile_layer(dw, {}, "Dynamic World Land Cover"),
+    "ESA Land Cover": geemap.ee_tile_layer(esa, esa_vis, "ESA Land Cover"),
+    "ESRI Land Cover": geemap.ee_tile_layer(esri, esri_vis, "ESRI Land Cover"),
+    "Floods HP": hp_layer,
+    "Floods MP": mp_layer,
+    "Floods LP": lp_layer,
+    "CORINE 2012": corine_2012,
+    "CORINE 2018": corine_2018,
+    **pop_tile_layers  # Unpacks Population 2011, 2021, 2025, 2030
+}
+
 
 
     
