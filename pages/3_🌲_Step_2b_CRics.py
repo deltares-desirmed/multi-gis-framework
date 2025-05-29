@@ -4,11 +4,11 @@ import streamlit as st
 import geemap.foliumap as geemap
 from utils_ee import initialize_earth_engine
 import ee
-
+st.set_page_config(layout="wide")
 # Initialize EE
 initialize_earth_engine()
 
-st.set_page_config(layout="wide")
+
 
 # Load flood FeatureCollections
 floods_HP = ee.FeatureCollection("projects/ee-desmond/assets/desirmed/floods_HP_2019")
