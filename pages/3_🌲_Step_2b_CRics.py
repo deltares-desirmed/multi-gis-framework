@@ -159,11 +159,9 @@ with col2:
     elif legend == "ESRI Land Cover":
         Map.add_legend(title="ESRI Land Cover", builtin_legend="ESRI_LandCover")
     elif legend.startswith("CORINE"):
-        Map.add_legend(
-            title=f"CORINE Land Cover {corine_year}",
-            keys=[f"{k} - {v}" for k, v in corine_classes.items()],
-            colors=corine_palette[:len(corine_classes)]
-        )
+        legend_dict = {f"{k} - {v}": corine_palette[i] for i, (k, v) in enumerate(corine_classes.items())}
+        Map.add_legend(title=f"CORINE Land Cover {corine_year}", legend_dict=legend_dict)
+
 
     # Data Sources
     with st.expander("Data sources"):
