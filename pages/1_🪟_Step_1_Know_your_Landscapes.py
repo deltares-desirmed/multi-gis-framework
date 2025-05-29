@@ -242,7 +242,7 @@ aoi_centroid = aoi_geom_for_centroid.centroid().coordinates().getInfo()
 ghs_years = [2015, 2020, 2025, 2030]
 
 # Center map and add layers
-Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=9)
+Map = geemap.Map(center=[aoi_centroid[1], aoi_centroid[0]], zoom=10)
 
 # Style and add AOI boundary
 if isinstance(final_aoi_fc, ee.FeatureCollection):
