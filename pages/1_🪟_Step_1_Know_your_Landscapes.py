@@ -20,15 +20,15 @@ st.title("Know your landscapes")
 
 # Step 1: AOI selection via dropdowns
 countries = admin0.aggregate_array('shapeName').getInfo()
-selected_country = st.selectbox("Select Country", sorted(countries))
+selected_country = st.selectbox("Select NUTS1", sorted(countries))
 country_geom = admin0.filter(ee.Filter.eq('shapeName', selected_country)).geometry()
 
 regions = admin1.filterBounds(country_geom).aggregate_array('shapeName').getInfo()
-selected_region = st.selectbox("Select Region", sorted(regions))
+selected_region = st.selectbox("Select NUTS2", sorted(regions))
 region_geom = admin1.filter(ee.Filter.eq('shapeName', selected_region)).geometry()
 
 subregions = admin2.filterBounds(region_geom).aggregate_array('shapeName').getInfo()
-selected_subregion = st.selectbox("Select Sub-region", sorted(subregions))
+selected_subregion = st.selectbox("Select NUTS3", sorted(subregions))
 aoi = admin2.filter(ee.Filter.eq('shapeName', selected_subregion))
 
 # Step 1: Upload user shapefile (if any)
