@@ -358,7 +358,9 @@ with st.expander("📊 Exposure Analysis", expanded=True):
         "Low Probability": floods_lp_img.geometry()
     }[scenario]
 
-    settlement_geom = selected_settlement.first().geometry()
+    first_feat = selected_settlement.first()
+    settlement_geom = first_feat.geometry() if first_feat else ee.Geometry.Point([0, 0])  # fallback
+
     settlement_fc = population_fc.filterBounds(settlement_geom)
     filtered_fc = settlement_fc.filterBounds(flood_geom)
 
