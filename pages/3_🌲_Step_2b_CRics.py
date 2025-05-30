@@ -413,21 +413,36 @@ with st.expander("⚠️ Vulnerability Analysis", expanded=True):
 
 
 # ---------------------- Risk Assessment Panel ----------------------
-with st.expander("📉 Risk Assessment Summary", expanded=False):
+with st.expander("📉 Flood Risk Assessment", expanded=False):
     
-    st.markdown("This panel estimates potential risk by combining flood-exposed population, roads, buildings, and vulnerable groups.")
-    
+    st.markdown("This panel estimates at-risk exposure by intersecting flood zones with population, roads, buildings, and vulnerable groups.")
+
+    # Select population year and flood scenario
+    selected_year = st.selectbox("Select Population Year", ["2011", "2021", "2025", "2030"])
+    selected_property = f"pop_{selected_year}"
+    scenario = st.selectbox("Select Flood Scenario", ["High Probability", "Medium Probability", "Low Probability"])
+
+    # Pick flood image based on scenario
+    flood_geom = {
+        "High Probability": floods_hp_img.geometry(),
+        "Medium Probability": floods_mp_img.geometry(),
+        "Low Probability": floods_lp_img.geometry()
+    }[scenario]
+
     try:
-        # Exposed Population (2021)
-        exposed_pop_2021 = population_fc.filterBounds(floods_hp_img.geometry()).aggregate_sum("pop_2021").getInfo()
-        st.metric("🧍 Exposed Population (2021)", f"{int(exposed_pop_2021):,}")
-        
+        # Exposed population
+        exposed_pop = population_fc.filterBounds(flood_geom).aggregate_sum(selected_property).getInfo()
+        st.metric(f"🧍 Exposed Population ({selected_year})", f"{int(exposed_pop):,}")
+
         # Vulnerable Children
         children_props = [
             "female_F_0_2020", "female_F_5_2020", "female_F_10_2020",
             "male_M_0_2020", "male_M_5_2020", "male_M_10_2020"
         ]
-        exposed_children = population_fc.filterBounds(floods_hp_img.geometry()).aggregate_sum(children_props).getInfo()
+        exposed_children = sum([
+            population_fc.filterBounds(flood_geom).aggregate_sum(p).getInfo()
+            for p in children_props
+        ])
         st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}")
 
         # Vulnerable Elderly
@@ -435,21 +450,24 @@ with st.expander("📉 Risk Assessment Summary", expanded=False):
             "female_F_65_2020", "female_F_70_2020", "female_F_75_2020", "female_F_80_2020",
             "male_M_65_2020", "male_M_70_2020", "male_M_75_2020", "male_M_80_2020"
         ]
-        exposed_elderly = population_fc.filterBounds(floods_hp_img.geometry()).aggregate_sum(elderly_props).getInfo()
+        exposed_elderly = sum([
+            population_fc.filterBounds(flood_geom).aggregate_sum(p).getInfo()
+            for p in elderly_props
+        ])
         st.metric("👵 Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}")
 
-        # Roads
-        exposed_roads = split_roads.filterBounds(floods_hp_img.geometry())
+        # Roads at risk
+        exposed_roads = split_roads.filterBounds(flood_geom)
         road_km = exposed_roads.geometry().length().divide(1000).getInfo()
         st.metric("🛣️ Roads at Risk", f"{road_km:.2f} km")
 
-        # Buildings
-        exposed_buildings = ms_buildings_split.filterBounds(floods_hp_img.geometry())
+        # Buildings at risk
+        exposed_buildings = ms_buildings_split.filterBounds(flood_geom)
         building_count = exposed_buildings.size().getInfo()
         st.metric("🏘️ Buildings at Risk", f"{building_count:,}")
 
-        st.success("✔ Risk indicators calculated based on 2021 population and 2020 vulnerability data.")
-    
+        st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and 2020 vulnerability data completed.")
+
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
 
