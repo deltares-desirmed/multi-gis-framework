@@ -47,6 +47,21 @@ hp_layer = geemap.ee_tile_layer(floods_hp_img, flood_vis, "Floods HP")
 mp_layer = geemap.ee_tile_layer(floods_mp_img, flood_vis, "Floods MP")
 lp_layer = geemap.ee_tile_layer(floods_lp_img, flood_vis, "Floods LP")
 
+
+# Load Google Open Buildings dataset and filter to Split-Dalmatia region
+buildings = ee.FeatureCollection("GOOGLE/Research/open-buildings/v3/polygons")
+split_bbox = ee.Geometry.BBox(16.0, 42.8, 17.0, 43.7)
+buildings_split = buildings.filterBounds(split_bbox)
+
+# Convert to image using "confidence"
+buildings_image = buildings_split.reduceToImage(
+    properties=["confidence"], reducer=ee.Reducer.first()
+).visualize(min=50, max=100, palette=["lightgrey", "blue", "darkblue"])
+
+# Create tile layer
+buildings_layer = geemap.ee_tile_layer(buildings_image, {}, "Buildings (Google)")
+
+
 # Load other base datasets
 esa = ee.ImageCollection("ESA/WorldCover/v100").first()
 esa_vis = {"bands": ["Map"]}
@@ -217,7 +232,8 @@ with col2:
     "Floods LP": lp_layer,
     "CORINE 2012": corine_2012,
     "CORINE 2018": corine_2018,
-    **pop_tile_layers  # Unpacks Population 2011, 2021, 2025, 2030
+    **pop_tile_layers,  # Unpacks Population 2011, 2021, 2025, 2030
+    "Buildings (Google)": buildings_layer,
 }
 
 
@@ -255,6 +271,15 @@ with col2:
         }
         Map.add_legend(title=f"{legend}", legend_dict=pop_legend_dict)
 
+    elif legend.startswith("Buildings"):
+        Map.add_legend(
+            title="Building Confidence",
+            legend_dict={
+                "50–60%": "lightgrey",
+                "60–80%": "blue",
+                "80–100%": "darkblue"
+            }
+        )
 
     # Data Sources
     with st.expander("Data sources"):
