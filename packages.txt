@@ -7,7 +7,3 @@ libgdal-dev
 libproj-dev
 libgeos-dev
 proj-bin
-gdal-bin
-libgdal-dev
-libspatialindex-dev
-libgl1
