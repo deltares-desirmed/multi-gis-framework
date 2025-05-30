@@ -334,6 +334,55 @@ with col1:
     Map.to_streamlit(height=750)
 
 
+# ---------------------- Exposure Analysis Panel ----------------------
+    with st.expander("📊 Exposure Analysis", expanded=False):
+
+        indicator = st.selectbox("Select Exposure Indicator", ["Population", "Roads", "Buildings"])
+        
+        if indicator == "Population":
+            selected_year = st.selectbox("Select Year", ["2011", "2021", "2025", "2030"])
+            selected_property = f"pop_{selected_year}"
+            total_pop = population_fc.aggregate_sum(selected_property).getInfo()
+            st.metric(f"Total Population ({selected_year})", f"{int(total_pop):,}")
+
+        elif indicator == "Roads":
+            total_length = split_roads.geometry().length().divide(1000).getInfo()  # in kilometers
+            st.metric("Total Road Length (GRIP4)", f"{total_length:.2f} km")
+
+        elif indicator == "Buildings":
+            building_count = ms_buildings_split.size().getInfo()
+            st.metric("Total Building Count (Microsoft)", f"{building_count:,}")
+
+
+# ---------------------- Vulnerability Analysis Panel ----------------------
+    with st.expander("⚠️ Vulnerability Analysis", expanded=False):
+
+        vuln_option = st.selectbox(
+            "Select Vulnerability Group",
+            ["Children (0–10)", "Elderly (65+)", "Female Total", "Male Total"]
+        )
+
+        if vuln_option == "Children (0–10)":
+            children_props = ["female_F_0_2020", "female_F_5_2020", "female_F_10_2020",
+                            "male_M_0_2020", "male_M_5_2020", "male_M_10_2020"]
+            total_children = population_fc.aggregate_sum(children_props).getInfo()
+            st.metric("Total Children (0–10)", f"{int(total_children):,}")
+
+        elif vuln_option == "Elderly (65+)":
+            elderly_props = ["female_F_65_2020", "female_F_70_2020", "female_F_75_2020", "female_F_80_2020",
+                            "male_M_65_2020", "male_M_70_2020", "male_M_75_2020", "male_M_80_2020"]
+            total_elderly = population_fc.aggregate_sum(elderly_props).getInfo()
+            st.metric("Total Elderly (65+)", f"{int(total_elderly):,}")
+
+        elif vuln_option == "Female Total":
+            female_props = [prop for prop in population_fc.first().propertyNames().getInfo() if prop.startswith("female_")]
+            total_females = population_fc.aggregate_sum(female_props).getInfo()
+            st.metric("Total Female Population", f"{int(total_females):,}")
+
+        elif vuln_option == "Male Total":
+            male_props = [prop for prop in population_fc.first().propertyNames().getInfo() if prop.startswith("male_")]
+            total_males = population_fc.aggregate_sum(male_props).getInfo()
+            st.metric("Total Male Population", f"{int(total_males):,}")
 
 import streamlit as st
 import datetime
