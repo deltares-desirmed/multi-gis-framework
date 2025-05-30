@@ -48,20 +48,27 @@ mp_layer = geemap.ee_tile_layer(floods_mp_img, flood_vis, "Floods MP")
 lp_layer = geemap.ee_tile_layer(floods_lp_img, flood_vis, "Floods LP")
 
 
-# Define a bounding box (adjust as needed)
-split_bbox = ee.Geometry.BBox(16.0, 42.8, 17.0, 43.7)
+# Define Split, Croatia bounding box (can narrow it further)
+split_bbox = ee.Geometry.BBox(16.35, 43.45, 16.55, 43.55)
 
-# Load Open Buildings from Earth Engine and clip
+# Load Open Buildings data and filter
 buildings = ee.FeatureCollection("GOOGLE/Research/open-buildings/v3/polygons")
 buildings_split = buildings.filterBounds(split_bbox)
 
-# Convert to image for display (based on confidence score)
-buildings_image = buildings_split.reduceToImage(
-    ["confidence"], ee.Reducer.first()
-).visualize(min=50, max=100, palette=["lightgrey", "blue", "darkblue"])
+# Debug: Check number of features returned
+count = buildings_split.size()
+st.write("Number of buildings in Split bbox:", count.getInfo())
 
-# Create tile layer for map
-buildings_layer = geemap.ee_tile_layer(buildings_image, {}, "Buildings (Google)")
+# Only visualize if there are features
+buildings_layer = None
+if count.getInfo() > 0:
+    buildings_image = buildings_split.reduceToImage(
+        ["confidence"], ee.Reducer.first()
+    ).visualize(min=50, max=100, palette=["lightgrey", "blue", "darkblue"])
+
+    buildings_layer = geemap.ee_tile_layer(buildings_image, {}, "Buildings (Google)")
+else:
+    st.warning("No building data found in the selected Split region.")
 
 
 # Load other base datasets
@@ -236,10 +243,13 @@ with col2:
     "CORINE 2018": corine_2018,
     **pop_tile_layers,  # Unpack population layers
     "Buildings (Google)": buildings_layer,
+    
 }
 
 
-
+# Step 2: Only add buildings if data exists
+if buildings_layer:
+    layers["Buildings (Google)"] = buildings_layer
 
     
     options = list(layers.keys())
