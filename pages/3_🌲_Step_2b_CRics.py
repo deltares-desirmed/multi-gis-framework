@@ -422,54 +422,71 @@ with st.expander("📉 Flood Risk Assessment", expanded=False):
     selected_property = f"pop_{selected_year}"
     scenario = st.selectbox("Select Flood Scenario", ["High Probability", "Medium Probability", "Low Probability"])
 
-    # Pick flood image based on scenario
+    # Pick flood geometry based on scenario
     flood_geom = {
         "High Probability": floods_hp_img.geometry(),
         "Medium Probability": floods_mp_img.geometry(),
         "Low Probability": floods_lp_img.geometry()
     }[scenario]
 
-    try:
-        # Exposed population
-        exposed_pop = population_fc.filterBounds(flood_geom).aggregate_sum(selected_property).getInfo()
-        st.metric(f"🧍 Exposed Population ({selected_year})", f"{int(exposed_pop):,}")
+    # Filter for selected settlement
+    selected_settlement = population_fc.filter(ee.Filter.eq("NA_IME", selected_settlement))
+    settlement_geom = selected_settlement.geometry()
+    settlement_fc = population_fc.filterBounds(settlement_geom)
+    filtered_fc = settlement_fc.filterBounds(flood_geom)
 
-        # Vulnerable Children
-        children_props = [
-            "female_F_0_2020", "female_F_5_2020", "female_F_10_2020",
-            "male_M_0_2020", "male_M_5_2020", "male_M_10_2020"
-        ]
-        exposed_children = sum([
-            population_fc.filterBounds(flood_geom).aggregate_sum(p).getInfo()
+    try:
+        # Total exposure
+        total_pop = settlement_fc.aggregate_sum(selected_property).getInfo()
+        total_children = sum([
+            settlement_fc.aggregate_sum(p).getInfo()
             for p in children_props
         ])
-        st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}")
-
-        # Vulnerable Elderly
-        elderly_props = [
-            "female_F_65_2020", "female_F_70_2020", "female_F_75_2020", "female_F_80_2020",
-            "male_M_65_2020", "male_M_70_2020", "male_M_75_2020", "male_M_80_2020"
-        ]
-        exposed_elderly = sum([
-            population_fc.filterBounds(flood_geom).aggregate_sum(p).getInfo()
+        total_elderly = sum([
+            settlement_fc.aggregate_sum(p).getInfo()
             for p in elderly_props
         ])
-        st.metric("👵 Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}")
 
-        # Roads at risk
+        # Exposed Population
+        exposed_pop = filtered_fc.aggregate_sum(selected_property).getInfo()
+        pct_pop = (exposed_pop / total_pop * 100) if total_pop else 0
+        st.metric(f"🧍 Exposed Population ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
+
+        # Vulnerable Children
+        exposed_children = sum([
+            filtered_fc.aggregate_sum(p).getInfo()
+            for p in children_props
+        ])
+        pct_children = (exposed_children / total_children * 100) if total_children else 0
+        st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
+
+        # Vulnerable Elderly
+        exposed_elderly = sum([
+            filtered_fc.aggregate_sum(p).getInfo()
+            for p in elderly_props
+        ])
+        pct_elderly = (exposed_elderly / total_elderly * 100) if total_elderly else 0
+        st.metric("👵 Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
+
+        # Roads at Risk
         exposed_roads = split_roads.filterBounds(flood_geom)
         road_km = exposed_roads.geometry().length().divide(1000).getInfo()
-        st.metric("🛣️ Roads at Risk", f"{road_km:.2f} km")
+        total_road_km = split_roads.geometry().length().divide(1000).getInfo()
+        pct_roads = (road_km / total_road_km * 100) if total_road_km else 0
+        st.metric("🛣️ Roads at Risk", f"{road_km:.2f} km", f"{pct_roads:.1f}%")
 
-        # Buildings at risk
+        # Buildings at Risk
         exposed_buildings = ms_buildings_split.filterBounds(flood_geom)
         building_count = exposed_buildings.size().getInfo()
-        st.metric("🏘️ Buildings at Risk", f"{building_count:,}")
+        total_buildings = ms_buildings_split.size().getInfo()
+        pct_buildings = (building_count / total_buildings * 100) if total_buildings else 0
+        st.metric("🏘️ Buildings at Risk", f"{building_count:,}", f"{pct_buildings:.1f}%")
 
         st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and 2020 vulnerability data completed.")
 
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
+
 
 
 import streamlit as st
