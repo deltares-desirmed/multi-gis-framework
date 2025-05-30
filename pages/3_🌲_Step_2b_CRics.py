@@ -360,7 +360,7 @@ with st.expander("📊 Exposure Analysis", expanded=False):
     indicator = st.selectbox("Select Exposure Indicator", ["Population", "Roads", "Buildings"])
 
     if indicator == "Population":
-        selected_year = st.selectbox("Select Year", ["2011", "2021", "2025", "2030"])
+        selected_year = st.selectbox("Select Year", ["2025", "2030"])
         selected_property = f"pop_{selected_year}"
         total_pop = filtered_fc.aggregate_sum(selected_property).getInfo()
         st.metric(f"Total Population ({selected_year})", f"{int(total_pop):,}")
