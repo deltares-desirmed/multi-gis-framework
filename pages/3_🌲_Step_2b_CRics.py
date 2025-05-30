@@ -334,80 +334,83 @@ with col1:
     Map.to_streamlit(height=750)
 
 
-# ---------------------- Exposure & Vulnerability Analysis ----------------------
+# ---------------------- Settlement Selection ----------------------
+with st.expander("📍 Select Settlement", expanded=True):
+    settlement_names = population_fc.aggregate_array("NA_IME").distinct().sort().getInfo()
+    selected_settlement = st.selectbox("Select a Settlement", ["All Settlements"] + settlement_names)
 
-# Get unique settlement names from population_fc
-settlement_names = population_fc.aggregate_array("ZU_IME").distinct().sort().getInfo()
-selected_settlement = st.selectbox("📍 Select Settlement", ["All Settlements"] + settlement_names)
+    # Filter FeatureCollection by selected settlement
+    if selected_settlement != "All Settlements":
+        filtered_fc = population_fc.filter(ee.Filter.eq("NA_IME", selected_settlement))
+        filtered_buildings = ms_buildings_split.filter(ee.Filter.eq("NA_IME", selected_settlement))
+    else:
+        filtered_fc = population_fc
+        filtered_buildings = ms_buildings_split
 
-# Filter the population feature collection
-if selected_settlement != "All Settlements":
-    filtered_fc = population_fc.filter(ee.Filter.eq("NA_IME", selected_settlement))
-else:
-    filtered_fc = population_fc
-
-# Optional: show selected settlement geometry on map
-if selected_settlement != "All Settlements":
-    Map.addLayer(
-        filtered_fc.style(**{"color": "orange", "fillColor": "00000000", "width": 2}),
-        {},
-        f"{selected_settlement}"
-    )
 
 # ---------------------- Exposure Analysis Panel ----------------------
-with st.expander("📊 Exposure Analysis", expanded=False):
+with st.expander("📊 Exposure Analysis", expanded=True):
 
     indicator = st.selectbox("Select Exposure Indicator", ["Population", "Roads", "Buildings"])
 
     if indicator == "Population":
-        selected_year = st.selectbox("Select Year", ["2025", "2030"])
+        selected_year = st.selectbox("Select Year", ["2011", "2021", "2025", "2030"])
         selected_property = f"pop_{selected_year}"
-        total_pop = filtered_fc.aggregate_sum(selected_property).getInfo()
-        st.metric(f"Total Population ({selected_year})", f"{int(total_pop):,}")
+        try:
+            total_pop = filtered_fc.aggregate_sum(selected_property).getInfo()
+            st.metric(f"Total Population ({selected_year})", f"{int(total_pop):,}")
+        except Exception as e:
+            st.error("Population data not available or aggregation failed.")
 
     elif indicator == "Roads":
-        total_length = split_roads.geometry().length().divide(1000).getInfo()  # in kilometers
-        st.metric("Total Road Length (GRIP4)", f"{total_length:.2f} km")
+        try:
+            road_geom = split_roads.filterBounds(filtered_fc.geometry()) if selected_settlement != "All Settlements" else split_roads
+            total_length = road_geom.geometry().length().divide(1000).getInfo()  # in km
+            st.metric("Total Road Length (GRIP4)", f"{total_length:.2f} km")
+        except Exception as e:
+            st.error("Road data could not be computed.")
 
     elif indicator == "Buildings":
-        building_count = ms_buildings_split.size().getInfo()
-        st.metric("Total Building Count (Microsoft)", f"{building_count:,}")
+        try:
+            building_count = filtered_buildings.size().getInfo()
+            st.metric("Total Building Count (Microsoft)", f"{building_count:,}")
+        except Exception as e:
+            st.error("Building count computation failed.")
 
 
 # ---------------------- Vulnerability Analysis Panel ----------------------
-with st.expander("⚠️ Vulnerability Analysis", expanded=False):
+with st.expander("⚠️ Vulnerability Analysis", expanded=True):
 
     vuln_option = st.selectbox(
         "Select Vulnerability Group",
         ["Children (0–10)", "Elderly (65+)", "Female Total", "Male Total"]
     )
 
-    if vuln_option == "Children (0–10)":
-        children_props = [
-            "female_F_0_2020", "female_F_5_2020", "female_F_10_2020",
-            "male_M_0_2020", "male_M_5_2020", "male_M_10_2020"
-        ]
-        total_children = filtered_fc.aggregate_sum(children_props).getInfo()
-        st.metric("Total Children (0–10)", f"{int(total_children):,}")
+    try:
+        if vuln_option == "Children (0–10)":
+            children_props = ["female_F_0_2020", "female_F_5_2020", "female_F_10_2020",
+                              "male_M_0_2020", "male_M_5_2020", "male_M_10_2020"]
+            total_children = sum(filtered_fc.aggregate_sum(prop).getInfo() for prop in children_props)
+            st.metric("Total Children (0–10)", f"{int(total_children):,}")
 
-    elif vuln_option == "Elderly (65+)":
-        elderly_props = [
-            "female_F_65_2020", "female_F_70_2020", "female_F_75_2020", "female_F_80_2020",
-            "male_M_65_2020", "male_M_70_2020", "male_M_75_2020", "male_M_80_2020"
-        ]
-        total_elderly = sum(filtered_fc.aggregate_sum(prop).getInfo()for prop in elderly_props)
+        elif vuln_option == "Elderly (65+)":
+            elderly_props = ["female_F_65_2020", "female_F_70_2020", "female_F_75_2020", "female_F_80_2020",
+                             "male_M_65_2020", "male_M_70_2020", "male_M_75_2020", "male_M_80_2020"]
+            total_elderly = sum(filtered_fc.aggregate_sum(prop).getInfo() for prop in elderly_props)
+            st.metric("Total Elderly (65+)", f"{int(total_elderly):,}")
 
-        st.metric("Total Elderly (65+)", f"{int(total_elderly):,}")
+        elif vuln_option == "Female Total":
+            female_props = [p for p in filtered_fc.first().propertyNames().getInfo() if p.startswith("female_")]
+            total_females = sum(filtered_fc.aggregate_sum(p).getInfo() for p in female_props)
+            st.metric("Total Female Population", f"{int(total_females):,}")
 
-    elif vuln_option == "Female Total":
-        female_props = [prop for prop in population_fc.first().propertyNames().getInfo() if prop.startswith("female_")]
-        total_females = filtered_fc.aggregate_sum(female_props).getInfo()
-        st.metric("Total Female Population", f"{int(total_females):,}")
+        elif vuln_option == "Male Total":
+            male_props = [p for p in filtered_fc.first().propertyNames().getInfo() if p.startswith("male_")]
+            total_males = sum(filtered_fc.aggregate_sum(p).getInfo() for p in male_props)
+            st.metric("Total Male Population", f"{int(total_males):,}")
+    except Exception as e:
+        st.error("⚠️ Could not compute vulnerability statistics. Please check property names and data availability.")
 
-    elif vuln_option == "Male Total":
-        male_props = [prop for prop in population_fc.first().propertyNames().getInfo() if prop.startswith("male_")]
-        total_males = filtered_fc.aggregate_sum(male_props).getInfo()
-        st.metric("Total Male Population", f"{int(total_males):,}")
 
 
 import streamlit as st
