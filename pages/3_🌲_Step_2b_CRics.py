@@ -48,18 +48,41 @@ mp_layer = geemap.ee_tile_layer(floods_mp_img, flood_vis, "Floods MP")
 lp_layer = geemap.ee_tile_layer(floods_lp_img, flood_vis, "Floods LP")
 
 
-# Load Google Open Buildings dataset and filter to Split-Dalmatia region
-buildings = ee.FeatureCollection("GOOGLE/Research/open-buildings/v3/polygons")
-split_bbox = ee.Geometry.BBox(16.0, 42.8, 17.0, 43.7)
-buildings_split = buildings.filterBounds(split_bbox)
+# Define Overture Maps PMTiles URLs
+building_pmtiles = "https://overturemaps-tiles-us-west-2-beta.s3.amazonaws.com/2025-04-23/buildings.pmtiles"
+road_pmtiles = "https://overturemaps-tiles-us-west-2-beta.s3.amazonaws.com/2025-04-23/transportation.pmtiles"
 
-# Convert to image using "confidence"
-buildings_image = buildings_split.reduceToImage(
-    properties=["confidence"], reducer=ee.Reducer.first()
-).visualize(min=50, max=100, palette=["lightgrey", "blue", "darkblue"])
+# Define styles
+building_style = {
+    "layers": [
+        {
+            "id": "Buildings",
+            "source": "buildings",
+            "source-layer": "building",
+            "type": "line",
+            "paint": {
+                "line-color": "#ff0000",
+                "line-width": 1,
+            },
+        },
+    ]
+}
 
-# Create tile layer
-buildings_layer = geemap.ee_tile_layer(buildings_image, {}, "Buildings (Google)")
+road_style = {
+    "layers": [
+        {
+            "id": "Roads",
+            "source": "transportation",
+            "source-layer": "segment",
+            "type": "line",
+            "paint": {
+                "line-color": "#ffffff",
+                "line-width": 2,
+            },
+        },
+    ]
+}
+
 
 
 # Load other base datasets
@@ -126,6 +149,19 @@ Map.add_basemap("ESA WorldCover 2020 S2 FCC")
 Map.add_basemap("ESA WorldCover 2020 S2 TCC")
 Map.add_basemap("HYBRID")
 
+Map.add_pmtiles(
+    url=building_pmtiles,
+    style=building_style,
+    tooltip=True,
+    fit_bounds=False
+)
+
+Map.add_pmtiles(
+    url=road_pmtiles,
+    style=road_style,
+    tooltip=True,
+    fit_bounds=False
+)
 
 # CORINE Land Cover
 CORINE_YEARS = {
@@ -232,9 +268,11 @@ with col2:
     "Floods LP": lp_layer,
     "CORINE 2012": corine_2012,
     "CORINE 2018": corine_2018,
-    **pop_tile_layers,  # Unpacks Population 2011, 2021, 2025, 2030
-    "Buildings (Google)": buildings_layer,
+    **pop_tile_layers,  # Unpacks population layers
+    "Buildings (Overture)": "PMTILES_BUILDINGS",  # placeholder
+    "Roads (Overture)": "PMTILES_ROADS",          # placeholder
 }
+
 
 
 
