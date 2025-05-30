@@ -337,20 +337,22 @@ with col1:
 # ---------------------- Settlement Selection ----------------------
 with st.expander("📍 Select Settlement", expanded=True):
     settlement_names = population_fc.aggregate_array("NA_IME").distinct().sort().getInfo()
-    selected_settlement = st.selectbox("Select a Settlement", ["All Settlements"] + settlement_names)
+    settlement_name = st.selectbox("Select a Settlement", ["All Settlements"] + settlement_names)
 
-    # Filter FeatureCollection by selected settlement
-    if selected_settlement != "All Settlements":
-        filtered_fc = population_fc.filter(ee.Filter.eq("NA_IME", selected_settlement))
-        filtered_buildings = ms_buildings_split.filter(ee.Filter.eq("NA_IME", selected_settlement))
+    if settlement_name != "All Settlements":
+        settlement_fc = population_fc.filter(ee.Filter.eq("NA_IME", settlement_name))
+        settlement_geom = settlement_fc.first().geometry()
+        filtered_buildings = ms_buildings_split.filterBounds(settlement_geom)
+        filtered_roads = split_roads.filterBounds(settlement_geom)
     else:
-        filtered_fc = population_fc
+        settlement_fc = population_fc
+        settlement_geom = settlement_fc.geometry()
         filtered_buildings = ms_buildings_split
+        filtered_roads = split_roads
 
 
 # ---------------------- Exposure Analysis Panel ----------------------
 with st.expander("📊 Exposure Analysis", expanded=True):
-
     scenario = st.selectbox("Select Flood Scenario for Exposure", ["High Probability", "Medium Probability", "Low Probability"])
     flood_geom = {
         "High Probability": floods_hp_img.geometry(),
@@ -358,10 +360,6 @@ with st.expander("📊 Exposure Analysis", expanded=True):
         "Low Probability": floods_lp_img.geometry()
     }[scenario]
 
-    first_feat = selected_settlement.first()
-    settlement_geom = first_feat.geometry() if first_feat else ee.Geometry.Point([0, 0])  # fallback
-
-    settlement_fc = population_fc.filterBounds(settlement_geom)
     filtered_fc = settlement_fc.filterBounds(flood_geom)
 
     indicator = st.selectbox("Select Exposure Indicator", ["Population", "Roads", "Buildings"])
@@ -372,29 +370,26 @@ with st.expander("📊 Exposure Analysis", expanded=True):
         try:
             total_pop = settlement_fc.aggregate_sum(selected_property).getInfo()
             st.metric(f"Total Population ({selected_year})", f"{int(total_pop):,}")
-        except Exception as e:
+        except Exception:
             st.error("Population data not available or aggregation failed.")
 
     elif indicator == "Roads":
         try:
-            road_geom = split_roads.filterBounds(settlement_geom)
-            total_length = road_geom.geometry().length().divide(1000).getInfo()  # in km
+            total_length = filtered_roads.geometry().length().divide(1000).getInfo()  # in km
             st.metric("Total Road Length (GRIP4)", f"{total_length:.2f} km")
-        except Exception as e:
+        except Exception:
             st.error("Road data could not be computed.")
 
     elif indicator == "Buildings":
         try:
-            buildings_fc = ms_buildings_split.filterBounds(settlement_geom)
-            building_count = buildings_fc.size().getInfo()
+            building_count = filtered_buildings.size().getInfo()
             st.metric("Total Building Count (Microsoft)", f"{building_count:,}")
-        except Exception as e:
+        except Exception:
             st.error("Building count computation failed.")
 
 
 # ---------------------- Vulnerability Analysis Panel ----------------------
 with st.expander("⚠️ Vulnerability Analysis", expanded=True):
-
     vuln_option = st.selectbox(
         "Select Vulnerability Group",
         ["Children (0–10)", "Elderly (65+)", "Female Total", "Male Total"]
@@ -412,36 +407,31 @@ with st.expander("⚠️ Vulnerability Analysis", expanded=True):
 
     try:
         if vuln_option == "Children (0–10)":
-            total_children = sum(settlement_fc.aggregate_sum(prop).getInfo() for prop in children_props)
+            total_children = sum(settlement_fc.aggregate_sum(p).getInfo() for p in children_props)
             st.metric("Total Children (0–10)", f"{int(total_children):,}")
-
         elif vuln_option == "Elderly (65+)":
-            total_elderly = sum(settlement_fc.aggregate_sum(prop).getInfo() for prop in elderly_props)
+            total_elderly = sum(settlement_fc.aggregate_sum(p).getInfo() for p in elderly_props)
             st.metric("Total Elderly (65+)", f"{int(total_elderly):,}")
-
         elif vuln_option == "Female Total":
             female_props = [p for p in settlement_fc.first().propertyNames().getInfo() if p.startswith("female_")]
             total_females = sum(settlement_fc.aggregate_sum(p).getInfo() for p in female_props)
             st.metric("Total Female Population", f"{int(total_females):,}")
-
         elif vuln_option == "Male Total":
             male_props = [p for p in settlement_fc.first().propertyNames().getInfo() if p.startswith("male_")]
             total_males = sum(settlement_fc.aggregate_sum(p).getInfo() for p in male_props)
             st.metric("Total Male Population", f"{int(total_males):,}")
-
-    except Exception as e:
+    except Exception:
         st.error("⚠️ Could not compute vulnerability statistics. Please check property names and data availability.")
 
 
 # ---------------------- Risk Assessment Panel ----------------------
 with st.expander("📉 Flood Risk Assessment", expanded=True):
-    
     st.markdown("This panel estimates at-risk exposure by intersecting flood zones with population, roads, buildings, and vulnerable groups.")
 
     selected_year = st.selectbox("Select Population Year", ["2025", "2030"])
     selected_property = f"pop_{selected_year}"
     scenario = st.selectbox("Select Flood Scenario", ["High Probability", "Medium Probability", "Low Probability"])
-    
+
     flood_geom = {
         "High Probability": floods_hp_img.geometry(),
         "Medium Probability": floods_mp_img.geometry(),
@@ -453,17 +443,17 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
     try:
         # Total values
         total_pop = settlement_fc.aggregate_sum(selected_property).getInfo()
-        total_children = sum([settlement_fc.aggregate_sum(p).getInfo() for p in children_props])
-        total_elderly = sum([settlement_fc.aggregate_sum(p).getInfo() for p in elderly_props])
-        total_road_km = split_roads.filterBounds(settlement_geom).geometry().length().divide(1000).getInfo()
-        total_buildings = ms_buildings_split.filterBounds(settlement_geom).size().getInfo()
+        total_children = sum(settlement_fc.aggregate_sum(p).getInfo() for p in children_props)
+        total_elderly = sum(settlement_fc.aggregate_sum(p).getInfo() for p in elderly_props)
+        total_road_km = filtered_roads.geometry().length().divide(1000).getInfo()
+        total_buildings = filtered_buildings.size().getInfo()
 
         # Exposed values
         exposed_pop = filtered_fc.aggregate_sum(selected_property).getInfo()
-        exposed_children = sum([filtered_fc.aggregate_sum(p).getInfo() for p in children_props])
-        exposed_elderly = sum([filtered_fc.aggregate_sum(p).getInfo() for p in elderly_props])
-        exposed_roads_km = split_roads.filterBounds(flood_geom).geometry().length().divide(1000).getInfo()
-        exposed_buildings = ms_buildings_split.filterBounds(flood_geom).size().getInfo()
+        exposed_children = sum(filtered_fc.aggregate_sum(p).getInfo() for p in children_props)
+        exposed_elderly = sum(filtered_fc.aggregate_sum(p).getInfo() for p in elderly_props)
+        exposed_roads_km = filtered_roads.filterBounds(flood_geom).geometry().length().divide(1000).getInfo()
+        exposed_buildings = filtered_buildings.filterBounds(flood_geom).size().getInfo()
 
         # Metrics
         pct_pop = (exposed_pop / total_pop * 100) if total_pop else 0
@@ -480,9 +470,9 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
         st.metric("🏘️ Buildings at Risk", f"{exposed_buildings:,}", f"{pct_buildings:.1f}%")
 
         st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and 2020 vulnerability data completed.")
-
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
+
 
 
 
