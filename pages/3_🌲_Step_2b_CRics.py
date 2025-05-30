@@ -438,25 +438,25 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
         "Low Probability": floods_lp_img.geometry()
     }[scenario]
 
-    # Apply flood filter ONLY for exposed subset
-    filtered_fc = settlement_fc.filterBounds(flood_geom)
-    exposed_buildings = filtered_buildings.filterBounds(flood_geom)
-    exposed_roads = filtered_roads.filterBounds(flood_geom)
-
     try:
-        # Total values — UNFILTERED
+        # Compute geometries and areas
+        settlement_area = settlement_geom.area().getInfo()
+        flooded_area = flood_geom.intersection(settlement_geom, ee.ErrorMargin(1)).area().getInfo()
+        proportion_affected = flooded_area / settlement_area if settlement_area else 0
+
+        # Total values
         total_pop = settlement_fc.aggregate_sum(selected_property).getInfo()
         total_children = sum(settlement_fc.aggregate_sum(p).getInfo() for p in children_props)
         total_elderly = sum(settlement_fc.aggregate_sum(p).getInfo() for p in elderly_props)
         total_road_km = filtered_roads.geometry().length().divide(1000).getInfo()
         total_buildings = filtered_buildings.size().getInfo()
 
-        # Exposed values — FILTERED by flood
-        exposed_pop = filtered_fc.aggregate_sum(selected_property).getInfo()
-        exposed_children = sum(filtered_fc.aggregate_sum(p).getInfo() for p in children_props)
-        exposed_elderly = sum(filtered_fc.aggregate_sum(p).getInfo() for p in elderly_props)
-        exposed_roads_km = exposed_roads.geometry().length().divide(1000).getInfo()
-        exposed_buildings_count = exposed_buildings.size().getInfo()
+        # Affected values (proportional estimate)
+        exposed_pop = total_pop * proportion_affected
+        exposed_children = total_children * proportion_affected
+        exposed_elderly = total_elderly * proportion_affected
+        exposed_roads_km = total_road_km * proportion_affected
+        exposed_buildings_count = total_buildings * proportion_affected
 
         # Percentages
         pct_pop = (exposed_pop / total_pop * 100) if total_pop else 0
@@ -470,11 +470,12 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
         st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
         st.metric("👵 Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
         st.metric("🛣️ Roads at Risk", f"{exposed_roads_km:.2f} km", f"{pct_roads:.1f}%")
-        st.metric("🏘️ Buildings at Risk", f"{exposed_buildings_count:,}", f"{pct_buildings:.1f}%")
+        st.metric("🏘️ Buildings at Risk", f"{int(exposed_buildings_count):,}", f"{pct_buildings:.1f}%")
 
         st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and 2020 vulnerability data completed.")
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
+
 
 
 
