@@ -84,7 +84,6 @@ road_style = {
 }
 
 
-
 # Load other base datasets
 esa = ee.ImageCollection("ESA/WorldCover/v100").first()
 esa_vis = {"bands": ["Map"]}
@@ -268,9 +267,9 @@ with col2:
     "Floods LP": lp_layer,
     "CORINE 2012": corine_2012,
     "CORINE 2018": corine_2018,
-    **pop_tile_layers,  # Unpacks population layers
-    "Buildings (Overture)": "PMTILES_BUILDINGS",  # placeholder
-    "Roads (Overture)": "PMTILES_ROADS",          # placeholder
+    **pop_tile_layers,  # Unpack population layers
+    "Buildings (Overture)": "PMTILES_BUILDINGS",
+    "Roads (Overture)": "PMTILES_ROADS",
 }
 
 
@@ -281,24 +280,18 @@ with col2:
     left = st.selectbox("Select a left layer", options, index=1)
     right = st.selectbox("Select a right layer", options, index=0)
 
-    # Handle PMTiles layers for split map
     def get_layer(layer_key):
-        if layer_key in layers:
-            layer_obj = layers[layer_key]
-            if layer_obj == "PMTILES_BUILDINGS":
-                return geemap.EmptyTileLayer(name="Buildings (Overture)")
-            elif layer_obj == "PMTILES_ROADS":
-                return geemap.EmptyTileLayer(name="Roads (Overture)")
-            else:
-                return layer_obj
-        return None
+        if layer_key not in layers:
+            return None
+        layer_obj = layers[layer_key]
+        if layer_obj == "PMTILES_BUILDINGS":
+            return geemap.EmptyTileLayer(name="Buildings (Overture)")
+        elif layer_obj == "PMTILES_ROADS":
+            return geemap.EmptyTileLayer(name="Roads (Overture)")
+        else:
+            return layer_obj
 
-    # Use custom logic to assign layers for split map
-    left_layer = get_layer(left)
-    right_layer = get_layer(right)
-
-
-    Map.split_map(left_layer, right_layer)
+    Map.split_map(get_layer(left), get_layer(right))
 
 
     # Dynamic legend for selected right layer
@@ -337,6 +330,7 @@ with col2:
                 "80–100%": "darkblue"
             }
         )
+
 
     # Data Sources
     with st.expander("Data sources"):
