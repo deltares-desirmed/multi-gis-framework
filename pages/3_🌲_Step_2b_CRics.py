@@ -66,6 +66,19 @@ ms_building_vis = ms_buildings_split.style(
 ms_building_layer = geemap.ee_tile_layer(ms_building_vis, {}, "Buildings (Microsoft)")
 
 
+# Load GRIP4 Europe roads
+grip4_europe = ee.FeatureCollection("projects/sat-io/open-datasets/GRIP4/Europe")
+
+# Filter to the Split region
+split_bbox = ee.Geometry.BBox(16.0, 42.8, 17.0, 43.7)
+split_roads = grip4_europe.filterBounds(split_bbox)
+
+# Style the roads (thin red lines)
+road_style = split_roads.style(color='FF5500', width=1)
+
+# Convert to tile layer
+roads_layer = geemap.ee_tile_layer(road_style, {}, "Roads (GRIP4)")
+
 
 # Load other base datasets
 esa = ee.ImageCollection("ESA/WorldCover/v100").first()
@@ -243,6 +256,7 @@ with col2:
     
 }
     layers["Buildings (Microsoft)"] = ms_building_layer
+    layers["Roads (GRIP4)"] = roads_layer
 
 
     
@@ -293,10 +307,15 @@ with col2:
 
     elif legend == "Buildings (Microsoft)":
         Map.add_legend(
-            title="Microsoft Buildings (Outline)",
+            title="Microsoft Buildings",
             legend_dict={
                 "Building Footprint": "#FF5500"
             }
+        )
+    elif legend == "Roads (GRIP4)":
+        Map.add_legend(
+            title="GRIP4 Roads",
+            legend_dict={"Roads": "#FF5500"}
         )
 
 
