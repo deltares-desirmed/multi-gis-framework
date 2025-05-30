@@ -48,27 +48,23 @@ mp_layer = geemap.ee_tile_layer(floods_mp_img, flood_vis, "Floods MP")
 lp_layer = geemap.ee_tile_layer(floods_lp_img, flood_vis, "Floods LP")
 
 
-# Define Split, Croatia bounding box (can narrow it further)
-split_bbox = ee.Geometry.BBox(16.35, 43.45, 16.55, 43.55)
+# Load Microsoft Buildings for Croatia
+ms_buildings_hr = ee.FeatureCollection('projects/sat-io/open-datasets/MSBuildings/Croatia')
 
-# Load Open Buildings data and filter
-buildings = ee.FeatureCollection("GOOGLE/Research/open-buildings/v3/polygons")
-buildings_split = buildings.filterBounds(split_bbox)
+# Optional: Filter to your region (e.g., Split)
+split_bbox = ee.Geometry.BBox(16.3, 43.4, 16.6, 43.6)
+ms_buildings_split = ms_buildings_hr.filterBounds(split_bbox)
 
-# Debug: Check number of features returned
-count = buildings_split.size()
-st.write("Number of buildings in Split bbox:", count.getInfo())
+# Style the layer (outline only, transparent fill)
+ms_building_vis = ms_buildings_split.style(
+    color='FF5500',
+    fillColor='00000000',
+    width=1
+)
 
-# Only visualize if there are features
-buildings_layer = None
-if count.getInfo() > 0:
-    buildings_image = buildings_split.reduceToImage(
-        ["confidence"], ee.Reducer.first()
-    ).visualize(min=50, max=100, palette=["lightgrey", "blue", "darkblue"])
+# Create tile layer
+ms_building_layer = geemap.ee_tile_layer(ms_building_vis, {}, "Buildings (Microsoft)")
 
-    buildings_layer = geemap.ee_tile_layer(buildings_image, {}, "Buildings (Google)")
-else:
-    st.warning("No building data found in the selected Split region.")
 
 
 # Load other base datasets
@@ -242,14 +238,12 @@ with col2:
     "CORINE 2012": corine_2012,
     "CORINE 2018": corine_2018,
     **pop_tile_layers,  # Unpack population layers
-    "Buildings (Google)": buildings_layer,
+    
+
     
 }
+    layers["Buildings (Microsoft)"] = ms_building_layer
 
-
-# Step 2: Only add buildings if data exists
-if buildings_layer:
-    layers["Buildings (Google)"] = buildings_layer
 
     
     options = list(layers.keys())
@@ -297,15 +291,14 @@ if buildings_layer:
         }
         Map.add_legend(title=f"{legend}", legend_dict=pop_legend_dict)
 
-    elif legend.startswith("Buildings"):
+    elif legend == "Buildings (Microsoft)":
         Map.add_legend(
-            title="Building Confidence",
+            title="Microsoft Buildings (Outline)",
             legend_dict={
-                "50–60%": "lightgrey",
-                "60–80%": "blue",
-                "80–100%": "darkblue"
+                "Building Footprint": "#FF5500"
             }
         )
+
 
 
     # Data Sources
