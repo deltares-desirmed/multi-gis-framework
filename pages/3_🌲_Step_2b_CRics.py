@@ -342,7 +342,7 @@ selected_settlement = st.selectbox("📍 Select Settlement", ["All Settlements"]
 
 # Filter the population feature collection
 if selected_settlement != "All Settlements":
-    filtered_fc = population_fc.filter(ee.Filter.eq("ZU_IME", selected_settlement))
+    filtered_fc = population_fc.filter(ee.Filter.eq("NA_IME", selected_settlement))
 else:
     filtered_fc = population_fc
 
