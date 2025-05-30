@@ -280,7 +280,26 @@ with col2:
     options = list(layers.keys())
     left = st.selectbox("Select a left layer", options, index=1)
     right = st.selectbox("Select a right layer", options, index=0)
-    Map.split_map(layers[left], layers[right])
+
+    # Handle PMTiles layers for split map
+    def get_layer(layer_key):
+        if layer_key in layers:
+            layer_obj = layers[layer_key]
+            if layer_obj == "PMTILES_BUILDINGS":
+                return geemap.EmptyTileLayer(name="Buildings (Overture)")
+            elif layer_obj == "PMTILES_ROADS":
+                return geemap.EmptyTileLayer(name="Roads (Overture)")
+            else:
+                return layer_obj
+        return None
+
+    # Use custom logic to assign layers for split map
+    left_layer = get_layer(left)
+    right_layer = get_layer(right)
+
+
+    Map.split_map(left_layer, right_layer)
+
 
     # Dynamic legend for selected right layer
     legend = st.selectbox("Select a legend", options, index=options.index(right))
