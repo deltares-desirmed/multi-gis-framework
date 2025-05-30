@@ -395,7 +395,8 @@ with st.expander("⚠️ Vulnerability Analysis", expanded=False):
             "female_F_65_2020", "female_F_70_2020", "female_F_75_2020", "female_F_80_2020",
             "male_M_65_2020", "male_M_70_2020", "male_M_75_2020", "male_M_80_2020"
         ]
-        total_elderly = filtered_fc.aggregate_sum(elderly_props).getInfo()
+        total_elderly = sum(filtered_fc.aggregate_sum(prop).getInfo()for prop in elderly_props)
+
         st.metric("Total Elderly (65+)", f"{int(total_elderly):,}")
 
     elif vuln_option == "Female Total":
