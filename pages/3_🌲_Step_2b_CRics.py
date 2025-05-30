@@ -411,6 +411,16 @@ with st.expander("⚠️ Vulnerability Analysis", expanded=True):
     except Exception as e:
         st.error("⚠️ Could not compute vulnerability statistics. Please check property names and data availability.")
 
+    # Define vulnerability property lists
+    children_props = [
+        "female_F_0_2020", "female_F_5_2020", "female_F_10_2020",
+        "male_M_0_2020", "male_M_5_2020", "male_M_10_2020"
+    ]
+
+    elderly_props = [
+        "female_F_65_2020", "female_F_70_2020", "female_F_75_2020", "female_F_80_2020",
+        "male_M_65_2020", "male_M_70_2020", "male_M_75_2020", "male_M_80_2020"
+    ]
 
 # ---------------------- Risk Assessment Panel ----------------------
 with st.expander("📉 Flood Risk Assessment", expanded=False):
