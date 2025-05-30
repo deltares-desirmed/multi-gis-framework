@@ -412,6 +412,47 @@ with st.expander("⚠️ Vulnerability Analysis", expanded=True):
         st.error("⚠️ Could not compute vulnerability statistics. Please check property names and data availability.")
 
 
+# ---------------------- Risk Assessment Panel ----------------------
+with st.expander("📉 Risk Assessment Summary", expanded=False):
+    
+    st.markdown("This panel estimates potential risk by combining flood-exposed population, roads, buildings, and vulnerable groups.")
+    
+    try:
+        # Exposed Population (2021)
+        exposed_pop_2021 = population_fc.filterBounds(floods_hp_img.geometry()).aggregate_sum("pop_2021").getInfo()
+        st.metric("🧍 Exposed Population (2021)", f"{int(exposed_pop_2021):,}")
+        
+        # Vulnerable Children
+        children_props = [
+            "female_F_0_2020", "female_F_5_2020", "female_F_10_2020",
+            "male_M_0_2020", "male_M_5_2020", "male_M_10_2020"
+        ]
+        exposed_children = population_fc.filterBounds(floods_hp_img.geometry()).aggregate_sum(children_props).getInfo()
+        st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}")
+
+        # Vulnerable Elderly
+        elderly_props = [
+            "female_F_65_2020", "female_F_70_2020", "female_F_75_2020", "female_F_80_2020",
+            "male_M_65_2020", "male_M_70_2020", "male_M_75_2020", "male_M_80_2020"
+        ]
+        exposed_elderly = population_fc.filterBounds(floods_hp_img.geometry()).aggregate_sum(elderly_props).getInfo()
+        st.metric("👵 Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}")
+
+        # Roads
+        exposed_roads = split_roads.filterBounds(floods_hp_img.geometry())
+        road_km = exposed_roads.geometry().length().divide(1000).getInfo()
+        st.metric("🛣️ Roads at Risk", f"{road_km:.2f} km")
+
+        # Buildings
+        exposed_buildings = ms_buildings_split.filterBounds(floods_hp_img.geometry())
+        building_count = exposed_buildings.size().getInfo()
+        st.metric("🏘️ Buildings at Risk", f"{building_count:,}")
+
+        st.success("✔ Risk indicators calculated based on 2021 population and 2020 vulnerability data.")
+    
+    except Exception as e:
+        st.error(f"⚠️ Error during risk summary: {str(e)}")
+
 
 import streamlit as st
 import datetime
