@@ -48,40 +48,20 @@ mp_layer = geemap.ee_tile_layer(floods_mp_img, flood_vis, "Floods MP")
 lp_layer = geemap.ee_tile_layer(floods_lp_img, flood_vis, "Floods LP")
 
 
-# Define Overture Maps PMTiles URLs
-building_pmtiles = "https://overturemaps-tiles-us-west-2-beta.s3.amazonaws.com/2025-04-23/buildings.pmtiles"
-road_pmtiles = "https://overturemaps-tiles-us-west-2-beta.s3.amazonaws.com/2025-04-23/transportation.pmtiles"
+# Define a bounding box (adjust as needed)
+split_bbox = ee.Geometry.BBox(16.0, 42.8, 17.0, 43.7)
 
-# Define styles
-building_style = {
-    "layers": [
-        {
-            "id": "Buildings",
-            "source": "buildings",
-            "source-layer": "building",
-            "type": "line",
-            "paint": {
-                "line-color": "#ff0000",
-                "line-width": 1,
-            },
-        },
-    ]
-}
+# Load Open Buildings from Earth Engine and clip
+buildings = ee.FeatureCollection("GOOGLE/Research/open-buildings/v3/polygons")
+buildings_split = buildings.filterBounds(split_bbox)
 
-road_style = {
-    "layers": [
-        {
-            "id": "Roads",
-            "source": "transportation",
-            "source-layer": "segment",
-            "type": "line",
-            "paint": {
-                "line-color": "#ffffff",
-                "line-width": 2,
-            },
-        },
-    ]
-}
+# Convert to image for display (based on confidence score)
+buildings_image = buildings_split.reduceToImage(
+    ["confidence"], ee.Reducer.first()
+).visualize(min=50, max=100, palette=["lightgrey", "blue", "darkblue"])
+
+# Create tile layer for map
+buildings_layer = geemap.ee_tile_layer(buildings_image, {}, "Buildings (Google)")
 
 
 # Load other base datasets
@@ -148,19 +128,6 @@ Map.add_basemap("ESA WorldCover 2020 S2 FCC")
 Map.add_basemap("ESA WorldCover 2020 S2 TCC")
 Map.add_basemap("HYBRID")
 
-Map.add_pmtiles(
-    url=building_pmtiles,
-    style=building_style,
-    tooltip=True,
-    fit_bounds=False
-)
-
-Map.add_pmtiles(
-    url=road_pmtiles,
-    style=road_style,
-    tooltip=True,
-    fit_bounds=False
-)
 
 # CORINE Land Cover
 CORINE_YEARS = {
@@ -268,8 +235,7 @@ with col2:
     "CORINE 2012": corine_2012,
     "CORINE 2018": corine_2018,
     **pop_tile_layers,  # Unpack population layers
-    "Buildings (Overture)": "PMTILES_BUILDINGS",
-    "Roads (Overture)": "PMTILES_ROADS",
+    "Buildings (Google)": buildings_layer,
 }
 
 
