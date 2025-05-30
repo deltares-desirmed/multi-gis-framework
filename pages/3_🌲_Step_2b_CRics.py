@@ -351,20 +351,31 @@ with st.expander("📍 Select Settlement", expanded=True):
 # ---------------------- Exposure Analysis Panel ----------------------
 with st.expander("📊 Exposure Analysis", expanded=True):
 
+    scenario = st.selectbox("Select Flood Scenario for Exposure", ["High Probability", "Medium Probability", "Low Probability"])
+    flood_geom = {
+        "High Probability": floods_hp_img.geometry(),
+        "Medium Probability": floods_mp_img.geometry(),
+        "Low Probability": floods_lp_img.geometry()
+    }[scenario]
+
+    settlement_geom = selected_settlement.geometry()
+    settlement_fc = population_fc.filterBounds(settlement_geom)
+    filtered_fc = settlement_fc.filterBounds(flood_geom)
+
     indicator = st.selectbox("Select Exposure Indicator", ["Population", "Roads", "Buildings"])
 
     if indicator == "Population":
         selected_year = st.selectbox("Select Year", ["2025", "2030"])
         selected_property = f"pop_{selected_year}"
         try:
-            total_pop = filtered_fc.aggregate_sum(selected_property).getInfo()
+            total_pop = settlement_fc.aggregate_sum(selected_property).getInfo()
             st.metric(f"Total Population ({selected_year})", f"{int(total_pop):,}")
         except Exception as e:
             st.error("Population data not available or aggregation failed.")
 
     elif indicator == "Roads":
         try:
-            road_geom = split_roads.filterBounds(filtered_fc.geometry()) if selected_settlement != "All Settlements" else split_roads
+            road_geom = split_roads.filterBounds(settlement_geom)
             total_length = road_geom.geometry().length().divide(1000).getInfo()  # in km
             st.metric("Total Road Length (GRIP4)", f"{total_length:.2f} km")
         except Exception as e:
@@ -372,7 +383,8 @@ with st.expander("📊 Exposure Analysis", expanded=True):
 
     elif indicator == "Buildings":
         try:
-            building_count = filtered_buildings.size().getInfo()
+            buildings_fc = ms_buildings_split.filterBounds(settlement_geom)
+            building_count = buildings_fc.size().getInfo()
             st.metric("Total Building Count (Microsoft)", f"{building_count:,}")
         except Exception as e:
             st.error("Building count computation failed.")
@@ -386,32 +398,6 @@ with st.expander("⚠️ Vulnerability Analysis", expanded=True):
         ["Children (0–10)", "Elderly (65+)", "Female Total", "Male Total"]
     )
 
-    try:
-        if vuln_option == "Children (0–10)":
-            children_props = ["female_F_0_2020", "female_F_5_2020", "female_F_10_2020",
-                              "male_M_0_2020", "male_M_5_2020", "male_M_10_2020"]
-            total_children = sum(filtered_fc.aggregate_sum(prop).getInfo() for prop in children_props)
-            st.metric("Total Children (0–10)", f"{int(total_children):,}")
-
-        elif vuln_option == "Elderly (65+)":
-            elderly_props = ["female_F_65_2020", "female_F_70_2020", "female_F_75_2020", "female_F_80_2020",
-                             "male_M_65_2020", "male_M_70_2020", "male_M_75_2020", "male_M_80_2020"]
-            total_elderly = sum(filtered_fc.aggregate_sum(prop).getInfo() for prop in elderly_props)
-            st.metric("Total Elderly (65+)", f"{int(total_elderly):,}")
-
-        elif vuln_option == "Female Total":
-            female_props = [p for p in filtered_fc.first().propertyNames().getInfo() if p.startswith("female_")]
-            total_females = sum(filtered_fc.aggregate_sum(p).getInfo() for p in female_props)
-            st.metric("Total Female Population", f"{int(total_females):,}")
-
-        elif vuln_option == "Male Total":
-            male_props = [p for p in filtered_fc.first().propertyNames().getInfo() if p.startswith("male_")]
-            total_males = sum(filtered_fc.aggregate_sum(p).getInfo() for p in male_props)
-            st.metric("Total Male Population", f"{int(total_males):,}")
-    except Exception as e:
-        st.error("⚠️ Could not compute vulnerability statistics. Please check property names and data availability.")
-
-    # Define vulnerability property lists
     children_props = [
         "female_F_0_2020", "female_F_5_2020", "female_F_10_2020",
         "male_M_0_2020", "male_M_5_2020", "male_M_10_2020"
@@ -422,80 +408,80 @@ with st.expander("⚠️ Vulnerability Analysis", expanded=True):
         "male_M_65_2020", "male_M_70_2020", "male_M_75_2020", "male_M_80_2020"
     ]
 
+    try:
+        if vuln_option == "Children (0–10)":
+            total_children = sum(settlement_fc.aggregate_sum(prop).getInfo() for prop in children_props)
+            st.metric("Total Children (0–10)", f"{int(total_children):,}")
+
+        elif vuln_option == "Elderly (65+)":
+            total_elderly = sum(settlement_fc.aggregate_sum(prop).getInfo() for prop in elderly_props)
+            st.metric("Total Elderly (65+)", f"{int(total_elderly):,}")
+
+        elif vuln_option == "Female Total":
+            female_props = [p for p in settlement_fc.first().propertyNames().getInfo() if p.startswith("female_")]
+            total_females = sum(settlement_fc.aggregate_sum(p).getInfo() for p in female_props)
+            st.metric("Total Female Population", f"{int(total_females):,}")
+
+        elif vuln_option == "Male Total":
+            male_props = [p for p in settlement_fc.first().propertyNames().getInfo() if p.startswith("male_")]
+            total_males = sum(settlement_fc.aggregate_sum(p).getInfo() for p in male_props)
+            st.metric("Total Male Population", f"{int(total_males):,}")
+
+    except Exception as e:
+        st.error("⚠️ Could not compute vulnerability statistics. Please check property names and data availability.")
+
+
 # ---------------------- Risk Assessment Panel ----------------------
-with st.expander("📉 Flood Risk Assessment", expanded=False):
+with st.expander("📉 Flood Risk Assessment", expanded=True):
     
     st.markdown("This panel estimates at-risk exposure by intersecting flood zones with population, roads, buildings, and vulnerable groups.")
 
-    # Select population year and flood scenario
-    selected_year = st.selectbox("Select Population Year", ["2011", "2021", "2025", "2030"])
+    selected_year = st.selectbox("Select Population Year", ["2025", "2030"])
     selected_property = f"pop_{selected_year}"
     scenario = st.selectbox("Select Flood Scenario", ["High Probability", "Medium Probability", "Low Probability"])
-
-    # Pick flood geometry based on scenario
+    
     flood_geom = {
         "High Probability": floods_hp_img.geometry(),
         "Medium Probability": floods_mp_img.geometry(),
         "Low Probability": floods_lp_img.geometry()
     }[scenario]
 
-    # Filter for selected settlement
-    selected_settlement = population_fc.filter(ee.Filter.eq("NA_IME", selected_settlement))
-    settlement_geom = selected_settlement.geometry()
-    settlement_fc = population_fc.filterBounds(settlement_geom)
     filtered_fc = settlement_fc.filterBounds(flood_geom)
 
     try:
-        # Total exposure
+        # Total values
         total_pop = settlement_fc.aggregate_sum(selected_property).getInfo()
-        total_children = sum([
-            settlement_fc.aggregate_sum(p).getInfo()
-            for p in children_props
-        ])
-        total_elderly = sum([
-            settlement_fc.aggregate_sum(p).getInfo()
-            for p in elderly_props
-        ])
+        total_children = sum([settlement_fc.aggregate_sum(p).getInfo() for p in children_props])
+        total_elderly = sum([settlement_fc.aggregate_sum(p).getInfo() for p in elderly_props])
+        total_road_km = split_roads.filterBounds(settlement_geom).geometry().length().divide(1000).getInfo()
+        total_buildings = ms_buildings_split.filterBounds(settlement_geom).size().getInfo()
 
-        # Exposed Population
+        # Exposed values
         exposed_pop = filtered_fc.aggregate_sum(selected_property).getInfo()
+        exposed_children = sum([filtered_fc.aggregate_sum(p).getInfo() for p in children_props])
+        exposed_elderly = sum([filtered_fc.aggregate_sum(p).getInfo() for p in elderly_props])
+        exposed_roads_km = split_roads.filterBounds(flood_geom).geometry().length().divide(1000).getInfo()
+        exposed_buildings = ms_buildings_split.filterBounds(flood_geom).size().getInfo()
+
+        # Metrics
         pct_pop = (exposed_pop / total_pop * 100) if total_pop else 0
-        st.metric(f"🧍 Exposed Population ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
-
-        # Vulnerable Children
-        exposed_children = sum([
-            filtered_fc.aggregate_sum(p).getInfo()
-            for p in children_props
-        ])
         pct_children = (exposed_children / total_children * 100) if total_children else 0
-        st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
-
-        # Vulnerable Elderly
-        exposed_elderly = sum([
-            filtered_fc.aggregate_sum(p).getInfo()
-            for p in elderly_props
-        ])
         pct_elderly = (exposed_elderly / total_elderly * 100) if total_elderly else 0
+        pct_roads = (exposed_roads_km / total_road_km * 100) if total_road_km else 0
+        pct_buildings = (exposed_buildings / total_buildings * 100) if total_buildings else 0
+
+        # Display
+        st.metric(f"🧍 Exposed Population ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
+        st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
         st.metric("👵 Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
-
-        # Roads at Risk
-        exposed_roads = split_roads.filterBounds(flood_geom)
-        road_km = exposed_roads.geometry().length().divide(1000).getInfo()
-        total_road_km = split_roads.geometry().length().divide(1000).getInfo()
-        pct_roads = (road_km / total_road_km * 100) if total_road_km else 0
-        st.metric("🛣️ Roads at Risk", f"{road_km:.2f} km", f"{pct_roads:.1f}%")
-
-        # Buildings at Risk
-        exposed_buildings = ms_buildings_split.filterBounds(flood_geom)
-        building_count = exposed_buildings.size().getInfo()
-        total_buildings = ms_buildings_split.size().getInfo()
-        pct_buildings = (building_count / total_buildings * 100) if total_buildings else 0
-        st.metric("🏘️ Buildings at Risk", f"{building_count:,}", f"{pct_buildings:.1f}%")
+        st.metric("🛣️ Roads at Risk", f"{exposed_roads_km:.2f} km", f"{pct_roads:.1f}%")
+        st.metric("🏘️ Buildings at Risk", f"{exposed_buildings:,}", f"{pct_buildings:.1f}%")
 
         st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and 2020 vulnerability data completed.")
 
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
+
 
 
 
