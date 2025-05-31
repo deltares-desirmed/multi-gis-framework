@@ -479,11 +479,11 @@ with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
         pct_buildings = (exposed_buildings_count / total_buildings * 100) if total_buildings else 0
 
         # Step 6: Display results
-        st.metric(f"🧍 Population at Risk ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
-        st.metric("🧒 Children at Risk (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
-        st.metric("👵 Elderly at Risk (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
-        st.metric("🛣️ Roads at Risk", f"{exposed_roads_km:.2f} km", f"{pct_roads:.1f}%")
-        st.metric("🏘️ Buildings at Risk", f"{int(exposed_buildings_count):,}", f"{pct_buildings:.1f}%")
+        st.metric(f" Population at Risk ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
+        st.metric(" Children at Risk (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
+        st.metric(" Elderly at Risk (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
+        st.metric(" Roads at Risk", f"{exposed_roads_km:.2f} km", f"{pct_roads:.1f}%")
+        st.metric(" Buildings at Risk", f"{int(exposed_buildings_count):,}", f"{pct_buildings:.1f}%")
 
         st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and 2020 vulnerability data completed.")
     except Exception as e:
@@ -491,7 +491,7 @@ with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
 
 
 
-with st.expander("📊 Risk Visualization & Summary", expanded=True):
+with st.expander("📊 Risk Summary", expanded=True):
     st.markdown("Visual breakdown of exposure indicators, actual values at risk, and composite risk index dynamics.")
 
     # Data prep
@@ -579,7 +579,7 @@ with st.expander("📊 Risk Visualization & Summary", expanded=True):
         facet_col="Risk Type" if use_facet else None,
         title="Distribution of Raw vs Weighted Risk per Indicator",
         color_discrete_map={
-            "Raw %": "orange",
+            "Raw %": "Red",
             "Weighted %": "crimson"
         }
     )
