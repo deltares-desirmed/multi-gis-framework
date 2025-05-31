@@ -629,8 +629,7 @@ with st.expander("ℹ️ How is the Risk Index Calculated?", expanded=False):
     - 🟢 0–5 → **Low Risk**  
     - 🟠 5–10 → **Moderate Risk**  
     - 🔴 >10 → **High Risk**
-
-    This helps policymakers understand not just how much is exposed, but how critically each sector is affected.
+                
     """)
 
 
