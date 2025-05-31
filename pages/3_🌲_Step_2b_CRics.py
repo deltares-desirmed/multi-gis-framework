@@ -426,7 +426,7 @@ with st.expander("⚠️ Step 2- CRICS - Vulnerability", expanded=True):
 
 # ---------------------- Risk Assessment Panel ----------------------
 with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
-    st.markdown("This panel estimates at-risk exposure using flood raster pixel coverage inside the selected settlement.")
+    st.markdown("This panel estimates at-risk exposure using actual flood extent intersection with each indicator.")
 
     selected_year = st.selectbox("Select Population Year", ["2025", "2030"])
     selected_property = f"pop_{selected_year}"
@@ -440,42 +440,67 @@ with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
             "Low Probability": floods_lp_img
         }[scenario]
 
-        # Step 2: Count flood pixels within the selected settlement
-        flood_pixel_count_dict = flood_raster.reduceRegion(
+        # Step 2: Clip flood to settlement geometry
+        affected_geom = flood_raster.gt(0).selfMask().clip(settlement_geom).geometry()
+
+        # Step 3: WorldPop base image
+        worldpop_mosaic = ee.ImageCollection("WorldPop/GP/100m/pop_age_sex") \
+                            .filterDate("2020-01-01", "2020-12-31") \
+                            .mosaic()
+
+        # --- Exposed Population ---
+        pop_img = worldpop_mosaic.select(selected_property)
+        pop_stat = pop_img.reduceRegion(
             reducer=ee.Reducer.sum(),
-            geometry=settlement_geom,
-            scale=30,
+            geometry=affected_geom,
+            scale=100,
             maxPixels=1e13
-        ).getInfo()
+        )
+        exposed_pop = float(pop_stat.getInfo().get(selected_property, 0))
 
-        flood_pixels = list(flood_pixel_count_dict.values())[0] or 0
-        flood_area = flood_pixels * 30 * 30  # pixel area = 900 m²
-        settlement_area = settlement_geom.area().getInfo()  # m²
+        # --- Children at Risk ---
+        child_img = worldpop_mosaic.select(children_props)
+        child_stat = child_img.reduceRegion(
+            reducer=ee.Reducer.sum(),
+            geometry=affected_geom,
+            scale=100,
+            maxPixels=1e13
+        )
+        exposed_children = sum(child_stat.getInfo().values())
 
-        proportion_affected = flood_area / settlement_area if settlement_area else 0
+        # --- Elderly at Risk ---
+        elderly_img = worldpop_mosaic.select(elderly_props)
+        elderly_stat = elderly_img.reduceRegion(
+            reducer=ee.Reducer.sum(),
+            geometry=affected_geom,
+            scale=100,
+            maxPixels=1e13
+        )
+        exposed_elderly = sum(elderly_stat.getInfo().values())
 
-        # Step 3: Total values from the full settlement
+        # --- Roads at Risk ---
+        affected_roads = filtered_roads.filterBounds(affected_geom)
+        exposed_roads_km = affected_roads.geometry().length().divide(1000).getInfo()
+
+        # --- Buildings at Risk ---
+        affected_buildings = filtered_buildings.filterBounds(affected_geom)
+        exposed_buildings_count = affected_buildings.size().getInfo()
+
+        # --- Total Values ---
         total_pop = settlement_fc.aggregate_sum(selected_property).getInfo()
         total_children = sum(settlement_fc.aggregate_sum(p).getInfo() for p in children_props)
         total_elderly = sum(settlement_fc.aggregate_sum(p).getInfo() for p in elderly_props)
         total_road_km = filtered_roads.geometry().length().divide(1000).getInfo()
         total_buildings = filtered_buildings.size().getInfo()
 
-        # Step 4: Compute affected using flood proportion
-        exposed_pop = total_pop * proportion_affected
-        exposed_children = total_children * proportion_affected
-        exposed_elderly = total_elderly * proportion_affected
-        exposed_roads_km = total_road_km * proportion_affected
-        exposed_buildings_count = total_buildings * proportion_affected
-
-        # Step 5: Percentages
+        # --- Percentages ---
         pct_pop = (exposed_pop / total_pop * 100) if total_pop else 0
         pct_children = (exposed_children / total_children * 100) if total_children else 0
         pct_elderly = (exposed_elderly / total_elderly * 100) if total_elderly else 0
         pct_roads = (exposed_roads_km / total_road_km * 100) if total_road_km else 0
         pct_buildings = (exposed_buildings_count / total_buildings * 100) if total_buildings else 0
 
-        # Step 6: Display results
+        # --- Display Metrics ---
         st.metric(f"🧍 Population at Risk ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
         st.metric("🧒 Children at Risk (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
         st.metric("👵 Elderly at Risk (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
@@ -483,8 +508,10 @@ with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
         st.metric("🏘️ Buildings at Risk", f"{int(exposed_buildings_count):,}", f"{pct_buildings:.1f}%")
 
         st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and 2020 vulnerability data completed.")
+
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
+
 
 
 # ---------------------- Risk Visualization & Summary ----------------------
