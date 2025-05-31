@@ -4,6 +4,8 @@ import streamlit as st
 from utils_ee import initialize_earth_engine
 import geemap.foliumap as geemap
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 
 # Must be first Streamlit command
 st.set_page_config(layout="wide")
