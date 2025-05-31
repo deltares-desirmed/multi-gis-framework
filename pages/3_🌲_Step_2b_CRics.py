@@ -530,26 +530,38 @@ with st.expander("📊 Risk Visualization & Summary", expanded=True):
 
     with col3:
         st.markdown("**🎻 Risk Distribution (Violin Plot)**")
-        fig_violin = go.Figure()
 
-        for i, ind in enumerate(indicators):
-            fig_violin.add_trace(go.Violin(
-                y=[percentages[i]] * 10 + [weighted_contrib[i]] * 10,
-                x=[ind] * 20,
-                name=ind,
-                box_visible=True,
-                meanline_visible=True,
-                line_color='blue',
-                points=False
-            ))
+        import numpy as np
+        import pandas as pd
+        import plotly.express as px
 
-        fig_violin.update_layout(
-            title="Violin Plot of Raw vs Weighted Risk per Indicator",
-            yaxis_title="Risk Percentage",
-            violingap=0.3,
-            violinmode='group'
+        # Create expanded dataframe for raw and weighted
+        violin_data = []
+
+        for i, indicator in enumerate(indicators):
+            raw_sim = np.random.normal(loc=percentages[i], scale=0.3, size=50)
+            weighted_sim = np.random.normal(loc=weighted_contrib[i], scale=0.3, size=50)
+
+            for val in raw_sim:
+                violin_data.append({"Indicator": indicator, "Risk Type": "Raw %", "Value": val})
+            for val in weighted_sim:
+                violin_data.append({"Indicator": indicator, "Risk Type": "Weighted %", "Value": val})
+
+        violin_df = pd.DataFrame(violin_data)
+
+        # Plot using Plotly Express
+        fig_violin = px.violin(
+            violin_df,
+            x="Indicator",
+            y="Value",
+            color="Risk Type",
+            box=True,
+            points="all",
+            title="Distribution of Raw vs Weighted Risk per Indicator"
         )
+
         st.plotly_chart(fig_violin, use_container_width=True)
+
 
 
     with col4:
