@@ -430,7 +430,7 @@ with st.expander("⚠️ Step 2- CRICS - Vulnerability", expanded=True):
 
 
 # ---------------------- Risk Assessment Panel ----------------------
-with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
+with st.expander("📉 Flood Risk Assessment", expanded=True):
     st.markdown("This panel estimates at-risk exposure using flood raster pixel coverage inside the selected settlement.")
 
     selected_year = st.selectbox("Select Population Year", ["2025", "2030"])
@@ -481,11 +481,11 @@ with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
         pct_buildings = (exposed_buildings_count / total_buildings * 100) if total_buildings else 0
 
         # Step 6: Display results
-        st.metric(f" Population at Risk ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
-        st.metric(" Children at Risk (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
-        st.metric(" Elderly at Risk (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
-        st.metric(" Roads at Risk", f"{exposed_roads_km:.2f} km", f"{pct_roads:.1f}%")
-        st.metric(" Buildings at Risk", f"{int(exposed_buildings_count):,}", f"{pct_buildings:.1f}%")
+        st.metric(f"🧍 Exposed Population ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
+        st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
+        st.metric("👵 Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
+        st.metric("🛣️ Roads at Risk", f"{exposed_roads_km:.2f} km", f"{pct_roads:.1f}%")
+        st.metric("🏘️ Buildings at Risk", f"{int(exposed_buildings_count):,}", f"{pct_buildings:.1f}%")
 
         st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and 2020 vulnerability data completed.")
     except Exception as e:
@@ -493,13 +493,9 @@ with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
 
 
 
-with st.expander("📊 Risk Summary", expanded=True):
-    st.markdown("Visual breakdown of exposure indicators, actual values at risk, and composite risk index dynamics.")
 
-    import numpy as np
-    import pandas as pd
-    import plotly.express as px
-    import plotly.graph_objects as go
+with st.expander(" Risk Summary", expanded=True):
+    st.markdown("Visual breakdown of exposure indicators, actual values at risk, and composite risk index dynamics.")
 
     # Data prep
     indicators = ['Exposed Population', 'Vulnerable Children (0–10)', 'Vulnerable Elderly (65+)', 'Roads at Risk', 'Buildings at Risk']
