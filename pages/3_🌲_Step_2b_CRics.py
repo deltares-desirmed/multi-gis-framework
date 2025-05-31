@@ -493,8 +493,13 @@ with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
 
 
 
-with st.expander(" Risk Summary", expanded=True):
+with st.expander("📊 Risk Summary", expanded=True):
     st.markdown("Visual breakdown of exposure indicators, actual values at risk, and composite risk index dynamics.")
+
+    import numpy as np
+    import pandas as pd
+    import plotly.express as px
+    import plotly.graph_objects as go
 
     # Data prep
     indicators = ['Exposed Population', 'Vulnerable Children (0–10)', 'Vulnerable Elderly (65+)', 'Roads at Risk', 'Buildings at Risk']
@@ -516,29 +521,28 @@ with st.expander(" Risk Summary", expanded=True):
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("** Actual Values at Risk**")
+        st.markdown("**📦 Actual Values at Risk**")
         fig_val = px.bar(df, x="Indicator", y="Exposed Value", color="Indicator",
                          title="Quantity of Assets/People at Risk", text_auto='.2s')
         st.plotly_chart(fig_val, use_container_width=True)
 
     with col2:
-        st.markdown("** Contribution to Risk Index**")
+        st.markdown("**📎 Contribution to Risk Index**")
         fig_pie = px.pie(df, names="Indicator", values="Weighted Contribution",
                          title="Weighted Share of Composite Risk Index")
         st.plotly_chart(fig_pie, use_container_width=True)
 
-    # Row 2: Violin and comparison bar
+    # Row 2: Violin and new Total vs At-Risk comparison
     col3, col4 = st.columns(2)
 
     with col3:
-        st.markdown("** Risk Distribution by Indicator & Type**")
+        st.markdown("**🎻 Risk Distribution by Indicator & Type**")
 
-        # Customization
+        # Simulate data for violin plot
         noise_scale = 0.4
         num_points = 50
         use_facet = False
 
-        # Generate simulated data
         violin_data = []
         for i, indicator in enumerate(indicators):
             raw_sim = np.random.normal(loc=percentages[i], scale=noise_scale, size=num_points)
@@ -565,7 +569,6 @@ with st.expander(" Risk Summary", expanded=True):
 
         violin_df = pd.DataFrame(violin_data)
 
-        # Plot
         fig_violin = px.violin(
             violin_df,
             x="Indicator",
@@ -585,25 +588,36 @@ with st.expander(" Risk Summary", expanded=True):
         st.plotly_chart(fig_violin, use_container_width=True)
 
     with col4:
-        st.markdown("**📉 Unweighted vs Weighted Exposure**")
-        fig_compare = go.Figure()
-        fig_compare.add_trace(go.Bar(x=indicators, y=percentages, name="Raw %"))
-        fig_compare.add_trace(go.Bar(x=indicators, y=weighted_contrib, name="Weighted %"))
-        fig_compare.update_layout(barmode='group', title="Raw vs Weighted Indicator Contribution")
-        st.plotly_chart(fig_compare, use_container_width=True)
+        st.markdown("**📊 Total Exposure vs People/Assets at Risk**")
+
+        # Simulate total population/assets for demo: reverse-calculate
+        total_values = [raw * (100 / pct) if pct else raw for raw, pct in zip(raw_values, percentages)]
+
+        fig_exposure = go.Figure()
+        fig_exposure.add_trace(go.Bar(x=indicators, y=total_values, name="Total Exposed (Estimate)", marker_color="lightgrey"))
+        fig_exposure.add_trace(go.Bar(x=indicators, y=raw_values, name="At Risk", marker_color="firebrick"))
+
+        fig_exposure.update_layout(
+            barmode='group',
+            title="Comparison of Total Exposed vs People/Assets Actually at Risk",
+            yaxis_title="Count or Length (km)",
+            legend_title="Exposure Type"
+        )
+
+        st.plotly_chart(fig_exposure, use_container_width=True)
 
     # Composite Risk Index metric
-    # st.metric(" Composite Risk Index", f"{risk_index:.1f}")
+    risk_level = "Low" if risk_index <= 5 else "Moderate" if risk_index <= 10 else "High"
+    st.metric("📌 Composite Risk Index", f"{risk_index:.1f}", help=f"Risk Level: {risk_level}")
 
-
-    # Export to CSV
+    # Export CSV
     df["Settlement"] = settlement_name
     df["Flood Scenario"] = scenario
     df["Year"] = selected_year
     df["Risk Index"] = risk_index
 
     csv = df.to_csv(index=False).encode('utf-8')
-    st.download_button(" Download Risk Summary CSV", csv, file_name=f"{settlement_name}_risk_summary.csv", mime="text/csv")
+    st.download_button("📥 Download Risk Summary CSV", csv, file_name=f"{settlement_name}_risk_summary.csv", mime="text/csv")
 
 
 # Explanation of the Risk Index
