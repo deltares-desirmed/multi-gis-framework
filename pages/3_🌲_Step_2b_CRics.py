@@ -443,13 +443,13 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
         affected_geom = flood_geom.intersection(settlement_geom, ee.ErrorMargin(1))
 
         # Step 2: Clip population and infrastructure by affected area
-        flooded_population = population_fc.filterBounds(affected_geom)
+        flooded_population = settlement_fc.filterBounds(affected_geom)
         exposed_pop = flooded_population.aggregate_sum(selected_property).getInfo()
 
-        flooded_buildings = ms_buildings_split.filterBounds(affected_geom)
+        flooded_buildings = filtered_buildings.filterBounds(affected_geom)
         exposed_buildings_count = flooded_buildings.size().getInfo()
 
-        flooded_roads = split_roads.filterBounds(affected_geom)
+        flooded_roads = filtered_roads.filterBounds(affected_geom)
         exposed_roads_km = flooded_roads.geometry().length().divide(1000).getInfo()
 
         # Step 3: Vulnerable groups in affected area
