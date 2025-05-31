@@ -529,27 +529,45 @@ with st.expander("📊 Risk Visualization & Summary", expanded=True):
     col3, col4 = st.columns(2)
 
     with col3:
-        st.markdown("**🎻 Risk Distribution (Violin Plot)**")
+        st.markdown("**🎻 Risk Distribution by Indicator & Type (Violin)**")
 
         import numpy as np
         import pandas as pd
         import plotly.express as px
 
-        # Create expanded dataframe for raw and weighted
-        violin_data = []
+        # Customization
+        noise_scale = 0.4
+        num_points = 50
+        use_facet = False  # Set True to separate Raw vs Weighted vertically
 
+        # Generate simulated data
+        violin_data = []
         for i, indicator in enumerate(indicators):
-            raw_sim = np.random.normal(loc=percentages[i], scale=0.3, size=50)
-            weighted_sim = np.random.normal(loc=weighted_contrib[i], scale=0.3, size=50)
+            raw_sim = np.random.normal(loc=percentages[i], scale=noise_scale, size=num_points)
+            weighted_sim = np.random.normal(loc=weighted_contrib[i], scale=noise_scale, size=num_points)
 
             for val in raw_sim:
-                violin_data.append({"Indicator": indicator, "Risk Type": "Raw %", "Value": val})
+                violin_data.append({
+                    "Indicator": indicator,
+                    "Risk Type": "Raw %",
+                    "Value": val,
+                    "Settlement": settlement_name,
+                    "Flood Scenario": scenario,
+                    "Year": selected_year
+                })
             for val in weighted_sim:
-                violin_data.append({"Indicator": indicator, "Risk Type": "Weighted %", "Value": val})
+                violin_data.append({
+                    "Indicator": indicator,
+                    "Risk Type": "Weighted %",
+                    "Value": val,
+                    "Settlement": settlement_name,
+                    "Flood Scenario": scenario,
+                    "Year": selected_year
+                })
 
         violin_df = pd.DataFrame(violin_data)
 
-        # Plot using Plotly Express
+        # Plot
         fig_violin = px.violin(
             violin_df,
             x="Indicator",
@@ -557,10 +575,19 @@ with st.expander("📊 Risk Visualization & Summary", expanded=True):
             color="Risk Type",
             box=True,
             points="all",
+            hover_data=["Settlement", "Flood Scenario", "Year"],
+            facet_col="Risk Type" if use_facet else None,
             title="Distribution of Raw vs Weighted Risk per Indicator"
         )
 
+        fig_violin.update_layout(
+            violingap=0.3,
+            violinmode='group',
+            height=500
+        )
+
         st.plotly_chart(fig_violin, use_container_width=True)
+
 
 
 
