@@ -247,10 +247,10 @@ with col2:
     )
 
     layers = {
-    "Dynamic World": geemap.ee_tile_layer(dw, {}, "Dynamic World Land Cover"),
-    "ESA Land Cover": geemap.ee_tile_layer(esa, esa_vis, "ESA Land Cover"),
-    "ESRI Land Cover": geemap.ee_tile_layer(esri, esri_vis, "ESRI Land Cover"),
     "Floods HP": hp_layer,
+    "ESA Land Cover": geemap.ee_tile_layer(esa, esa_vis, "ESA Land Cover"),
+    "Dynamic World": geemap.ee_tile_layer(dw, {}, "Dynamic World Land Cover"),
+    "ESRI Land Cover": geemap.ee_tile_layer(esri, esri_vis, "ESRI Land Cover"),
     "Floods MP": mp_layer,
     "Floods LP": lp_layer,
     "CORINE 2012": corine_2012,
