@@ -425,7 +425,7 @@ with st.expander("⚠️ Step 2- CRICS - Vulnerability", expanded=True):
 
 
 # ---------------------- Risk Assessment Panel ----------------------
-with st.expander("📉 Risk Assessment", expanded=True):
+with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
     st.markdown("This panel estimates at-risk exposure using flood raster pixel coverage inside the selected settlement.")
 
     selected_year = st.selectbox("Select Population Year", ["2025", "2030"])
