@@ -477,7 +477,12 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
                 scale=30,
                 bestEffort=True
             )
-            coverage = ee.Number(reduction.get('flooded')).orElse(0)
+            coverage = ee.Algorithms.If(
+                reduction.contains('flooded'),
+                ee.Number(reduction.get('flooded')),
+                ee.Number(0)
+            )
+
             return feature.set('flood_coverage', coverage)
         
         settlement_fc_flood = settlement_fc.map(add_flood_coverage)
