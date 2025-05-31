@@ -430,6 +430,7 @@ with st.expander("⚠️ Step 2- CRICS - Vulnerability", expanded=True):
 
 
 # ---------------------- Risk Assessment Panel ----------------------
+# ---------------------- Risk Assessment Panel ----------------------
 with st.expander("📉 Flood Risk Assessment", expanded=True):
     st.markdown("This panel estimates at-risk exposure using flood raster pixel coverage inside the selected settlement.")
 
@@ -437,139 +438,59 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
     selected_property = f"pop_{selected_year}"
     scenario = st.selectbox("Select Flood Scenario", ["High Probability", "Medium Probability", "Low Probability"])
 
-    # Initialize variables
-    exposed_pop = 0
-    exposed_children = 0
-    exposed_elderly = 0
-    exposed_roads_km = 0.0
-    exposed_buildings_count = 0
-    total_pop = 0
-    total_children = 0
-    total_elderly = 0
-    total_road_km = 0.0
-    total_buildings = 0
-    pct_pop = 0.0
-    pct_children = 0.0
-    pct_elderly = 0.0
-    pct_roads = 0.0
-    pct_buildings = 0.0
-
     try:
-        # Step 1: Get flood raster and mask
+        # Step 1: Get flood raster image based on selected scenario
         flood_raster = {
             "High Probability": floods_hp_img,
             "Medium Probability": floods_mp_img,
             "Low Probability": floods_lp_img
         }[scenario]
 
-        flood_mask = flood_raster.gt(0).rename("flooded")
+        # Step 2: Count flood pixels within the selected settlement
+        flood_pixel_count_dict = flood_raster.reduceRegion(
+            reducer=ee.Reducer.sum(),
+            geometry=settlement_geom,
+            scale=30,
+            maxPixels=1e13
+        ).getInfo()
 
-        # Step 2: Safely add flood coverage and weighted properties
-        def add_weighted_exposure(feature):
-            reduction = flood_mask.reduceRegion(
-                reducer=ee.Reducer.mean(),
-                geometry=feature.geometry(),
-                scale=30,
-                bestEffort=True
-            )
+        flood_pixels = list(flood_pixel_count_dict.values())[0] or 0
+        flood_area = flood_pixels * 30 * 30  # pixel area = 900 m²
+        settlement_area = settlement_geom.area().getInfo()  # m²
 
-            flooded = ee.Algorithms.If(
-                reduction.contains('flooded'),
-                ee.Number(reduction.get('flooded')),
-                ee.Number(0)
-            )
+        proportion_affected = flood_area / settlement_area if settlement_area else 0
 
-            # Safe getter using dictionary.contains()
-            def safe_get(prop_name):
-                return ee.Algorithms.If(
-                    feature.toDictionary().contains(prop_name),
-                    ee.Number(feature.get(prop_name)),
-                    ee.Number(0)
-                )
-
-            weighted_pop = ee.Number(safe_get(selected_property)).multiply(ee.Number(flooded))
-            weighted_children = ee.Number(safe_get(children_props[0])).multiply(ee.Number(flooded))
-            weighted_elderly = ee.Number(safe_get(elderly_props[0])).multiply(ee.Number(flooded))
-
-            return feature.set({
-                'flood_coverage': flooded,
-                'weighted_pop': weighted_pop,
-                'weighted_children': weighted_children,
-                'weighted_elderly': weighted_elderly
-            })
-
-
-        settlement_fc_flooded = settlement_fc.map(add_weighted_exposure)
-
-        # Step 3: Aggregate exposure
-        exposed_pop = settlement_fc_flooded.aggregate_sum('weighted_pop').getInfo()
-        exposed_children = settlement_fc_flooded.aggregate_sum('weighted_children').getInfo()
-        exposed_elderly = settlement_fc_flooded.aggregate_sum('weighted_elderly').getInfo()
-
-        # Step 4: Buildings flooded
-        def add_building_flooded(building):
-            reduction = flood_mask.reduceRegion(
-                reducer=ee.Reducer.mean(),
-                geometry=building.geometry(),
-                scale=30
-            )
-            flooded = ee.Algorithms.If(
-                reduction.contains('flooded'),
-                ee.Number(reduction.get('flooded')),
-                ee.Number(0)
-            )
-            return building.set('flooded', flooded)
-
-        flooded_buildings = filtered_buildings.map(add_building_flooded)
-        exposed_buildings_count = flooded_buildings.aggregate_sum('flooded').getInfo()
-
-        # Step 5: Roads flooded
-        def add_road_flooded(road):
-            reduction = flood_mask.reduceRegion(
-                reducer=ee.Reducer.mean(),
-                geometry=road.geometry(),
-                scale=30,
-                bestEffort=True
-            )
-            fraction = ee.Algorithms.If(
-                reduction.contains('flooded'),
-                ee.Number(reduction.get('flooded')),
-                ee.Number(0)
-            )
-            flooded_length = road.geometry().length().multiply(fraction)
-            return road.set('flooded_length', flooded_length)
-
-        flooded_roads = filtered_roads.map(add_road_flooded)
-        exposed_roads_m = flooded_roads.aggregate_sum('flooded_length').getInfo()
-        exposed_roads_km = exposed_roads_m / 1000.0
-
-        # Step 6: Totals
+        # Step 3: Total values from the full settlement
         total_pop = settlement_fc.aggregate_sum(selected_property).getInfo()
         total_children = sum(settlement_fc.aggregate_sum(p).getInfo() for p in children_props)
         total_elderly = sum(settlement_fc.aggregate_sum(p).getInfo() for p in elderly_props)
         total_road_km = filtered_roads.geometry().length().divide(1000).getInfo()
         total_buildings = filtered_buildings.size().getInfo()
 
-        # Step 7: Percentages
+        # Step 4: Compute affected using flood proportion
+        exposed_pop = total_pop * proportion_affected
+        exposed_children = total_children * proportion_affected
+        exposed_elderly = total_elderly * proportion_affected
+        exposed_roads_km = total_road_km * proportion_affected
+        exposed_buildings_count = total_buildings * proportion_affected
+
+        # Step 5: Percentages
         pct_pop = (exposed_pop / total_pop * 100) if total_pop else 0
         pct_children = (exposed_children / total_children * 100) if total_children else 0
         pct_elderly = (exposed_elderly / total_elderly * 100) if total_elderly else 0
         pct_roads = (exposed_roads_km / total_road_km * 100) if total_road_km else 0
         pct_buildings = (exposed_buildings_count / total_buildings * 100) if total_buildings else 0
 
+        # Step 6: Display results
+        st.metric(f"🧍 Exposed Population ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
+        st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
+        st.metric("👵 Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
+        st.metric("🛣️ Roads at Risk", f"{exposed_roads_km:.2f} km", f"{pct_roads:.1f}%")
+        st.metric("🏘️ Buildings at Risk", f"{int(exposed_buildings_count):,}", f"{pct_buildings:.1f}%")
+
+        st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and vulnerability data completed.")
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
-
-    # Step 8: Display metrics
-    st.metric(f"🧍 Exposed Population ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
-    st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
-    st.metric("👵 Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
-    st.metric("🛣️ Roads at Risk", f"{exposed_roads_km:.2f} km", f"{pct_roads:.1f}%")
-    st.metric("🏘️ Buildings at Risk", f"{int(exposed_buildings_count):,}", f"{pct_buildings:.1f}%")
-
-    if 'e' not in locals():
-        st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and 2020 vulnerability data completed.")
-
 
 
 with st.expander(" Risk Summary", expanded=True):
