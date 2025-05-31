@@ -605,12 +605,8 @@ with st.expander("📊 Risk Summary", expanded=True):
     csv = df.to_csv(index=False).encode('utf-8')
     st.download_button("📥 Download Risk Summary CSV", csv, file_name=f"{settlement_name}_risk_summary.csv", mime="text/csv")
 
-# Main container
-with st.expander("📊 Risk Summary", expanded=True):
-    # ... all your charts, metrics, CSV export, etc.
-    st.metric("📌 Composite Risk Index", f"{risk_index:.1f}")
 
-# Outside and after the main block
+# Explanation of the Risk Index
 with st.expander("ℹ️ How is the Risk Index Calculated?"):
     st.markdown("""
     The **Composite Risk Index** gives an overall sense of exposure by combining key indicators using weighted contributions:
