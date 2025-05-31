@@ -6,6 +6,8 @@ import geemap.foliumap as geemap
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import numpy as np
+
 
 # Must be first Streamlit command
 st.set_page_config(layout="wide")
@@ -514,7 +516,7 @@ with st.expander("📊 Risk Summary", expanded=True):
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("**📊 Actual Values at Risk**")
+        st.markdown("** Actual Values at Risk**")
         fig_val = px.bar(df, x="Indicator", y="Exposed Value", color="Indicator",
                          title="Quantity of Assets/People at Risk", text_auto='.2s')
         st.plotly_chart(fig_val, use_container_width=True)
@@ -530,10 +532,6 @@ with st.expander("📊 Risk Summary", expanded=True):
 
     with col3:
         st.markdown("**🎻 Risk Distribution by Indicator & Type (Violin)**")
-
-        import numpy as np
-        import pandas as pd
-        import plotly.express as px
 
         # Customization
         noise_scale = 0.4
