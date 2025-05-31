@@ -493,7 +493,7 @@ with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
 
 
 
-with st.expander("📊 Risk Summary", expanded=True):
+with st.expander(" Risk Summary", expanded=True):
     st.markdown("Visual breakdown of exposure indicators, actual values at risk, and composite risk index dynamics.")
 
     # Data prep
@@ -516,13 +516,13 @@ with st.expander("📊 Risk Summary", expanded=True):
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("**📊 Actual Values at Risk**")
+        st.markdown("** Actual Values at Risk**")
         fig_val = px.bar(df, x="Indicator", y="Exposed Value", color="Indicator",
                          title="Quantity of Assets/People at Risk", text_auto='.2s')
         st.plotly_chart(fig_val, use_container_width=True)
 
     with col2:
-        st.markdown("**📎 Contribution to Risk Index**")
+        st.markdown("** Contribution to Risk Index**")
         fig_pie = px.pie(df, names="Indicator", values="Weighted Contribution",
                          title="Weighted Share of Composite Risk Index")
         st.plotly_chart(fig_pie, use_container_width=True)
@@ -531,7 +531,7 @@ with st.expander("📊 Risk Summary", expanded=True):
     col3, col4 = st.columns(2)
 
     with col3:
-        st.markdown("**🎻 Risk Distribution by Indicator & Type (Violin)**")
+        st.markdown("** Risk Distribution by Indicator & Type**")
 
         # Customization
         noise_scale = 0.4
@@ -593,7 +593,7 @@ with st.expander("📊 Risk Summary", expanded=True):
         st.plotly_chart(fig_compare, use_container_width=True)
 
     # Composite Risk Index metric
-    st.metric("📌 Composite Risk Index", f"{risk_index:.1f}")
+    st.metric(" Composite Risk Index", f"{risk_index:.1f}")
 
 
     # Export to CSV
@@ -603,7 +603,7 @@ with st.expander("📊 Risk Summary", expanded=True):
     df["Risk Index"] = risk_index
 
     csv = df.to_csv(index=False).encode('utf-8')
-    st.download_button("📥 Download Risk Summary CSV", csv, file_name=f"{settlement_name}_risk_summary.csv", mime="text/csv")
+    st.download_button(" Download Risk Summary CSV", csv, file_name=f"{settlement_name}_risk_summary.csv", mime="text/csv")
 
 
 # Explanation of the Risk Index
@@ -621,10 +621,16 @@ with st.expander("ℹ️ How is the Risk Index Calculated?", expanded=False):
     - Roads = 15%  
     - Buildings = 15%  
 
+    **Example Calculation:**  
+    If `Exposed Population = 20%`, then contribution = `20 × 0.3 = 6.0`  
+    (and so on for each indicator)
+
     **Interpretation Scale:**  
     - 🟢 0–5 → **Low Risk**  
     - 🟠 5–10 → **Moderate Risk**  
     - 🔴 >10 → **High Risk**
+
+    This helps policymakers understand not just how much is exposed, but how critically each sector is affected.
     """)
 
 
