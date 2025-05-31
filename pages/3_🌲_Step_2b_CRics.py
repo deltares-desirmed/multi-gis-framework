@@ -430,8 +430,7 @@ with st.expander("⚠️ Step 2- CRICS - Vulnerability", expanded=True):
 
 
 # ---------------------- Risk Assessment Panel ----------------------
-# ---------------------- Risk Assessment Panel ----------------------
-with st.expander("📉 Flood Risk Assessment", expanded=True):
+with st.expander("📉 Risk Assessment", expanded=True):
     st.markdown("This panel estimates at-risk exposure using flood raster pixel coverage inside the selected settlement.")
 
     selected_year = st.selectbox("Select Population Year", ["2025", "2030"])
@@ -482,11 +481,11 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
         pct_buildings = (exposed_buildings_count / total_buildings * 100) if total_buildings else 0
 
         # Step 6: Display results
-        st.metric(f"🧍 Exposed Population ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
-        st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
-        st.metric("👵 Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
-        st.metric("🛣️ Roads at Risk", f"{exposed_roads_km:.2f} km", f"{pct_roads:.1f}%")
-        st.metric("🏘️ Buildings at Risk", f"{int(exposed_buildings_count):,}", f"{pct_buildings:.1f}%")
+        st.metric(f"Exposed Population ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
+        st.metric("Vulnerable Children (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
+        st.metric("Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
+        st.metric("Roads at Risk", f"{exposed_roads_km:.2f} km", f"{pct_roads:.1f}%")
+        st.metric("Buildings at Risk", f"{int(exposed_buildings_count):,}", f"{pct_buildings:.1f}%")
 
         st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and vulnerability data completed.")
     except Exception as e:
@@ -516,7 +515,7 @@ with st.expander(" Risk Summary", expanded=True):
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("**📦 Actual Values at Risk**")
+        st.markdown("** Actual Values at Risk**")
         fig_val = px.bar(df, x="Indicator", y="Exposed Value", color="Indicator",
                          title="Quantity of Assets/People at Risk", text_auto='.2s')
         st.plotly_chart(fig_val, use_container_width=True)
@@ -531,7 +530,7 @@ with st.expander(" Risk Summary", expanded=True):
     col3, col4 = st.columns(2)
 
     with col3:
-        st.markdown("**🎻 Risk Distribution by Indicator & Type**")
+        st.markdown("** Risk Distribution by Indicator**")
 
         # Simulate data for violin plot
         noise_scale = 0.4
@@ -583,7 +582,7 @@ with st.expander(" Risk Summary", expanded=True):
         st.plotly_chart(fig_violin, use_container_width=True)
 
     with col4:
-        st.markdown("**📊 Total Exposure vs People/Assets at Risk**")
+        st.markdown("** People/Assets at Risk**")
 
         # Simulate total population/assets for demo: reverse-calculate
         total_values = [raw * (100 / pct) if pct else raw for raw, pct in zip(raw_values, percentages)]
@@ -602,8 +601,8 @@ with st.expander(" Risk Summary", expanded=True):
         st.plotly_chart(fig_exposure, use_container_width=True)
 
     # Composite Risk Index metric
-    risk_level = "Low" if risk_index <= 5 else "Moderate" if risk_index <= 10 else "High"
-    st.metric("📌 Composite Risk Index", f"{risk_index:.1f}", help=f"Risk Level: {risk_level}")
+    # risk_level = "Low" if risk_index <= 5 else "Moderate" if risk_index <= 10 else "High"
+    # st.metric(" Composite Risk Index", f"{risk_index:.1f}", help=f"Risk Level: {risk_level}")
 
     # Export CSV
     df["Settlement"] = settlement_name
@@ -612,7 +611,7 @@ with st.expander(" Risk Summary", expanded=True):
     df["Risk Index"] = risk_index
 
     csv = df.to_csv(index=False).encode('utf-8')
-    st.download_button("📥 Download Risk Summary CSV", csv, file_name=f"{settlement_name}_risk_summary.csv", mime="text/csv")
+    st.download_button(" Download Risk Summary CSV", csv, file_name=f"{settlement_name}_risk_summary.csv", mime="text/csv")
 
 
 # Explanation of the Risk Index
