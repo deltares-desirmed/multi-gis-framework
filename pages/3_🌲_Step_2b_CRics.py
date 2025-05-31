@@ -430,7 +430,7 @@ with st.expander("⚠️ Step 2- CRICS - Vulnerability", expanded=True):
 
 
 # ---------------------- Risk Assessment Panel ----------------------
-# ---------------------- Risk Assessment Panel ----------------------
+# ---------------------- Risk Assessment Panel ---------------------- 
 with st.expander("📉 Flood Risk Assessment", expanded=True):
     st.markdown("This panel estimates at-risk exposure using flood raster pixel coverage inside the selected settlement.")
 
@@ -471,14 +471,14 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
         # 2a. Population Exposure - use settlement polygons weighted by flood coverage
         # Calculate flood coverage percentage per settlement polygon
         def add_flood_coverage(feature):
-            coverage = flood_mask.reduceRegion(
+            reduction = flood_mask.reduceRegion(
                 reducer=ee.Reducer.mean(),
                 geometry=feature.geometry(),
                 scale=30,
                 bestEffort=True
-            ).get('flooded')
-            # Handle null values by converting to 0 using ee.Number
-            return feature.set('flood_coverage', ee.Number(coverage).orElse(0))
+            )
+            coverage = ee.Number(reduction.get('flooded')).orElse(0)
+            return feature.set('flood_coverage', coverage)
         
         settlement_fc_flood = settlement_fc.map(add_flood_coverage)
         
@@ -498,27 +498,28 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
         
         # 2c. Buildings Exposure - point-in-polygon analysis
         def building_flood_exposure(building):
-            value = flood_mask.reduceRegion(
+            reduction = flood_mask.reduceRegion(
                 reducer=ee.Reducer.mean(),
                 geometry=building.geometry(),
                 scale=30
-            ).get('flooded')
-            return building.set('flooded', ee.Number(value).orElse(0))
+            )
+            flooded_value = ee.Number(reduction.get('flooded')).orElse(0)
+            return building.set('flooded', flooded_value)
         
         buildings_flooded = filtered_buildings.map(building_flood_exposure)
         exposed_buildings_count = buildings_flooded.aggregate_sum('flooded').getInfo()
         
         # 2d. Roads Exposure - length-based calculation
         def road_flood_exposure(road):
-            # Calculate flooded length
-            fraction = flood_mask.reduceRegion(
+            reduction = flood_mask.reduceRegion(
                 reducer=ee.Reducer.mean(),
                 geometry=road.geometry(),
                 scale=30,
                 bestEffort=True
-            ).get('flooded')
-            fraction = ee.Number(fraction).orElse(0)
-            return road.set('flooded_length', road.geometry().length().multiply(fraction))
+            )
+            fraction = ee.Number(reduction.get('flooded')).orElse(0)
+            flooded_length = road.geometry().length().multiply(fraction)
+            return road.set('flooded_length', flooded_length)
         
         roads_flooded = filtered_roads.map(road_flood_exposure)
         exposed_roads_m = roads_flooded.aggregate_sum('flooded_length').getInfo()
@@ -551,7 +552,6 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
     # Only show success if we didn't have an error
     if 'e' not in locals():
         st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and 2020 vulnerability data completed.")
-
 
 
 
