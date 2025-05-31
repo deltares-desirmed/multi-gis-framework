@@ -500,6 +500,9 @@ with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
         pct_roads = (exposed_roads_km / total_road_km * 100) if total_road_km else 0
         pct_buildings = (exposed_buildings_count / total_buildings * 100) if total_buildings else 0
 
+        values = [pct_pop, pct_children, pct_elderly, pct_roads, pct_buildings]
+
+
         # --- Display Metrics ---
         st.metric(f"🧍 Population at Risk ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
         st.metric("🧒 Children at Risk (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
