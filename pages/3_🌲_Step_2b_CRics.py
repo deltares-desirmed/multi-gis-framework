@@ -527,15 +527,18 @@ with st.expander("📊 Risk Summary", expanded=True):
                          title="Weighted Share of Composite Risk Index")
         st.plotly_chart(fig_pie, use_container_width=True)
 
-    # Row 2: Violin Plot and Comparison Bar
+    # Row 2: Violin and comparison bar
     col3, col4 = st.columns(2)
 
     with col3:
         st.markdown("**🎻 Risk Distribution by Indicator & Type (Violin)**")
+
+        # Customization
         noise_scale = 0.4
         num_points = 50
         use_facet = False
 
+        # Generate simulated data
         violin_data = []
         for i, indicator in enumerate(indicators):
             raw_sim = np.random.normal(loc=percentages[i], scale=noise_scale, size=num_points)
@@ -543,19 +546,26 @@ with st.expander("📊 Risk Summary", expanded=True):
 
             for val in raw_sim:
                 violin_data.append({
-                    "Indicator": indicator, "Risk Type": "Raw %",
-                    "Value": val, "Settlement": settlement_name,
-                    "Flood Scenario": scenario, "Year": selected_year
+                    "Indicator": indicator,
+                    "Risk Type": "Raw %",
+                    "Value": val,
+                    "Settlement": settlement_name,
+                    "Flood Scenario": scenario,
+                    "Year": selected_year
                 })
             for val in weighted_sim:
                 violin_data.append({
-                    "Indicator": indicator, "Risk Type": "Weighted %",
-                    "Value": val, "Settlement": settlement_name,
-                    "Flood Scenario": scenario, "Year": selected_year
+                    "Indicator": indicator,
+                    "Risk Type": "Weighted %",
+                    "Value": val,
+                    "Settlement": settlement_name,
+                    "Flood Scenario": scenario,
+                    "Year": selected_year
                 })
 
         violin_df = pd.DataFrame(violin_data)
 
+        # Plot
         fig_violin = px.violin(
             violin_df,
             x="Indicator",
@@ -566,48 +576,53 @@ with st.expander("📊 Risk Summary", expanded=True):
             hover_data=["Settlement", "Flood Scenario", "Year"],
             facet_col="Risk Type" if use_facet else None,
             title="Distribution of Raw vs Weighted Risk per Indicator",
-            color_discrete_map={"Raw %": "orange", "Weighted %": "crimson"}
+            color_discrete_map={
+                "Raw %": "orange",
+                "Weighted %": "crimson"
+            }
         )
-        fig_violin.update_layout(violingap=0.3, violinmode='group', height=500)
+
         st.plotly_chart(fig_violin, use_container_width=True)
 
     with col4:
-        st.markdown("**📦 Unweighted vs Weighted Exposure**")
+        st.markdown("**📉 Unweighted vs Weighted Exposure**")
         fig_compare = go.Figure()
         fig_compare.add_trace(go.Bar(x=indicators, y=percentages, name="Raw %"))
         fig_compare.add_trace(go.Bar(x=indicators, y=weighted_contrib, name="Weighted %"))
         fig_compare.update_layout(barmode='group', title="Raw vs Weighted Indicator Contribution")
         st.plotly_chart(fig_compare, use_container_width=True)
 
-    # Composite Risk Index Display + Category
-    if risk_index < 5:
-        risk_level = "🟢 Low"
-    elif 5 <= risk_index <= 10:
-        risk_level = "🟠 Moderate"
-    else:
-        risk_level = "🔴 High"
+    # Composite Risk Index metric
+    st.metric("📌 Composite Risk Index", f"{risk_index:.1f}")
 
-    st.metric(label="📌 Composite Risk Index", value=f"{risk_index:.1f}", delta=risk_level)
-
+    # 📘 Explanation box for Composite Risk Index
     with st.expander("ℹ️ How is the Risk Index Calculated?"):
         st.markdown("""
-        The **Composite Risk Index** is a single number that summarizes how much risk a community faces.
-        
-        It's calculated like this:
-        - Each type of risk (like population or roads) is measured as a percentage of what's at risk.
-        - Some risks matter more than others, so we assign them a **weight**.
-        - We multiply the percentage by the weight and **add them up**.
+        The **Composite Risk Index** gives an overall sense of exposure by combining key indicators using weighted contributions:
 
-        For example:
-        > If 10% of people are at risk and that risk is weighted as 0.3 (30%), it contributes **3.0** to the final index.
+        **Formula:**  
+        `Index = ∑ (Exposure % × Weight)` for each indicator
 
-        **Risk Categories:**
-        - **0–5** → Low Risk
-        - **5–10** → Moderate Risk
-        - **10+** → High Risk
+        **Weights:**  
+        - Population = 30%  
+        - Children = 20%  
+        - Elderly = 20%  
+        - Roads = 15%  
+        - Buildings = 15%  
+
+        **Example Calculation:**  
+        If `Exposed Population = 20%`, then contribution = `20 × 0.3 = 6.0`  
+        (and so on for each indicator)
+
+        **Interpretation Scale:**  
+        - 🟢 0–5 → **Low Risk**  
+        - 🟠 5–10 → **Moderate Risk**  
+        - 🔴 >10 → **High Risk**
+
+        This helps policymakers understand not just how much is exposed, but how critically each sector is affected.
         """)
 
-    # CSV export
+    # Export to CSV
     df["Settlement"] = settlement_name
     df["Flood Scenario"] = scenario
     df["Year"] = selected_year
