@@ -438,6 +438,18 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
     selected_property = f"pop_{selected_year}"
     scenario = st.selectbox("Select Flood Scenario", ["High Probability", "Medium Probability", "Low Probability"])
 
+    # Initialize variables to prevent reference errors
+    exposed_pop = 0
+    exposed_children = 0
+    exposed_elderly = 0
+    exposed_roads_km = 0.0
+    exposed_buildings_count = 0
+    pct_pop = 0.0
+    pct_children = 0.0
+    pct_elderly = 0.0
+    pct_roads = 0.0
+    pct_buildings = 0.0
+
     try:
         # Step 1: Get flood raster and create binary mask
         flood_raster = {
@@ -521,16 +533,22 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
         pct_roads = (exposed_roads_km / total_road_km * 100) if total_road_km else 0
         pct_buildings = (exposed_buildings_count / total_buildings * 100) if total_buildings else 0
 
-        # Step 5: Display results
-        st.metric(f"🧍 Exposed Population ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
-        st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
-        st.metric("👵 Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
-        st.metric("🛣️ Roads at Risk", f"{exposed_roads_km:.2f} km", f"{pct_roads:.1f}%")
-        st.metric("🏘️ Buildings at Risk", f"{int(exposed_buildings_count):,}", f"{pct_buildings:.1f}%")
-
-        st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and 2020 vulnerability data completed.")
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
+
+    # Step 5: Display results (always show metrics, even if error occurred)
+    st.metric(f"🧍 Exposed Population ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
+    st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
+    st.metric("👵 Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
+    st.metric("🛣️ Roads at Risk", f"{exposed_roads_km:.2f} km", f"{pct_roads:.1f}%")
+    st.metric("🏘️ Buildings at Risk", f"{int(exposed_buildings_count):,}", f"{pct_buildings:.1f}%")
+
+    try:
+        # Only show success if we completed without errors
+        if 'e' not in locals():
+            st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and 2020 vulnerability data completed.")
+    except:
+        pass
 
 
 
