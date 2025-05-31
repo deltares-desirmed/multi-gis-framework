@@ -426,7 +426,7 @@ with st.expander("⚠️ Vulnerability Analysis", expanded=True):
 
 # ---------------------- Risk Assessment Panel ----------------------
 with st.expander("📉 Flood Risk Assessment", expanded=True):
-    st.markdown("This panel estimates at-risk exposure by intersecting flood zones with population, roads, buildings, and vulnerable groups.")
+    st.markdown("This panel estimates at-risk exposure by spatially intersecting flood zones with population, roads, buildings, and vulnerable groups.")
 
     selected_year = st.selectbox("Select Population Year", ["2025", "2030"])
     selected_property = f"pop_{selected_year}"
@@ -439,33 +439,39 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
     }[scenario]
 
     try:
-        # Compute geometries and areas
+        # Step 1: Intersect flood geometry with selected settlement
+        affected_geom = flood_geom.intersection(settlement_geom, ee.ErrorMargin(1))
+        affected_area = affected_geom.area().getInfo()
         settlement_area = settlement_geom.area().getInfo()
-        flooded_area = flood_geom.intersection(settlement_geom, ee.ErrorMargin(1)).area().getInfo()
-        proportion_affected = flooded_area / settlement_area if settlement_area else 0
+        exposure_proportion = affected_area / settlement_area if settlement_area else 0
 
-        # Total values
+        # Step 2: Filter features that fall within flood-affected area
+        flooded_population = settlement_fc.filterBounds(affected_geom)
+        flooded_buildings = filtered_buildings.filterBounds(affected_geom)
+        flooded_roads = filtered_roads.filterBounds(affected_geom)
+
+        # Step 3: Compute actual affected values
+        exposed_pop = flooded_population.aggregate_sum(selected_property).getInfo()
+        exposed_children = sum(flooded_population.aggregate_sum(p).getInfo() for p in children_props)
+        exposed_elderly = sum(flooded_population.aggregate_sum(p).getInfo() for p in elderly_props)
+        exposed_roads_km = flooded_roads.geometry().length().divide(1000).getInfo()
+        exposed_buildings_count = flooded_buildings.size().getInfo()
+
+        # Step 4: Compute total values for selected settlement
         total_pop = settlement_fc.aggregate_sum(selected_property).getInfo()
         total_children = sum(settlement_fc.aggregate_sum(p).getInfo() for p in children_props)
         total_elderly = sum(settlement_fc.aggregate_sum(p).getInfo() for p in elderly_props)
         total_road_km = filtered_roads.geometry().length().divide(1000).getInfo()
         total_buildings = filtered_buildings.size().getInfo()
 
-        # Affected values (proportional estimate)
-        exposed_pop = total_pop * proportion_affected
-        exposed_children = total_children * proportion_affected
-        exposed_elderly = total_elderly * proportion_affected
-        exposed_roads_km = total_road_km * proportion_affected
-        exposed_buildings_count = total_buildings * proportion_affected
-
-        # Percentages
+        # Step 5: Percentages
         pct_pop = (exposed_pop / total_pop * 100) if total_pop else 0
         pct_children = (exposed_children / total_children * 100) if total_children else 0
         pct_elderly = (exposed_elderly / total_elderly * 100) if total_elderly else 0
         pct_roads = (exposed_roads_km / total_road_km * 100) if total_road_km else 0
         pct_buildings = (exposed_buildings_count / total_buildings * 100) if total_buildings else 0
 
-        # Display metrics
+        # Step 6: Display metrics
         st.metric(f"🧍 Exposed Population ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
         st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
         st.metric("👵 Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
@@ -475,6 +481,7 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
         st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and 2020 vulnerability data completed.")
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
+
 
 
 
