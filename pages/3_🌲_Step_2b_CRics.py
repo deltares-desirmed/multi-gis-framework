@@ -595,32 +595,6 @@ with st.expander("📊 Risk Summary", expanded=True):
     # Composite Risk Index metric
     st.metric("📌 Composite Risk Index", f"{risk_index:.1f}")
 
-    # 📘 Explanation box for Composite Risk Index
-    with st.expander("ℹ️ How is the Risk Index Calculated?"):
-        st.markdown("""
-        The **Composite Risk Index** gives an overall sense of exposure by combining key indicators using weighted contributions:
-
-        **Formula:**  
-        `Index = ∑ (Exposure % × Weight)` for each indicator
-
-        **Weights:**  
-        - Population = 30%  
-        - Children = 20%  
-        - Elderly = 20%  
-        - Roads = 15%  
-        - Buildings = 15%  
-
-        **Example Calculation:**  
-        If `Exposed Population = 20%`, then contribution = `20 × 0.3 = 6.0`  
-        (and so on for each indicator)
-
-        **Interpretation Scale:**  
-        - 🟢 0–5 → **Low Risk**  
-        - 🟠 5–10 → **Moderate Risk**  
-        - 🔴 >10 → **High Risk**
-
-        This helps policymakers understand not just how much is exposed, but how critically each sector is affected.
-        """)
 
     # Export to CSV
     df["Settlement"] = settlement_name
@@ -630,6 +604,32 @@ with st.expander("📊 Risk Summary", expanded=True):
 
     csv = df.to_csv(index=False).encode('utf-8')
     st.download_button("📥 Download Risk Summary CSV", csv, file_name=f"{settlement_name}_risk_summary.csv", mime="text/csv")
+
+# Main container
+with st.expander("📊 Risk Summary", expanded=True):
+    # ... all your charts, metrics, CSV export, etc.
+    st.metric("📌 Composite Risk Index", f"{risk_index:.1f}")
+
+# Outside and after the main block
+with st.expander("ℹ️ How is the Risk Index Calculated?"):
+    st.markdown("""
+    The **Composite Risk Index** gives an overall sense of exposure by combining key indicators using weighted contributions:
+
+    **Formula:**  
+    `Index = ∑ (Exposure % × Weight)` for each indicator
+
+    **Weights:**  
+    - Population = 30%  
+    - Children = 20%  
+    - Elderly = 20%  
+    - Roads = 15%  
+    - Buildings = 15%  
+
+    **Interpretation Scale:**  
+    - 🟢 0–5 → **Low Risk**  
+    - 🟠 5–10 → **Moderate Risk**  
+    - 🔴 >10 → **High Risk**
+    """)
 
 
 
