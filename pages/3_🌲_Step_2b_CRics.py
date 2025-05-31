@@ -607,7 +607,7 @@ with st.expander("📊 Risk Summary", expanded=True):
 
 
 # Explanation of the Risk Index
-with st.expander("ℹ️ How is the Risk Index Calculated?"):
+with st.expander("ℹ️ How is the Risk Index Calculated?", expanded=False):
     st.markdown("""
     The **Composite Risk Index** gives an overall sense of exposure by combining key indicators using weighted contributions:
 
