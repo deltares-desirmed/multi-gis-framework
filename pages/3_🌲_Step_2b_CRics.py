@@ -521,7 +521,7 @@ with st.expander(" Risk Summary", expanded=True):
         st.plotly_chart(fig_val, use_container_width=True)
 
     with col2:
-        st.markdown("**📎 Contribution to Risk Index**")
+        st.markdown("** Contribution to Risk Index**")
         fig_pie = px.pie(df, names="Indicator", values="Weighted Contribution",
                          title="Weighted Share of Composite Risk Index")
         st.plotly_chart(fig_pie, use_container_width=True)
