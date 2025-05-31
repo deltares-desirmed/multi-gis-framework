@@ -572,11 +572,11 @@ with st.expander("📊 Risk Visualization & Summary", expanded=True):
             violin_df,
             x="Indicator",
             y="Value",
-            color="Risk Type",
+            color="gold",
             box=True,
             points="all",
             hover_data=["Settlement", "Flood Scenario", "Year"],
-            facet_col="Risk Type" if use_facet else None,
+            facet_col="gold" if use_facet else None,
             title="Distribution of Raw vs Weighted Risk per Indicator"
         )
 
