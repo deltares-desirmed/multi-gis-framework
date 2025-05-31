@@ -473,21 +473,17 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
                 scale=30,
                 bestEffort=True
             )
-            coverage = ee.Number(reduction.get('flooded'))
-            flooded = ee.Algorithms.If(coverage, coverage, ee.Number(0))
+            flooded = ee.Number(reduction.get('flooded')).defaultValue(0)
 
-            # Safely get the population and vulnerability group values
-            raw_pop = ee.Number(feature.get(selected_property))
-            raw_children = ee.Number(feature.get(children_props[0]))
-            raw_elderly = ee.Number(feature.get(elderly_props[0]))
+            # Fetch population and group values safely
+            raw_pop = ee.Number(feature.get(selected_property)).defaultValue(0)
+            raw_children = ee.Number(feature.get(children_props[0])).defaultValue(0)
+            raw_elderly = ee.Number(feature.get(elderly_props[0])).defaultValue(0)
 
-            safe_pop = ee.Algorithms.If(raw_pop, raw_pop, ee.Number(0))
-            safe_children = ee.Algorithms.If(raw_children, raw_children, ee.Number(0))
-            safe_elderly = ee.Algorithms.If(raw_elderly, raw_elderly, ee.Number(0))
-
-            weighted_pop = ee.Number(safe_pop).multiply(flooded)
-            weighted_children = ee.Number(safe_children).multiply(flooded)
-            weighted_elderly = ee.Number(safe_elderly).multiply(flooded)
+            # Multiply with flooded proportion
+            weighted_pop = raw_pop.multiply(flooded)
+            weighted_children = raw_children.multiply(flooded)
+            weighted_elderly = raw_elderly.multiply(flooded)
 
             return feature.set({
                 'flood_coverage': flooded,
@@ -495,6 +491,7 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
                 'weighted_children': weighted_children,
                 'weighted_elderly': weighted_elderly
             })
+
 
 
         settlement_fc_flooded = settlement_fc.map(add_weighted_exposure)
