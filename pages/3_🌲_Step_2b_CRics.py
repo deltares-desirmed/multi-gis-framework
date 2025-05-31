@@ -489,9 +489,7 @@ with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
 
-# Ensure these exist if you're outside the original try block
-raw_values = [exposed_pop, exposed_children, exposed_elderly, exposed_roads_km, exposed_buildings_count]
-percentages = [pct_pop, pct_children, pct_elderly, pct_roads, pct_buildings]
+
 
 with st.expander("📊 Risk Visualization & Summary", expanded=True):
     st.markdown("Visual breakdown of exposure indicators, actual values at risk, and composite risk index dynamics.")
@@ -531,17 +529,28 @@ with st.expander("📊 Risk Visualization & Summary", expanded=True):
     col3, col4 = st.columns(2)
 
     with col3:
-        st.markdown(f"**📈 Risk Balance (Radar, Index = {risk_index:.1f})**")
-        fig_radar = go.Figure(data=go.Scatterpolar(
-            r=percentages + [percentages[0]],
-            theta=indicators + [indicators[0]],
-            fill='toself'
-        ))
-        fig_radar.update_layout(
-            polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
-            showlegend=False
+        st.markdown("**🎻 Risk Distribution (Violin Plot)**")
+        fig_violin = go.Figure()
+
+        for i, ind in enumerate(indicators):
+            fig_violin.add_trace(go.Violin(
+                y=[percentages[i]] * 10 + [weighted_contrib[i]] * 10,
+                x=[ind] * 20,
+                name=ind,
+                box_visible=True,
+                meanline_visible=True,
+                line_color='blue',
+                points=False
+            ))
+
+        fig_violin.update_layout(
+            title="Violin Plot of Raw vs Weighted Risk per Indicator",
+            yaxis_title="Risk Percentage",
+            violingap=0.3,
+            violinmode='group'
         )
-        st.plotly_chart(fig_radar, use_container_width=True)
+        st.plotly_chart(fig_violin, use_container_width=True)
+
 
     with col4:
         st.markdown("**📦 Unweighted vs Weighted Exposure**")
