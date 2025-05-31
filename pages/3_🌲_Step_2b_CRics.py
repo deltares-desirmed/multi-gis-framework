@@ -430,18 +430,6 @@ with st.expander("⚠️ Step 2- CRICS - Vulnerability", expanded=True):
 
 
 # ---------------------- Risk Assessment Panel ----------------------
-import datetime
-import ee
-import streamlit as st
-from utils_ee import initialize_earth_engine
-import geemap.foliumap as geemap
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-import numpy as np
-
-# Initialize Earth Engine and other setup remains the same...
-
 # ---------------------- Risk Assessment Panel ----------------------
 with st.expander("📉 Flood Risk Assessment", expanded=True):
     st.markdown("This panel estimates at-risk exposure using flood raster pixel coverage inside the selected settlement.")
@@ -472,7 +460,8 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
                 scale=30,
                 bestEffort=True
             ).get('flooded')
-            return feature.set('flood_coverage', ee.Number(coverage).fraction(0))
+            # Handle null values by converting to 0
+            return feature.set('flood_coverage', ee.Number(coverage).default(0))
         
         settlement_fc_flood = settlement_fc.map(add_flood_coverage)
         
@@ -497,7 +486,7 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
                 geometry=building.geometry(),
                 scale=30
             ).get('flooded')
-            return building.set('flooded', ee.Number(value).fraction(0))
+            return building.set('flooded', ee.Number(value).default(0))
         
         buildings_flooded = filtered_buildings.map(building_flood_exposure)
         exposed_buildings_count = buildings_flooded.aggregate_sum('flooded').getInfo()
@@ -511,7 +500,7 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
                 scale=30,
                 bestEffort=True
             ).get('flooded')
-            fraction = ee.Number(fraction).fraction(0)
+            fraction = ee.Number(fraction).default(0)
             return road.set('flooded_length', road.geometry().length().multiply(fraction))
         
         roads_flooded = filtered_roads.map(road_flood_exposure)
@@ -542,7 +531,6 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
         st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and 2020 vulnerability data completed.")
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
-
 
 
 
