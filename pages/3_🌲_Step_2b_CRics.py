@@ -426,7 +426,7 @@ with st.expander("⚠️ Vulnerability Analysis", expanded=True):
 
 # ---------------------- Risk Assessment Panel ----------------------
 with st.expander("📉 Flood Risk Assessment", expanded=True):
-    st.markdown("This panel estimates at-risk exposure by **precisely intersecting** flood zones with population, roads, buildings, and vulnerable groups.")
+    st.markdown("This panel estimates at-risk exposure using area-weighted proportions based on flood extent within the selected settlement.")
 
     selected_year = st.selectbox("Select Population Year", ["2025", "2030"])
     selected_property = f"pop_{selected_year}"
@@ -439,38 +439,34 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
     }[scenario]
 
     try:
-        # Step 1: Intersect flood zone with selected settlement
+        # Step 1: Calculate intersection and areas
         affected_geom = flood_geom.intersection(settlement_geom, ee.ErrorMargin(1))
+        affected_area = affected_geom.area().getInfo()  # m²
+        settlement_area = settlement_geom.area().getInfo()  # m²
+        proportion_affected = affected_area / settlement_area if settlement_area else 0
 
-        # Step 2: Clip population and infrastructure by affected area
-        flooded_population = settlement_fc.filterBounds(affected_geom)
-        exposed_pop = flooded_population.aggregate_sum(selected_property).getInfo()
-
-        flooded_buildings = filtered_buildings.filterBounds(affected_geom)
-        exposed_buildings_count = flooded_buildings.size().getInfo()
-
-        flooded_roads = filtered_roads.filterBounds(affected_geom)
-        exposed_roads_km = flooded_roads.geometry().length().divide(1000).getInfo()
-
-        # Step 3: Vulnerable groups in affected area
-        exposed_children = sum(flooded_population.aggregate_sum(p).getInfo() for p in children_props)
-        exposed_elderly = sum(flooded_population.aggregate_sum(p).getInfo() for p in elderly_props)
-
-        # Step 4: Total values from entire settlement
+        # Step 2: Total values from full settlement
         total_pop = settlement_fc.aggregate_sum(selected_property).getInfo()
         total_children = sum(settlement_fc.aggregate_sum(p).getInfo() for p in children_props)
         total_elderly = sum(settlement_fc.aggregate_sum(p).getInfo() for p in elderly_props)
-        total_road_km = split_roads.filterBounds(settlement_geom).geometry().length().divide(1000).getInfo()
-        total_buildings = ms_buildings_split.filterBounds(settlement_geom).size().getInfo()
+        total_road_km = filtered_roads.geometry().length().divide(1000).getInfo()
+        total_buildings = filtered_buildings.size().getInfo()
 
-        # Step 5: Compute % values
+        # Step 3: Compute affected using proportion
+        exposed_pop = total_pop * proportion_affected
+        exposed_children = total_children * proportion_affected
+        exposed_elderly = total_elderly * proportion_affected
+        exposed_roads_km = total_road_km * proportion_affected
+        exposed_buildings_count = total_buildings * proportion_affected
+
+        # Step 4: Percentages
         pct_pop = (exposed_pop / total_pop * 100) if total_pop else 0
         pct_children = (exposed_children / total_children * 100) if total_children else 0
         pct_elderly = (exposed_elderly / total_elderly * 100) if total_elderly else 0
         pct_roads = (exposed_roads_km / total_road_km * 100) if total_road_km else 0
         pct_buildings = (exposed_buildings_count / total_buildings * 100) if total_buildings else 0
 
-        # Step 6: Display metrics
+        # Step 5: Display results
         st.metric(f"🧍 Exposed Population ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
         st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
         st.metric("👵 Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
