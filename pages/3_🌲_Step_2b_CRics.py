@@ -487,77 +487,75 @@ with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
         st.error(f"⚠️ Error during risk summary: {str(e)}")
 
 
-# ---------------------- Risk Visualization & Summary ----------------------
 with st.expander("📊 Risk Visualization & Summary", expanded=True):
-    st.markdown("Visual breakdown of exposure and vulnerability indicators with a composite risk index.")
+    st.markdown("Visual breakdown of exposure indicators, actual values at risk, and composite risk index dynamics.")
 
-    import pandas as pd
-    import plotly.express as px
-    import plotly.graph_objects as go
-
-    # Data
-    indicators = [
-        'Exposed Population',
-        'Vulnerable Children (0–10)',
-        'Vulnerable Elderly (65+)',
-        'Roads at Risk',
-        'Buildings at Risk'
-    ]
-    values = [pct_pop, pct_children, pct_elderly, pct_roads, pct_buildings]
+    # Data prep
+    indicators = ['Exposed Population', 'Vulnerable Children (0–10)', 'Vulnerable Elderly (65+)', 'Roads at Risk', 'Buildings at Risk']
+    raw_values = [exposed_pop, exposed_children, exposed_elderly, exposed_roads_km, exposed_buildings_count]
+    percentages = [pct_pop, pct_children, pct_elderly, pct_roads, pct_buildings]
     weights = [0.3, 0.2, 0.2, 0.15, 0.15]
-
-    risk_index = sum([v * w for v, w in zip(values, weights)])
+    weighted_contrib = [p * w for p, w in zip(percentages, weights)]
+    risk_index = sum(weighted_contrib)
 
     df = pd.DataFrame({
         "Indicator": indicators,
-        "Value (%)": values,
+        "Exposed Value": raw_values,
+        "Exposure (%)": percentages,
         "Weight": weights,
-        "Weighted Contribution": [v * w for v, w in zip(values, weights)]
+        "Weighted Contribution": weighted_contrib
     })
 
-    # Column layout
+    # Row 1: Bar of exposed values and Pie
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("**📊 Indicator Exposure (%):**")
-        fig_bar = px.bar(df, x="Indicator", y="Value (%)", color="Indicator",
-                         title="Percentage of Indicator at Risk", text_auto='.1f')
-        st.plotly_chart(fig_bar, use_container_width=True)
+        st.markdown("**📊 Actual Values at Risk**")
+        fig_val = px.bar(df, x="Indicator", y="Exposed Value", color="Indicator",
+                         title="Quantity of Assets/People at Risk", text_auto='.2s')
+        st.plotly_chart(fig_val, use_container_width=True)
 
     with col2:
-        st.markdown("**📈 Risk Balance (Radar Chart):**")
+        st.markdown("**📎 Contribution to Risk Index**")
+        fig_pie = px.pie(df, names="Indicator", values="Weighted Contribution",
+                         title="Weighted Share of Composite Risk Index")
+        st.plotly_chart(fig_pie, use_container_width=True)
+
+    # Row 2: Radar + Line or Stacked Bar
+    col3, col4 = st.columns(2)
+
+    with col3:
+        st.markdown(f"**📈 Risk Balance (Radar, Index = {risk_index:.1f})**")
         fig_radar = go.Figure(data=go.Scatterpolar(
-            r=values + [values[0]],
+            r=percentages + [percentages[0]],
             theta=indicators + [indicators[0]],
             fill='toself'
         ))
         fig_radar.update_layout(
             polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
-            showlegend=False,
-            title=f"Risk Radar (Index = {risk_index:.1f})"
+            showlegend=False
         )
         st.plotly_chart(fig_radar, use_container_width=True)
 
-    # Second row layout
-    col3, col4 = st.columns(2)
-
-    with col3:
-        st.markdown("**📎 Risk Contribution by Indicator:**")
-        fig_pie = px.pie(df, names="Indicator", values="Weighted Contribution",
-                         title="Share of Composite Risk Index")
-        st.plotly_chart(fig_pie, use_container_width=True)
-
     with col4:
-        st.markdown("**⬇️ Export Risk Summary:**")
-        df_export = df.copy()
-        df_export["Settlement"] = settlement_name
-        df_export["Flood Scenario"] = scenario
-        df_export["Year"] = selected_year
-        df_export["Risk Index"] = risk_index
+        st.markdown("**📦 Unweighted vs Weighted Exposure**")
+        fig_compare = go.Figure()
+        fig_compare.add_trace(go.Bar(x=indicators, y=percentages, name="Raw %"))
+        fig_compare.add_trace(go.Bar(x=indicators, y=weighted_contrib, name="Weighted %"))
+        fig_compare.update_layout(barmode='group', title="Raw vs Weighted Indicator Contribution")
+        st.plotly_chart(fig_compare, use_container_width=True)
 
-        csv = df_export.to_csv(index=False).encode('utf-8')
-        st.download_button("📥 Download CSV", csv, file_name=f"{settlement_name}_risk_summary.csv", mime="text/csv")
+    # Risk index summary
+    st.metric("📌 Composite Risk Index", f"{risk_index:.1f}")
 
+    # CSV export
+    df["Settlement"] = settlement_name
+    df["Flood Scenario"] = scenario
+    df["Year"] = selected_year
+    df["Risk Index"] = risk_index
+
+    csv = df.to_csv(index=False).encode('utf-8')
+    st.download_button("📥 Download Risk Summary CSV", csv, file_name=f"{settlement_name}_risk_summary.csv", mime="text/csv")
 
 
 
