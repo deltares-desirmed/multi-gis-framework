@@ -496,6 +496,7 @@ with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
         ]
 
         values = [pct_pop, pct_children, pct_elderly, pct_roads, pct_buildings]
+        
 
         weights = [0.3, 0.2, 0.2, 0.15, 0.15]
         weighted_contrib = [v * w for v, w in zip(values, weights)]
@@ -549,7 +550,7 @@ with st.expander("📊 Risk Visualization & Summary", expanded=True):
         'Roads at Risk',
         'Buildings at Risk'
     ]
-    values = [pct_pop, pct_children, pct_elderly, pct_roads, pct_buildings]
+    
     weights = [0.3, 0.2, 0.2, 0.15, 0.15]
 
     risk_index = sum([v * w for v, w in zip(values, weights)])
