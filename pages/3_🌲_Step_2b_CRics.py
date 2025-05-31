@@ -487,6 +487,56 @@ with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
         st.error(f"⚠️ Error during risk summary: {str(e)}")
 
 
+# ---------------------- Risk Visualization & Summary ----------------------
+with st.expander("📊 Risk Visualization & Summary", expanded=True):
+    st.markdown("Radar chart of exposure and vulnerability indicators with a composite risk index.")
+
+    import pandas as pd
+    import plotly.express as px
+
+    # Prepare radar chart data
+    radar_df = pd.DataFrame({
+        'Indicator': [
+            'Exposed Population',
+            'Vulnerable Children (0–10)',
+            'Vulnerable Elderly (65+)',
+            'Roads at Risk',
+            'Buildings at Risk'
+        ],
+        'Value (%)': [
+            pct_pop,
+            pct_children,
+            pct_elderly,
+            pct_roads,
+            pct_buildings
+        ]
+    })
+
+    # Compute risk index
+    risk_index = (
+        pct_pop * 0.3 +
+        pct_children * 0.2 +
+        pct_elderly * 0.2 +
+        pct_roads * 0.15 +
+        pct_buildings * 0.15
+    )
+
+    st.metric("📈 Custom Risk Index", f"{risk_index:.1f}")
+
+    fig = px.line_polar(radar_df, r='Value (%)', theta='Indicator', line_close=True)
+    fig.update_traces(fill='toself')
+    st.plotly_chart(fig)
+
+    # Export as CSV or Excel
+    radar_df['Settlement'] = settlement_name
+    radar_df['Flood Scenario'] = scenario
+    radar_df['Year'] = selected_year
+    radar_df['Risk Index'] = risk_index
+
+    csv = radar_df.to_csv(index=False).encode('utf-8')
+    xlsx = radar_df.to_excel(index=False, engine='openpyxl')
+
+    st.download_button("⬇️ Download CSV", data=csv, file_name=f"{settlement_name}_risk_summary.csv", mime='text/csv')
 
 
 
