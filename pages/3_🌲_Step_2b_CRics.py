@@ -430,6 +430,19 @@ with st.expander("⚠️ Step 2- CRICS - Vulnerability", expanded=True):
 
 
 # ---------------------- Risk Assessment Panel ----------------------
+import datetime
+import ee
+import streamlit as st
+from utils_ee import initialize_earth_engine
+import geemap.foliumap as geemap
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+import numpy as np
+
+# Initialize Earth Engine and other setup remains the same...
+
+# ---------------------- Risk Assessment Panel ----------------------
 with st.expander("📉 Flood Risk Assessment", expanded=True):
     st.markdown("This panel estimates at-risk exposure using flood raster pixel coverage inside the selected settlement.")
 
@@ -438,26 +451,72 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
     scenario = st.selectbox("Select Flood Scenario", ["High Probability", "Medium Probability", "Low Probability"])
 
     try:
-        # Step 1: Get flood raster image based on selected scenario
+        # Step 1: Get flood raster and create binary mask
         flood_raster = {
             "High Probability": floods_hp_img,
             "Medium Probability": floods_mp_img,
             "Low Probability": floods_lp_img
         }[scenario]
+        
+        # Create binary flood mask (1=flooded, 0=not flooded)
+        flood_mask = flood_raster.gt(0).rename('flooded')
 
-        # Step 2: Count flood pixels within the selected settlement
-        flood_pixel_count_dict = flood_raster.reduceRegion(
-            reducer=ee.Reducer.sum(),
-            geometry=settlement_geom,
-            scale=30,
-            maxPixels=1e13
+        # Step 2: Calculate actual exposed features using spatial overlay
+        # --------------------------------------------------------------
+        # 2a. Population Exposure - use settlement polygons weighted by flood coverage
+        # Calculate flood coverage percentage per settlement polygon
+        def add_flood_coverage(feature):
+            coverage = flood_mask.reduceRegion(
+                reducer=ee.Reducer.mean(),
+                geometry=feature.geometry(),
+                scale=30,
+                bestEffort=True
+            ).get('flooded')
+            return feature.set('flood_coverage', ee.Number(coverage).fraction(0))
+        
+        settlement_fc_flood = settlement_fc.map(add_flood_coverage)
+        
+        # Get exposed population
+        exposed_pop = settlement_fc_flood.aggregate_sum(
+            f"{selected_property} * flood_coverage"
         ).getInfo()
-
-        flood_pixels = list(flood_pixel_count_dict.values())[0] or 0
-        flood_area = flood_pixels * 30 * 30  # pixel area = 900 m²
-        settlement_area = settlement_geom.area().getInfo()  # m²
-
-        proportion_affected = flood_area / settlement_area if settlement_area else 0
+        
+        # 2b. Vulnerable Groups Exposure (using same flood coverage)
+        exposed_children = settlement_fc_flood.aggregate_sum(
+            f"{children_props[0]} * flood_coverage"
+        ).getInfo()
+        
+        exposed_elderly = settlement_fc_flood.aggregate_sum(
+            f"{elderly_props[0]} * flood_coverage"
+        ).getInfo()
+        
+        # 2c. Buildings Exposure - point-in-polygon analysis
+        def building_flood_exposure(building):
+            value = flood_mask.reduceRegion(
+                reducer=ee.Reducer.mean(),
+                geometry=building.geometry(),
+                scale=30
+            ).get('flooded')
+            return building.set('flooded', ee.Number(value).fraction(0))
+        
+        buildings_flooded = filtered_buildings.map(building_flood_exposure)
+        exposed_buildings_count = buildings_flooded.aggregate_sum('flooded').getInfo()
+        
+        # 2d. Roads Exposure - length-based calculation
+        def road_flood_exposure(road):
+            # Calculate flooded length
+            fraction = flood_mask.reduceRegion(
+                reducer=ee.Reducer.mean(),
+                geometry=road.geometry(),
+                scale=30,
+                bestEffort=True
+            ).get('flooded')
+            fraction = ee.Number(fraction).fraction(0)
+            return road.set('flooded_length', road.geometry().length().multiply(fraction))
+        
+        roads_flooded = filtered_roads.map(road_flood_exposure)
+        exposed_roads_m = roads_flooded.aggregate_sum('flooded_length').getInfo()
+        exposed_roads_km = exposed_roads_m / 1000.0
 
         # Step 3: Total values from the full settlement
         total_pop = settlement_fc.aggregate_sum(selected_property).getInfo()
@@ -466,21 +525,14 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
         total_road_km = filtered_roads.geometry().length().divide(1000).getInfo()
         total_buildings = filtered_buildings.size().getInfo()
 
-        # Step 4: Compute affected using flood proportion
-        exposed_pop = total_pop * proportion_affected
-        exposed_children = total_children * proportion_affected
-        exposed_elderly = total_elderly * proportion_affected
-        exposed_roads_km = total_road_km * proportion_affected
-        exposed_buildings_count = total_buildings * proportion_affected
-
-        # Step 5: Percentages
+        # Step 4: Compute percentages
         pct_pop = (exposed_pop / total_pop * 100) if total_pop else 0
         pct_children = (exposed_children / total_children * 100) if total_children else 0
         pct_elderly = (exposed_elderly / total_elderly * 100) if total_elderly else 0
         pct_roads = (exposed_roads_km / total_road_km * 100) if total_road_km else 0
         pct_buildings = (exposed_buildings_count / total_buildings * 100) if total_buildings else 0
 
-        # Step 6: Display results
+        # Step 5: Display results
         st.metric(f"🧍 Exposed Population ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
         st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
         st.metric("👵 Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
@@ -490,6 +542,7 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
         st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and 2020 vulnerability data completed.")
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
+
 
 
 
