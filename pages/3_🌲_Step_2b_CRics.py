@@ -569,22 +569,21 @@ with st.expander("📊 Risk Visualization & Summary", expanded=True):
 
         # Plot
         fig_violin = px.violin(
-            violin_df,
-            x="Indicator",
-            y="Value",
-            color="gold",
-            box=True,
-            points="all",
-            hover_data=["Settlement", "Flood Scenario", "Year"],
-            facet_col="gold" if use_facet else None,
-            title="Distribution of Raw vs Weighted Risk per Indicator"
-        )
+        violin_df,
+        x="Indicator",
+        y="Value",
+        color="Risk Type",  # Grouping by type of risk
+        box=True,
+        points="all",
+        hover_data=["Settlement", "Flood Scenario", "Year"],
+        facet_col="Risk Type" if use_facet else None,
+        title="Distribution of Raw vs Weighted Risk per Indicator",
+        color_discrete_map={
+            "Raw %": "orange",
+            "Weighted %": "crimson"
+        }
+    )
 
-        fig_violin.update_layout(
-            violingap=0.3,
-            violinmode='group',
-            height=500
-        )
 
         st.plotly_chart(fig_violin, use_container_width=True)
 
