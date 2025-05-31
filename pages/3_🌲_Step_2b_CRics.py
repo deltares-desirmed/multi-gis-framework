@@ -479,15 +479,17 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
                 ee.Number(0)
             )
 
-            # Safe getter
-            def safe_get(property_name):
-                value = ee.Number(feature.get(property_name))
-                return ee.Algorithms.If(value, value, ee.Number(0))
+            # Safe getter using dictionary.contains()
+            def safe_get(prop_name):
+                return ee.Algorithms.If(
+                    feature.toDictionary().contains(prop_name),
+                    ee.Number(feature.get(prop_name)),
+                    ee.Number(0)
+                )
 
-            # Weighted values
-            weighted_pop = ee.Number(safe_get(selected_property)).multiply(flooded)
-            weighted_children = ee.Number(safe_get(children_props[0])).multiply(flooded)
-            weighted_elderly = ee.Number(safe_get(elderly_props[0])).multiply(flooded)
+            weighted_pop = ee.Number(safe_get(selected_property)).multiply(ee.Number(flooded))
+            weighted_children = ee.Number(safe_get(children_props[0])).multiply(ee.Number(flooded))
+            weighted_elderly = ee.Number(safe_get(elderly_props[0])).multiply(ee.Number(flooded))
 
             return feature.set({
                 'flood_coverage': flooded,
@@ -495,6 +497,7 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
                 'weighted_children': weighted_children,
                 'weighted_elderly': weighted_elderly
             })
+
 
         settlement_fc_flooded = settlement_fc.map(add_weighted_exposure)
 
