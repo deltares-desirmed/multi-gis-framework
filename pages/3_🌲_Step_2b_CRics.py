@@ -487,6 +487,9 @@ with st.expander("📉 Step 2 CRICS - Risk Assessment", expanded=True):
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
 
+# Ensure these exist if you're outside the original try block
+raw_values = [exposed_pop, exposed_children, exposed_elderly, exposed_roads_km, exposed_buildings_count]
+percentages = [pct_pop, pct_children, pct_elderly, pct_roads, pct_buildings]
 
 with st.expander("📊 Risk Visualization & Summary", expanded=True):
     st.markdown("Visual breakdown of exposure indicators, actual values at risk, and composite risk index dynamics.")
