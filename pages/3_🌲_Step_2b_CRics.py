@@ -593,7 +593,7 @@ with st.expander(" Risk Summary", expanded=True):
         st.plotly_chart(fig_compare, use_container_width=True)
 
     # Composite Risk Index metric
-    st.metric(" Composite Risk Index", f"{risk_index:.1f}")
+    # st.metric(" Composite Risk Index", f"{risk_index:.1f}")
 
 
     # Export to CSV
@@ -607,30 +607,30 @@ with st.expander(" Risk Summary", expanded=True):
 
 
 # Explanation of the Risk Index
-with st.expander("ℹ️ How is the Risk Index Calculated?", expanded=False):
-    st.markdown("""
-    The **Composite Risk Index** gives an overall sense of exposure by combining key indicators using weighted contributions:
+# with st.expander("ℹ️ How is the Risk Index Calculated?", expanded=False):
+#     st.markdown("""
+#     The **Composite Risk Index** gives an overall sense of exposure by combining key indicators using weighted contributions:
 
-    **Formula:**  
-    `Index = ∑ (Exposure % × Weight)` for each indicator
+#     **Formula:**  
+#     `Index = ∑ (Exposure % × Weight)` for each indicator
 
-    **Weights:**  
-    - Population = 30%  
-    - Children = 20%  
-    - Elderly = 20%  
-    - Roads = 15%  
-    - Buildings = 15%  
+#     **Weights:**  
+#     - Population = 30%  
+#     - Children = 20%  
+#     - Elderly = 20%  
+#     - Roads = 15%  
+#     - Buildings = 15%  
 
-    **Example Calculation:**  
-    If `Exposed Population = 20%`, then contribution = `20 × 0.3 = 6.0`  
-    (and so on for each indicator)
+#     **Example Calculation:**  
+#     If `Exposed Population = 20%`, then contribution = `20 × 0.3 = 6.0`  
+#     (and so on for each indicator)
 
-    **Interpretation Scale:**  
-    - 🟢 0–5 → **Low Risk**  
-    - 🟠 5–10 → **Moderate Risk**  
-    - 🔴 >10 → **High Risk**
+#     **Interpretation Scale:**  
+#     - 🟢 0–5 → **Low Risk**  
+#     - 🟠 5–10 → **Moderate Risk**  
+#     - 🔴 >10 → **High Risk**
                 
-    """)
+#     """)
 
 
 
