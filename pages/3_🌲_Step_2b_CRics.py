@@ -438,12 +438,17 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
     selected_property = f"pop_{selected_year}"
     scenario = st.selectbox("Select Flood Scenario", ["High Probability", "Medium Probability", "Low Probability"])
 
-    # Initialize variables
+    # Initialize variables to prevent reference errors
     exposed_pop = 0
     exposed_children = 0
     exposed_elderly = 0
     exposed_roads_km = 0.0
     exposed_buildings_count = 0
+    total_pop = 0
+    total_children = 0
+    total_elderly = 0
+    total_road_km = 0.0
+    total_buildings = 0
     pct_pop = 0.0
     pct_children = 0.0
     pct_elderly = 0.0
@@ -472,8 +477,8 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
                 scale=30,
                 bestEffort=True
             ).get('flooded')
-            # Handle null values by converting to 0
-            return feature.set('flood_coverage', ee.Number(coverage).unmask(0))
+            # Handle null values by converting to 0 using ee.Number
+            return feature.set('flood_coverage', ee.Number(coverage).orElse(0))
         
         settlement_fc_flood = settlement_fc.map(add_flood_coverage)
         
@@ -498,7 +503,7 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
                 geometry=building.geometry(),
                 scale=30
             ).get('flooded')
-            return building.set('flooded', ee.Number(value).unmask(0))
+            return building.set('flooded', ee.Number(value).orElse(0))
         
         buildings_flooded = filtered_buildings.map(building_flood_exposure)
         exposed_buildings_count = buildings_flooded.aggregate_sum('flooded').getInfo()
@@ -512,7 +517,7 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
                 scale=30,
                 bestEffort=True
             ).get('flooded')
-            fraction = ee.Number(fraction).unmask(0)
+            fraction = ee.Number(fraction).orElse(0)
             return road.set('flooded_length', road.geometry().length().multiply(fraction))
         
         roads_flooded = filtered_roads.map(road_flood_exposure)
