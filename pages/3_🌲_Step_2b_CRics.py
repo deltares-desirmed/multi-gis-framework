@@ -482,16 +482,18 @@ with st.expander("📉 Risk Assessment", expanded=True):
             scale=100,
             maxPixels=1e13
         ).getInfo()
-        exposed_pop = exposed_pop_dict.get("first", 0)
+        exposed_pop = exposed_pop_dict.get("first", 0) or 0
 
         total_pop = settlement_fc.aggregate_sum(selected_property).getInfo()
         pct_pop = (exposed_pop / total_pop * 100) if total_pop else 0
 
         # Step 3: Children exposed
         child_masked = children_img.updateMask(flood_raster)
-        exposed_children = child_masked.reduceRegion(
+        exposed_children_dict = child_masked.reduceRegion(
             ee.Reducer.sum(), settlement_geom, 100, maxPixels=1e13
-        ).get("sum", 0)
+        ).getInfo()
+        exposed_children = exposed_children_dict.get("sum", 0) or 0
+
         total_children = sum(settlement_fc.aggregate_sum(p).getInfo() for p in children_props)
         pct_children = (exposed_children / total_children * 100) if total_children else 0
 
@@ -502,6 +504,8 @@ with st.expander("📉 Risk Assessment", expanded=True):
         ).getInfo()
         exposed_elderly = exposed_elderly_dict.get("sum", 0) or 0
 
+        total_elderly = sum(settlement_fc.aggregate_sum(p).getInfo() for p in elderly_props)
+        pct_elderly = (exposed_elderly / total_elderly * 100) if total_elderly else 0
 
         # Step 5: Roads at risk
         flood_geom = flood_raster.geometry()
@@ -527,6 +531,7 @@ with st.expander("📉 Risk Assessment", expanded=True):
 
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
+
 
 
 
