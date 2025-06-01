@@ -433,30 +433,23 @@ with st.expander("⚠️ Step 2- CRICS - Vulnerability", expanded=True):
 # Define and clip population and demographic rasters to the selected settlement
 # ------------------------------------------
 
-# Define mask for selected settlement
-settlement_mask = ee.Image.constant(1).clip(settlement_geom)
+# ----- Rasterize Total Population Images -----
+pop_img_2025 = population_fc.reduceToImage(["pop_2025"], ee.Reducer.first()).reproject(crs=eco_crs, scale=eco_scale)
+pop_img_2030 = population_fc.reduceToImage(["pop_2030"], ee.Reducer.first()).reproject(crs=eco_crs, scale=eco_scale)
 
-# Total population images (already rasterized)
+# Clip & unmask population images to match settlement
 pop_img_2025_clipped = pop_img_2025.clip(settlement_geom).unmask(0)
 pop_img_2030_clipped = pop_img_2030.clip(settlement_geom).unmask(0)
 
-# Define function to create and clip demographic raster
-def rasterize_demographic_clipped(props):
+# ----- Rasterize Children and Elderly -----
+def rasterize_demographic(props):
     image = population_fc.reduceToImage([props[0]], ee.Reducer.first())
     for p in props[1:]:
         image = image.add(population_fc.reduceToImage([p], ee.Reducer.first()))
-    return image.clip(settlement_geom).unmask(0)
+    return image.reproject(crs=eco_crs, scale=eco_scale)
 
-# Create clipped child and elderly rasters
-children_img_clipped = rasterize_demographic_clipped([
-    "female_F_0_2020", "female_F_5_2020", "female_F_10_2020",
-    "male_M_0_2020", "male_M_5_2020", "male_M_10_2020"
-])
-
-elderly_img_clipped = rasterize_demographic_clipped([
-    "female_F_65_2020", "female_F_70_2020", "female_F_75_2020", "female_F_80_2020",
-    "male_M_65_2020", "male_M_70_2020", "male_M_75_2020", "male_M_80_2020"
-])
+children_img_clipped = rasterize_demographic(children_props).clip(settlement_geom).unmask(0)
+elderly_img_clipped = rasterize_demographic(elderly_props).clip(settlement_geom).unmask(0)
 
 
 # ---------------------- Risk Assessment Panel ----------------------
