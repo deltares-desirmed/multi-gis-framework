@@ -497,7 +497,7 @@ with st.expander("📉 Risk Assessment", expanded=True):
         })
 
         # Population Exposure
-        exposed_pop_img = population_img.multiply(flood_raster.gt(0))
+        exposed_pop_img = population_img.updateMask(flood_raster.gt(0))
         exposed_pop_dict = exposed_pop_img.reduceRegion(
             reducer=ee.Reducer.sum(), geometry=settlement_geom, scale=100, maxPixels=1e13
         ).getInfo()
@@ -506,7 +506,7 @@ with st.expander("📉 Risk Assessment", expanded=True):
         pct_pop = (exposed_pop / total_pop * 100) if total_pop else 0
 
         # Children Exposure
-        exposed_children_img = children_img_clipped.multiply(flood_raster.gt(0))
+        exposed_children_img = children_img_clipped.updateMask(flood_raster.gt(0))
         exposed_children_dict = exposed_children_img.reduceRegion(
             reducer=ee.Reducer.sum(), geometry=settlement_geom, scale=100, maxPixels=1e13
         ).getInfo()
@@ -515,7 +515,7 @@ with st.expander("📉 Risk Assessment", expanded=True):
         pct_children = (exposed_children / total_children * 100) if total_children else 0
 
         # Elderly Exposure
-        exposed_elderly_img = elderly_img_clipped.multiply(flood_raster.gt(0))
+        exposed_elderly_img = elderly_img_clipped.updateMask(flood_raster.gt(0))
         exposed_elderly_dict = exposed_elderly_img.reduceRegion(
             reducer=ee.Reducer.sum(), geometry=settlement_geom, scale=100, maxPixels=1e13
         ).getInfo()
