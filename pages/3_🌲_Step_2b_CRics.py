@@ -497,11 +497,11 @@ with st.expander("📉 Risk Assessment", expanded=True):
 
         # Step 4: Elderly exposed
         elderly_masked = elderly_img.updateMask(flood_raster)
-        exposed_elderly = elderly_masked.reduceRegion(
+        exposed_elderly_dict = elderly_masked.reduceRegion(
             ee.Reducer.sum(), settlement_geom, 100, maxPixels=1e13
-        ).get("sum", 0)
-        total_elderly = sum(settlement_fc.aggregate_sum(p).getInfo() for p in elderly_props)
-        pct_elderly = (exposed_elderly / total_elderly * 100) if total_elderly else 0
+        ).getInfo()
+        exposed_elderly = exposed_elderly_dict.get("sum", 0) or 0
+
 
         # Step 5: Roads at risk
         flood_geom = flood_raster.geometry()
