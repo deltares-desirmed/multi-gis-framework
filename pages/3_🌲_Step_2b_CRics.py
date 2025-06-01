@@ -461,7 +461,7 @@ elderly_img_clipped = elderly_img.clip(settlement_geom).unmask(0)
 
 
 # ---------------------- Risk Assessment Panel ----------------------
-with st.expander("📉 Flood Risk Assessment", expanded=True):
+with st.expander("📉 Risk Assessment", expanded=True):
     st.markdown("This panel estimates at-risk exposure using flood raster pixel coverage inside the selected settlement.")
 
     selected_year = st.selectbox("Select Population Year", ["2025", "2030"])
@@ -512,41 +512,15 @@ with st.expander("📉 Flood Risk Assessment", expanded=True):
         pct_buildings = (exposed_buildings_count / total_buildings * 100) if total_buildings else 0
 
         # Step 6: Display results
-        st.metric(f"🧍 Exposed Population ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
-        st.metric("🧒 Vulnerable Children (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
-        st.metric("👵 Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
-        st.metric("🛣️ Roads at Risk", f"{exposed_roads_km:.2f} km", f"{pct_roads:.1f}%")
-        st.metric("🏘️ Buildings at Risk", f"{int(exposed_buildings_count):,}", f"{pct_buildings:.1f}%")
+        st.metric(f"Population at Risk ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
+        st.metric("Children (0–10) at Risk", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
+        st.metric("Elderly at Risk (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
+        st.metric("Roads at Risk", f"{exposed_roads_km:.2f} km", f"{pct_roads:.1f}%")
+        st.metric("Buildings at Risk", f"{int(exposed_buildings_count):,}", f"{pct_buildings:.1f}%")
 
         st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and 2020 vulnerability data completed.")
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
-
-
-
-
-
-
-
-
-
-# ---------------------- Debug Panel ----------------------
-if st.checkbox("🔎 Show internal debug values"):
-    st.write({
-        "Exposed Population": exposed_pop,
-        "Total Population": total_pop,
-        "Exposed Children": exposed_children,
-        "Total Children": total_children,
-        "Exposed Elderly": exposed_elderly,
-        "Total Elderly": total_elderly,
-        "Exposed Roads (km)": exposed_roads_km,
-        "Total Roads (km)": total_road_km,
-        "Exposed Buildings": exposed_buildings_count,
-        "Total Buildings": total_buildings
-    })
-
-
-
 
 
 
