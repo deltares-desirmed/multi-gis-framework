@@ -480,7 +480,7 @@ with st.expander("📉 Risk Assessment", expanded=True):
             "2030": pop_img_2030
         }[selected_year]
 
-        # Step 2: Compute proportion of flooded area
+        # Step 2: Compute flood stats
         flood_area_pixels = flood_raster.reduceRegion(
             reducer=ee.Reducer.sum(),
             geometry=settlement_geom,
@@ -528,16 +528,23 @@ with st.expander("📉 Risk Assessment", expanded=True):
         total_elderly = sum(settlement_fc.aggregate_sum(p).getInfo() for p in elderly_props)
         pct_elderly = (exposed_elderly / total_elderly * 100) if total_elderly else 0
 
-        # Step 6: Roads
-        flood_geom = flood_raster.geometry()
-        flooded_roads = filtered_roads.filterBounds(flood_geom)
-        exposed_roads_km = flooded_roads.geometry().length().divide(1000).getInfo()
-        total_road_km = filtered_roads.geometry().length().divide(1000).getInfo()
+        # Step 6: Roads — use flood mask intersection for precision
+        flood_mask_geom = flood_raster.updateMask(flood_raster.gt(0)).clip(settlement_geom).geometry()
+
+        def compute_flooded_road_length(road):
+            intersection = road.geometry().intersection(flood_mask_geom, ee.ErrorMargin(1))
+            return road.set('flood_km', intersection.length().divide(1000))
+
+        flooded_roads_fc = filtered_roads.map(compute_flooded_road_length)
+        exposed_roads_km = flooded_roads_fc.aggregate_sum('flood_km').getInfo()
+        total_road_km = filtered_roads.aggregate_total_length('length_km').getInfo() if 'length_km' in filtered_roads.first().propertyNames().getInfo() else filtered_roads.geometry().length().divide(1000).getInfo()
         pct_roads = (exposed_roads_km / total_road_km * 100) if total_road_km else 0
 
-        # Step 7: Buildings
-        flooded_buildings = filtered_buildings.filterBounds(flood_geom)
-        exposed_buildings_count = flooded_buildings.size().getInfo()
+        # Step 7: Buildings — use intersection filter
+        flooded_buildings_fc = filtered_buildings.filter(
+            ee.Filter.intersects('.geo', flood_mask_geom, maxError=1)
+        )
+        exposed_buildings_count = flooded_buildings_fc.size().getInfo()
         total_buildings = filtered_buildings.size().getInfo()
         pct_buildings = (exposed_buildings_count / total_buildings * 100) if total_buildings else 0
 
@@ -552,6 +559,7 @@ with st.expander("📉 Risk Assessment", expanded=True):
 
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
+
 
 
 
