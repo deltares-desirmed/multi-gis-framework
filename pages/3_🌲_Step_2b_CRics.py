@@ -429,32 +429,31 @@ with st.expander("⚠️ Step 2- CRICS - Vulnerability", expanded=True):
         st.error("⚠️ Could not compute vulnerability statistics. Please check property names and data availability.")
 
 
-# ------------------------------------------
-# Define and clip population and demographic rasters to the selected settlement
-# ------------------------------------------
-
+# Rasterized total population with explicit band names
 pop_img_2025 = population_fc.reduceToImage(["pop_2025"], ee.Reducer.first()) \
     .rename("pop_2025").reproject(crs=eco_crs, scale=eco_scale)
+
 pop_img_2030 = population_fc.reduceToImage(["pop_2030"], ee.Reducer.first()) \
     .rename("pop_2030").reproject(crs=eco_crs, scale=eco_scale)
 
-# Then clip as usual
-pop_img_2025_clipped = pop_img_2025.clip(settlement_geom).unmask(0)
-pop_img_2030_clipped = pop_img_2030.clip(settlement_geom).unmask(0)
-
-
-# ----- Rasterize Children and Elderly -----
-def rasterize_demographic(props):
+# Rasterize demographic groups with consistent band names
+def rasterize_demographic(props, band_name):
     image = population_fc.reduceToImage([props[0]], ee.Reducer.first())
     for p in props[1:]:
         image = image.add(population_fc.reduceToImage([p], ee.Reducer.first()))
-    return image.reproject(crs=eco_crs, scale=eco_scale)
+    return image.rename(band_name).reproject(crs=eco_crs, scale=eco_scale)
 
-children_img_clipped = rasterize_demographic(children_props).clip(settlement_geom).unmask(0)
-elderly_img_clipped = rasterize_demographic(elderly_props).clip(settlement_geom).unmask(0)
+children_img = rasterize_demographic([
+    "female_F_0_2020", "female_F_5_2020", "female_F_10_2020",
+    "male_M_0_2020", "male_M_5_2020", "male_M_10_2020"
+], "children")
+
+elderly_img = rasterize_demographic([
+    "female_F_65_2020", "female_F_70_2020", "female_F_75_2020", "female_F_80_2020",
+    "male_M_65_2020", "male_M_70_2020", "male_M_75_2020", "male_M_80_2020"
+], "elderly")
 
 
-# ---------------------- Risk Assessment Panel ----------------------
 with st.expander("📉 Risk Assessment", expanded=True):
     st.markdown("This panel estimates at-risk exposure using flood raster pixel coverage inside the selected settlement.")
 
@@ -462,85 +461,79 @@ with st.expander("📉 Risk Assessment", expanded=True):
     scenario = st.selectbox("Select Flood Scenario", ["High Probability", "Medium Probability", "Low Probability"])
 
     try:
-        # Step 1: Select flood raster
         flood_raster = {
             "High Probability": floods_hp_img,
             "Medium Probability": floods_mp_img,
             "Low Probability": floods_lp_img
         }[scenario]
 
-        # Select population image by year
         population_img = {
-            "2025": pop_img_2025_clipped,
-            "2030": pop_img_2030_clipped
+            "2025": pop_img_2025,
+            "2030": pop_img_2030
         }[selected_year]
         selected_property = f"pop_{selected_year}"
 
-        # Debug: Show flood area coverage within the settlement
+        # Flood area stats
         flood_stats = flood_raster.reduceRegion(
             reducer=ee.Reducer.sum(),
             geometry=settlement_geom,
             scale=30,
             maxPixels=1e13
         ).getInfo()
+        flood_pixels = list(flood_stats.values())[0] or 0
+        flood_area = flood_pixels * 30 * 30
+        settlement_area = settlement_geom.area().getInfo()
+        flood_pct = (flood_area / settlement_area * 100) if settlement_area else 0
 
-        flood_pixel_count = list(flood_stats.values())[0] or 0
-        flood_area_m2 = flood_pixel_count * 900  # each pixel is 30m x 30m
-        settlement_area_m2 = settlement_geom.area().getInfo()
-        flood_pct = round((flood_area_m2 / settlement_area_m2 * 100), 2) if settlement_area_m2 else 0
+        st.info(f"🧭 Debug: Flood Coverage Stats\n\n"
+                f"{{\n"
+                f"\"Flood Pixels Inside Settlement\":{flood_pixels}\n"
+                f"\"Flood Area (m²)\":{flood_area:.0f}\n"
+                f"\"Settlement Area (m²)\":{settlement_area:.0f}\n"
+                f"\"Flood % of Settlement\":{flood_pct:.2f}\n"
+                f"}}")
 
-        st.markdown("**🧭 Debug: Flood Coverage Stats**")
-        st.write({
-            "Flood Pixels Inside Settlement": flood_pixel_count,
-            "Flood Area (m²)": flood_area_m2,
-            "Settlement Area (m²)": settlement_area_m2,
-            "Flood % of Settlement": flood_pct
-        })
-
-        # Step 2: Exposed total population
+        # Population exposure
         pop_masked = population_img.updateMask(flood_raster)
-        exposed_pop_dict = pop_masked.reduceRegion(
-            reducer=ee.Reducer.sum(),
-            geometry=settlement_geom,
-            scale=100,
-            maxPixels=1e13
-        ).getInfo()
-        exposed_pop = exposed_pop_dict.get(selected_property, 0) or 0
+        exposed_pop = pop_masked.reduceRegion(
+            ee.Reducer.sum(), settlement_geom, 100, maxPixels=1e13
+        ).getInfo().get(selected_property, 0) or 0
+
         total_pop = settlement_fc.aggregate_sum(selected_property).getInfo()
         pct_pop = (exposed_pop / total_pop * 100) if total_pop else 0
 
-        # Step 3: Children
-        child_masked = children_img_clipped.updateMask(flood_raster)
-        exposed_children_dict = child_masked.reduceRegion(
+        # Children
+        child_masked = children_img.updateMask(flood_raster)
+        exposed_children = child_masked.reduceRegion(
             ee.Reducer.sum(), settlement_geom, 100, maxPixels=1e13
-        ).getInfo()
-        exposed_children = exposed_children_dict.get("sum", 0) or 0
+        ).getInfo().get("children", 0) or 0
+
         total_children = sum(settlement_fc.aggregate_sum(p).getInfo() for p in children_props)
         pct_children = (exposed_children / total_children * 100) if total_children else 0
 
-        # Step 4: Elderly
-        elderly_masked = elderly_img_clipped.updateMask(flood_raster)
-        exposed_elderly_dict = elderly_masked.reduceRegion(
+        # Elderly
+        elderly_masked = elderly_img.updateMask(flood_raster)
+        exposed_elderly = elderly_masked.reduceRegion(
             ee.Reducer.sum(), settlement_geom, 100, maxPixels=1e13
-        ).getInfo()
-        exposed_elderly = exposed_elderly_dict.get("sum", 0) or 0
+        ).getInfo().get("elderly", 0) or 0
+
         total_elderly = sum(settlement_fc.aggregate_sum(p).getInfo() for p in elderly_props)
         pct_elderly = (exposed_elderly / total_elderly * 100) if total_elderly else 0
 
-        # Step 5: Roads
+        # Roads
         flood_geom = flood_raster.geometry()
         flooded_roads = filtered_roads.filterBounds(flood_geom)
         exposed_roads_km = flooded_roads.geometry().length().divide(1000).getInfo()
         total_road_km = filtered_roads.geometry().length().divide(1000).getInfo()
         pct_roads = (exposed_roads_km / total_road_km * 100) if total_road_km else 0
 
-        # Step 6: Buildings
+        # Buildings
         flooded_buildings = filtered_buildings.filterBounds(flood_geom)
         exposed_buildings_count = flooded_buildings.size().getInfo()
         total_buildings = filtered_buildings.size().getInfo()
         pct_buildings = (exposed_buildings_count / total_buildings * 100) if total_buildings else 0
 
-        # Step 7: Display metrics
+        # Display
         st.metric(f"Exposed Population ({selected_year})", f"{int(exposed_pop):,}", f"{pct_pop:.1f}%")
         st.metric("Vulnerable Children (0–10)", f"{int(exposed_children):,}", f"{pct_children:.1f}%")
         st.metric("Vulnerable Elderly (65+)", f"{int(exposed_elderly):,}", f"{pct_elderly:.1f}%")
@@ -548,9 +541,9 @@ with st.expander("📉 Risk Assessment", expanded=True):
         st.metric("Buildings at Risk", f"{int(exposed_buildings_count):,}", f"{pct_buildings:.1f}%")
 
         st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and vulnerability data completed.")
-
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
+
 
 
 
