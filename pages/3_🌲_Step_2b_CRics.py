@@ -434,11 +434,14 @@ pop_img_2025 = population_fc.reduceToImage(["pop_2025"], ee.Reducer.first()).rep
 pop_img_2030 = population_fc.reduceToImage(["pop_2030"], ee.Reducer.first()).reproject(crs=eco_crs, scale=eco_scale)
 
 # ----- Rasterize child and elderly groups from population_fc -----
+# Correctly sum images in Earth Engine
 def rasterize_demographic(props):
-    return sum([
-        population_fc.reduceToImage([p], ee.Reducer.first())
-        for p in props
-    ]).reproject(crs=eco_crs, scale=eco_scale)
+    # Start with the first image
+    image = population_fc.reduceToImage([props[0]], ee.Reducer.first())
+    for p in props[1:]:
+        image = image.add(population_fc.reduceToImage([p], ee.Reducer.first()))
+    return image.reproject(crs=eco_crs, scale=eco_scale)
+
 
 children_img = rasterize_demographic([
     "female_F_0_2020", "female_F_5_2020", "female_F_10_2020",
