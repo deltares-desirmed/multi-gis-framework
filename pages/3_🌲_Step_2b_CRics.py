@@ -433,13 +433,15 @@ with st.expander("⚠️ Step 2- CRICS - Vulnerability", expanded=True):
 # Define and clip population and demographic rasters to the selected settlement
 # ------------------------------------------
 
-# ----- Rasterize Total Population Images -----
-pop_img_2025 = population_fc.reduceToImage(["pop_2025"], ee.Reducer.first()).reproject(crs=eco_crs, scale=eco_scale)
-pop_img_2030 = population_fc.reduceToImage(["pop_2030"], ee.Reducer.first()).reproject(crs=eco_crs, scale=eco_scale)
+pop_img_2025 = population_fc.reduceToImage(["pop_2025"], ee.Reducer.first()) \
+    .rename("pop_2025").reproject(crs=eco_crs, scale=eco_scale)
+pop_img_2030 = population_fc.reduceToImage(["pop_2030"], ee.Reducer.first()) \
+    .rename("pop_2030").reproject(crs=eco_crs, scale=eco_scale)
 
-# Clip & unmask population images to match settlement
+# Then clip as usual
 pop_img_2025_clipped = pop_img_2025.clip(settlement_geom).unmask(0)
 pop_img_2030_clipped = pop_img_2030.clip(settlement_geom).unmask(0)
+
 
 # ----- Rasterize Children and Elderly -----
 def rasterize_demographic(props):
@@ -503,7 +505,7 @@ with st.expander("📉 Risk Assessment", expanded=True):
             scale=100,
             maxPixels=1e13
         ).getInfo()
-        exposed_pop = exposed_pop_dict.get("first", 0) or 0
+        exposed_pop = exposed_pop_dict.get(selected_property, 0) or 0
         total_pop = settlement_fc.aggregate_sum(selected_property).getInfo()
         pct_pop = (exposed_pop / total_pop * 100) if total_pop else 0
 
