@@ -474,8 +474,8 @@ with st.expander("📉 Risk Assessment", expanded=True):
         }[selected_year]
         selected_property = f"pop_{selected_year}"
 
-        # Step 2: Exposed population (flood-masked)
-        pop_masked = population_img.updateMask(flood_raster)
+        # Step 2: Exposed population (clip + mask + unmask)
+        pop_masked = population_img.clip(settlement_geom).updateMask(flood_raster)
         exposed_pop_dict = pop_masked.reduceRegion(
             reducer=ee.Reducer.sum(),
             geometry=settlement_geom,
@@ -488,7 +488,7 @@ with st.expander("📉 Risk Assessment", expanded=True):
         pct_pop = (exposed_pop / total_pop * 100) if total_pop else 0
 
         # Step 3: Children exposed
-        child_masked = children_img.updateMask(flood_raster)
+        child_masked = children_img.clip(settlement_geom).updateMask(flood_raster).unmask(0)
         exposed_children_dict = child_masked.reduceRegion(
             ee.Reducer.sum(), settlement_geom, 100, maxPixels=1e13
         ).getInfo()
@@ -498,7 +498,7 @@ with st.expander("📉 Risk Assessment", expanded=True):
         pct_children = (exposed_children / total_children * 100) if total_children else 0
 
         # Step 4: Elderly exposed
-        elderly_masked = elderly_img.updateMask(flood_raster)
+        elderly_masked = elderly_img.clip(settlement_geom).updateMask(flood_raster).unmask(0)
         exposed_elderly_dict = elderly_masked.reduceRegion(
             ee.Reducer.sum(), settlement_geom, 100, maxPixels=1e13
         ).getInfo()
@@ -527,10 +527,26 @@ with st.expander("📉 Risk Assessment", expanded=True):
         st.metric("Roads at Risk", f"{exposed_roads_km:.2f} km", f"{pct_roads:.1f}%")
         st.metric("Buildings at Risk", f"{int(exposed_buildings_count):,}", f"{pct_buildings:.1f}%")
 
+        # Step 8: Debug log
+        with st.expander("🔎 Debug Values (internal checks)", expanded=False):
+            st.write({
+                "Exposed Population": exposed_pop,
+                "Total Population": total_pop,
+                "Exposed Children": exposed_children,
+                "Total Children": total_children,
+                "Exposed Elderly": exposed_elderly,
+                "Total Elderly": total_elderly,
+                "Exposed Roads (km)": exposed_roads_km,
+                "Total Roads (km)": total_road_km,
+                "Exposed Buildings": exposed_buildings_count,
+                "Total Buildings": total_buildings
+            })
+
         st.success(f"✔ Risk assessment for {scenario} flood scenario using {selected_year} population and vulnerability data completed.")
 
     except Exception as e:
         st.error(f"⚠️ Error during risk summary: {str(e)}")
+
 
 
 
