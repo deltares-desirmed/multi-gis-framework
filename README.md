@@ -4,8 +4,8 @@ A streamlit multipage app for geospatial applications. It can be deployed to [St
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/giswqs/streamlit-geospatial/master?urlpath=proxy/8501/)
 
-- Web app: <https://streamlit.gishub.org>
-- Source code: <https://github.com/giswqs/streamlit-geospatial>
+- Web app: <https://deltares-multi-gis-support.streamlit.app/Home>
+- Source code: <https://github.com/deltares-desirmed/multi-gis-framework>
 
 ## Instructions
 
