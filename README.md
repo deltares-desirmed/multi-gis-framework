@@ -16,7 +16,7 @@ A streamlit multipage app for geospatial applications. It can be deployed to [St
 
 ## Demo
 
-![](https://i.imgur.com/6lj0oAO.png)
+![](https://github.com/deltares-desirmed/multi-gis-framework/blob/main/img/demo.gif)
 
 ## Real Estate Data and Market Trends
 
