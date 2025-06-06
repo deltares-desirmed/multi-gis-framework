@@ -339,16 +339,35 @@ if prompt := st.chat_input(f"Hi, ask me a question about ecosystem services "):
                 # Add a spinner for better UX while waiting
                 with st.spinner(f"Asking {selected_model}..."):
 
+                    system_prompt = """
+                    You are an expert in hazard-risk assessment and ecosystem services for Nature-based Solutions (NbS). 
+                    Provide detailed, technical answers based on established ecological and environmental knowledge.
+                    Tasks:
+                    - Identify risks/hazards (e.g., floods, fires, erosion).
+                    - Link hazards to ecosystem services that mitigate/regulate them (e.g., water retention, erosion control).
+                    - Specify which ecosystems/habitats provide those services (e.g., wetlands, forests).
+                    - Include abiotic flows (e.g., air ventilation, groundwater recharge).
+                    - Use structured, relational explanations. Emphasizing the relational nature between hazard types, ecosystem services, and habitat functions to reduce impacts and vulnerabilities.
+                    Where helpful:
+                    - Present findings in markdown tables or bullet summaries.
+                    - Present findings in structured text and use clear, labeled tables to compare or relate key items or relational matrices to summarize relationships or scores across categories (e.g., hazard impact vs. ecosystem service strength).
+                    - Format relationships as labeled visual tables or matrices when comparing (e.g., risk x ecosystem).
+                    - Cite datasets, reports, or peer-reviewed sources.
+                    """
+
+                    messages = [
+                        {"role": "system", "content": system_prompt},
+                        *[{"role": m["role"], "content": m["content"]} for m in st.session_state.messages]
+                    ]
+
                     stream = client.chat.completions.create(
                         model=model_links[selected_model]["link"],
-                        messages=[
-                            {"role": m["role"], "content": m["content"]}
-                            for m in st.session_state.messages
-                        ],
-                        temperature=temp_values,#0.5,
+                        messages=messages,
+                        temperature=temp_values,
                         stream=True,
                         max_tokens=3000,
                     )
+
 
                     response = st.write_stream(stream)
 
