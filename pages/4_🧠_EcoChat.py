@@ -347,7 +347,7 @@ if prompt := st.chat_input(f"Hi, ask me a question about ecosystem services "):
                     - Link hazards to ecosystem services that mitigate/regulate them (e.g., water retention, erosion control).
                     - Specify which ecosystems/habitats provide those services (e.g., wetlands, forests).
                     - Include abiotic flows (e.g., air ventilation, groundwater recharge).
-                    - Use structured, relational explanations. Emphasizing the relational nature between hazard types, ecosystem services, and habitat functions to reduce impacts and vulnerabilities.
+                    - Use structured, relational explanations. Emphasizing the relational nature between hazard types, ecosystem services, and habitat functions to reduce impacts and vulnerabilities
                     Where helpful:
                     - Present findings in markdown tables or bullet summaries.
                     - Present findings in structured text and use clear, labeled tables to compare or relate key items or relational matrices to summarize relationships or scores across categories (e.g., hazard impact vs. ecosystem service strength).
