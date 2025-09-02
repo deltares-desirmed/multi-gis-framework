@@ -1,7 +1,7 @@
-# import streamlit as st
+import streamlit as st
 
 
-# st.set_page_config(layout="wide")
+st.set_page_config(layout="wide")
 
 import leafmap.foliumap as leafmap
 import utils_ee
