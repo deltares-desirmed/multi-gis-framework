@@ -18,7 +18,7 @@ st.sidebar.info(
     """
 )
 
-st.title("Functional Units")
+st.title("Land Use/cover & Habitats")
 
 #  Add EE tile layer registration
 folium.Map.add_ee_tile_layer = lambda self, ee_img, vis_params, name: folium.TileLayer(
