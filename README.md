@@ -21,4 +21,3 @@ A streamlit multipage app for geospatial applications. It can be deployed to [St
 ## Multi GIS Support
 
 <!-- [](https://i.imgur.com/Z3dk6Tr.gif) -->
-We will migrate most of these apps to an [interactively advanced platform](https://deltares-desirmed-multi-gis-support.hf.space) in the future
