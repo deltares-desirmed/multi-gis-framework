@@ -63,8 +63,8 @@ current_year = amsterdam_time.year
 st.sidebar.markdown(f"© {current_year}  Stichting Deltares")
 
 # Display date and time in Amsterdam timezone
-last_updated = amsterdam_time.strftime("%B %d, %Y")
-current_time = amsterdam_time.strftime("%H:%M:%S")
+# last_updated = amsterdam_time.strftime("%B %d, %Y")
+# current_time = amsterdam_time.strftime("%H:%M:%S")
 
-st.sidebar.markdown(f"**Last Updated:** {last_updated}")
+# st.sidebar.markdown(f"**Last Updated:** {last_updated}")
 # st.sidebar.markdown(f"**Local Time (Amsterdam):** {current_time}")
