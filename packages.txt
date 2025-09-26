@@ -8,4 +8,5 @@ libproj-dev
 libgeos-dev
 proj-bin
 unixodbc
-
+libodbc2
+libodbcinst2
