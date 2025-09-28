@@ -1,10 +1,8 @@
 # GIS Core
 geemap==0.20.0
 geemap[extra]
-geopandas
-fiona
-folium==0.14.0
 leafmap==0.30.0
+folium==0.14.0
 localtileserver
 owslib
 osmnx
@@ -14,6 +12,11 @@ openpyxl
 psycopg2-binary
 pandas
 numpy
+
+# Replace GDAL/Fiona/Geopandas with pygdal-compatible versions
+pygdal==3.6.0.10
+fiona==1.9.6
+geopandas==0.13.2
 
 # Visualization
 plotly
@@ -27,14 +30,9 @@ streamlit-bokeh-events
 streamlit-folium
 streamlit-keplergl
 
-# AI & RAG (optional)
+# AI (optional)
 openai>=1.74.0,<2.0.0
 python-dotenv>=1.0.0
-# sentence-transformers==2.2.2
-# huggingface_hub==0.14.1
-# transformers==4.38.0
-# torch==2.2.2
-# protobuf==3.20.3
 
-# Pin pyarrow to avoid source build
+# Arrow
 pyarrow==21.0.0
