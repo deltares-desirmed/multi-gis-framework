@@ -1,5 +1,5 @@
 # --find-links=https://girder.github.io/large_image_wheels GDAL
-
+GDAL==3.6.0
 # Core GIS Libraries
 folium==0.14.0
 leafmap==0.30.0
@@ -60,4 +60,4 @@ python-dotenv>=1.0.0
 # GDAL handled separately to avoid wheel issues.
 # Recommendation: conda install -c conda-forge gdal=3.6.2
 
-GDAL==3.6.0
+
