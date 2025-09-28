@@ -59,3 +59,5 @@ python-dotenv>=1.0.0
 
 # GDAL handled separately to avoid wheel issues.
 # Recommendation: conda install -c conda-forge gdal=3.6.2
+
+GDAL==3.6.0
