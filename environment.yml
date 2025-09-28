@@ -1,0 +1,33 @@
+name: multi-gis-framework
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - gdal=3.6.2
+  - geopandas
+  - fiona
+  - geemap=0.20.0
+  - leafmap=0.30.0
+  - folium=0.14.0
+  - localtileserver
+  - owslib
+  - osmnx
+  - rasterstats
+  - networkx
+  - openpyxl
+  - psycopg2-binary
+  - pandas
+  - numpy
+  - pyarrow=21.0.0
+  - pip
+  - pip:
+      - plotly
+      - seaborn
+      - altair==4.2.0
+      - streamlit
+      - streamlit-option-menu
+      - streamlit-bokeh-events
+      - streamlit-folium
+      - streamlit-keplergl
+      - openai>=1.74.0,<2.0.0
+      - python-dotenv>=1.0.0
