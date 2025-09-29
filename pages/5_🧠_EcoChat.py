@@ -208,35 +208,45 @@ st.sidebar.title("Chatbot Settings")
 client_names = ["Provided API Call", "HF-Token"]
 client_select = st.sidebar.selectbox("Select Model Client", client_names)
 
-# Handle Hugging Face Token
-if "HF-Token" in client_select:
+# Handle Provided API Call (default GROQ token from secrets)
+if "Provided API Call" in client_select:
     try:
         if "API_token" not in st.session_state:
             st.session_state.API_token = None
 
-        st.session_state.API_token = st.sidebar.text_input("Enter your Hugging Face Access Token", type="password")
-        model_links = model_links_hf
-
-    except Exception as e:
-        st.sidebar.error(f"Credentials Error:\n\n {e}")
-
-# Handle GROQ Token from secrets
-elif "Provided API Call" in client_select:
-    try:
-        if "API_token" not in st.session_state:
-            st.session_state.API_token = None
-
-        #  Use secrets safely here
-        st.session_state.API_token = st.secrets["GROQ_API_TOKEN"]
+        # Use GROQ API key from secrets
+        st.session_state.API_token = st.secrets["GROQ_API_KEY"]
         model_links = model_links_groq
 
         if not st.session_state.API_token:
-            st.error("Missing GROQ API Token. Please add it to your Streamlit secrets.")
+            st.error("Missing GROQ API Key in secrets.toml")
             st.stop()
 
+        st.sidebar.success("Using default GROQ API Key (limited to 10 calls)")
+
     except Exception as e:
-        st.sidebar.error("Credentials Error. Check your secrets configuration.")
+        st.sidebar.error(f"Credentials Error. Check your secrets configuration. {e}")
         st.stop()
+
+# Handle Hugging Face user-provided token
+elif "HF-Token" in client_select:
+    try:
+        if "API_token" not in st.session_state:
+            st.session_state.API_token = None
+
+        st.session_state.API_token = st.sidebar.text_input(
+            "Enter your Hugging Face Access Token", type="password"
+        )
+        model_links = model_links_hf
+
+        if st.session_state.API_token:
+            st.sidebar.success("Custom Hugging Face token set!")
+        else:
+            st.sidebar.warning("Please enter your Hugging Face token to continue")
+
+    except Exception as e:
+        st.sidebar.error(f"Credentials Error:\n\n{e}")
+
 
 
 
