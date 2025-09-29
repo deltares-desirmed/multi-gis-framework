@@ -1,6 +1,6 @@
 import ee
 import streamlit as st
-from google.oauth2 import service_account
+from google.oauth2 import service_account 
 
 def initialize_earth_engine():
     try:
