@@ -7,7 +7,7 @@ A streamlit multipage app for geospatial applications. It can be deployed to [St
 - Web app: <https://deltares-multi-gis-support.streamlit.app/Home>
 - Source code: <https://github.com/deltares-desirmed/multi-gis-framework>
 
-## Instructions
+## Instructions 
 
 1. For the GitHub repository to your GitHub account.
 2. Customize the sidebar by changing the sidebar text and logo in each Python file.
