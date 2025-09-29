@@ -524,13 +524,13 @@ with st.expander("Check this Population out!"):
 
     🔧 **Note:** Use the **Draw Tool** on the map to outline your **Area of Interest (AOI)**. All statistics will be based on the area you draw.
 
-    👉 [**Click here to launch the app**](https://desirmed.projects.earthengine.app/view/explore-population-and-sex-dynamics)
+     [**Click here to launch the app**](https://desirmed.projects.earthengine.app/view/explore-population-and-sex-dynamics)
 
     """)
 
 
 # -------------------- Export Options --------------------
-st.subheader("📤 Export Options")
+st.subheader(" Export Options")
 
 export_format = st.radio("Select Export Format", ["GeoTIFF", "SHP"])
 selected_years = st.multiselect("Select CORINE Year(s)", ['2012', '2018'], default=['2012'])
@@ -600,7 +600,7 @@ with col2:
                 task.start()
                 st.success(f" SHP export for {year} started to Drive/{export_folder}/{file_prefix}_Vector.zip")
 
-st.info("🕒 To check export progress, go to the [Earth Engine Code Editor](https://code.earthengine.google.com/) and click on the 'Tasks' tab.")
+st.info(" To check export progress, go to the [Earth Engine Code Editor](https://code.earthengine.google.com/) and click on the 'Tasks' tab.")
 
 import streamlit as st
 import datetime
