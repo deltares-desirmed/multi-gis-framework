@@ -4,7 +4,9 @@ import streamlit as st
 
 st.set_page_config(layout="wide")
 
-import leafmap.foliumap as leafmap
+import leafmap
+
+# import leafmap.foliumap as leafmap
 import utils_ee
 
 # Now safe to call Streamlit functions
