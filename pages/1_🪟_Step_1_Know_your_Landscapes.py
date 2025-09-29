@@ -477,7 +477,7 @@ def get_download_url(image, label):
             'format': 'GeoTIFF'
         })
         st.markdown(
-            f"[📁 Download {label} ({selected_year}) as GeoTIFF]({url})",
+            f"[ Download {label} ({selected_year}) as GeoTIFF]({url})",
             unsafe_allow_html=True
         )
     except Exception as e:
@@ -510,7 +510,7 @@ try:
     eunis_img = corine_to_eunis(corine_raw).clip(download_region).toInt()
     get_download_url(eunis_img, "EUNIS Reclassified")
 except Exception:
-    st.info("ℹ️ EUNIS layer not configured or skipped.")
+    st.info(" EUNIS layer not configured or skipped.")
 
 with st.expander("Check this Population out!"):
     st.markdown("""
@@ -565,7 +565,7 @@ with col1:
             maxPixels=1e13
         )
         task.start()
-        st.success(f" Export to EE Asset started.\n📁 Asset ID: `{asset_id}`")
+        st.success(f" Export to EE Asset started.\n Asset ID: `{asset_id}`")
 
 # Export to Drive
 with col2:
