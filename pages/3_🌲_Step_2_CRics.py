@@ -498,11 +498,11 @@ with st.expander("📉 Risk Assessment", expanded=True):
         total_buildings = filtered_buildings.size().getInfo()
 
         # Step 4: Compute affected using flood proportion
-        exposed_pop = total_pop * proportion_affected
-        exposed_children = total_children * proportion_affected
-        exposed_elderly = total_elderly * proportion_affected
-        exposed_roads_km = total_road_km * proportion_affected
-        exposed_buildings_count = total_buildings * proportion_affected
+        exposed_pop = total_pop * proportion_affected # exposed population
+        exposed_children = total_children * proportion_affected # exposed children
+        exposed_elderly = total_elderly * proportion_affected # exposed elderly
+        exposed_roads_km = total_road_km * proportion_affected # exposed roads in km
+        exposed_buildings_count = total_buildings * proportion_affected # exposed buildings
 
         # Step 5: Percentages
         pct_pop = (exposed_pop / total_pop * 100) if total_pop else 0
