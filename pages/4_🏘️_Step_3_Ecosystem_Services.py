@@ -114,18 +114,7 @@ from zoneinfo import ZoneInfo  # Requires Python 3.9+
 logo = "https://www.informatiehuismarien.nl/publish/pages/113886/deltares-logo.jpg"
 st.sidebar.image(logo)
 
-# Custom CSS to hide GitHub icon and other elements
-# hide_github_icon = """
-#     <style>
-#         .css-1jc7ptx, .e1ewe7hr3, .viewerBadge_container__1QSob, 
-#         .styles_viewerBadge__1yB5_, .viewerBadge_link__1S137, 
-#         .viewerBadge_text__1JaDK { display: none; } 
-#         #MainMenu { visibility: hidden; } 
-#         footer { visibility: hidden; } 
-#         header { visibility: hidden; }
-#     </style>
-# """
-# st.markdown(hide_github_icon, unsafe_allow_html=True)
+
 
 # Amsterdam time
 amsterdam_time = datetime.datetime.now(ZoneInfo("Europe/Amsterdam"))

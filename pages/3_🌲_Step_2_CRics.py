@@ -645,36 +645,7 @@ with st.expander(" Risk Summary", expanded=True):
     csv = df.to_csv(index=False).encode('utf-8')
     st.download_button(" Download Risk Summary CSV", csv, file_name=f"{settlement_name}_risk_summary.csv", mime="text/csv")
 
-
-# Explanation of the Risk Index
-# with st.expander("ℹ️ How is the Risk Index Calculated?", expanded=False):
-#     st.markdown("""
-#     The **Composite Risk Index** gives an overall sense of exposure by combining key indicators using weighted contributions:
-
-#     **Formula:**  
-#     `Index = ∑ (Exposure % × Weight)` for each indicator
-
-#     **Weights:**  
-#     - Population = 30%  
-#     - Children = 20%  
-#     - Elderly = 20%  
-#     - Roads = 15%  
-#     - Buildings = 15%  
-
-#     **Example Calculation:**  
-#     If `Exposed Population = 20%`, then contribution = `20 × 0.3 = 6.0`  
-#     (and so on for each indicator)
-
-#     **Interpretation Scale:**  
-#     - 🟢 0–5 → **Low Risk**  
-#     - 🟠 5–10 → **Moderate Risk**  
-#     - 🔴 >10 → **High Risk**
-                
-#     """)
-
-
-
-
+# ---------------------- Sidebar Footer ----------------------
 
 
 import streamlit as st
@@ -684,18 +655,6 @@ from zoneinfo import ZoneInfo  # Requires Python 3.9+
 logo = "https://www.informatiehuismarien.nl/publish/pages/113886/deltares-logo.jpg"
 st.sidebar.image(logo)
 
-# Custom CSS to hide GitHub icon and other elements
-# hide_github_icon = """
-#     <style>
-#         .css-1jc7ptx, .e1ewe7hr3, .viewerBadge_container__1QSob, 
-#         .styles_viewerBadge__1yB5_, .viewerBadge_link__1S137, 
-#         .viewerBadge_text__1JaDK { display: none; } 
-#         #MainMenu { visibility: hidden; } 
-#         footer { visibility: hidden; } 
-#         header { visibility: hidden; }
-#     </style>
-# """
-# st.markdown(hide_github_icon, unsafe_allow_html=True)
 
 # Amsterdam time
 amsterdam_time = datetime.datetime.now(ZoneInfo("Europe/Amsterdam"))
