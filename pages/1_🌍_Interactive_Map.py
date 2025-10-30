@@ -6,7 +6,7 @@ st.sidebar.title("Info")
 st.sidebar.info(
     """
     Deltares at [NbS Knowledge Hub](https://nbs-tutorials-and-tips) | 
-    [GitHub](https://github.com/deltares-desirmed)
+    [GitHub](https://github.com/desirmed)
     """
 )
 

@@ -25,7 +25,7 @@ st.markdown(
     This platform will support regional partners in advancing their work under the **DesirMED** (Tasks 4.1, 4.2, 4.4) and **NBRACER** (Tasks D5.1, D5.3, D5.5) projects. To fully understand the methodologies applied here, users are encouraged to consult the relevant project deliverables. This platform primarily serves to **visualize and demonstrate the operational frameworks** developed within these tasks.
 
     The platform integrates **on-the-fly web-mapping and decision-support** based on globally recognized datasets. 
-    *Note: The datasets used here are coarser. For region-specific, higher-resolution customised analyses and Pathways, please refer to the dedicated tool such as [WebGIS](https://github.com/deltares-desirmed), and [QuickScan tool](https://github.com/deltares-desirmed).
+    *Note: The datasets used here are coarser. For region-specific, higher-resolution customised analyses and Pathways, please refer to the dedicated tool such as [WebGIS](https://github.com/desirmed), and [QuickScan tool](https://github.com/desirmed).
 
     """
 )
@@ -34,7 +34,7 @@ st.markdown(
 st.sidebar.title("Info")
 st.sidebar.info(
     """
-    Deltares at [NbS Knowledge Hub](https://nbs-tutorials-and-tips) | [GitHub](https://github.com/deltares-desirmed) | [Twitter](https://twitter.com/deltares) | [YouTube](https://youtube.com/@deltares) | [LinkedIn](https://www.linkedin.com/in/deltares)
+    Deltares at [NbS Knowledge Hub](https://nbs-tutorials-and-tips) | [GitHub](https://github.com/desirmed) | [Twitter](https://twitter.com/deltares) | [YouTube](https://youtube.com/@deltares) | [LinkedIn](https://www.linkedin.com/in/deltares)
     """
 )
 
@@ -84,8 +84,8 @@ st.markdown(
     """
     This multi-page web app demonstrates various interactive web apps created using [streamlit](https://streamlit.io) and open-source mapping libraries,
     such as [leafmap](https://leafmap.org), [geemap](https://geemap.org), [pydeck](https://deckgl.readthedocs.io), and [kepler.gl](https://docs.kepler.gl/docs/keplergl-jupyter).
-    This is an open-source project and you are very welcome to contribute your comments, questions, resources, and apps as [issues](https://github.com/deltares-desirmed/multi-gis-support/issues) or
-    [pull requests](https://github.com/giswqs/multi-gis-support/pulls) to the [GitHub repository](https://github.com/deltares-desirmed/multi-gis-support).
+    This is an open-source project and you are very welcome to contribute your comments, questions, resources, and apps as [issues](https://github.com/desirmed/multi-gis-support/issues) or
+    [pull requests](https://github.com/giswqs/multi-gis-support/pulls) to the [GitHub repository](https://github.com/desirmed/multi-gis-support).
 
     """
 )
