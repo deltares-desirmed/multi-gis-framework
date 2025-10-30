@@ -111,7 +111,7 @@ import streamlit as st
 import datetime
 from zoneinfo import ZoneInfo  # Requires Python 3.9+
 
-logo = "https://www.informatiehuismarien.nl/publish/pages/113886/deltares-logo.jpg"
+logo = "https://www.desirmed.eu/theme17/img/logos/6_Deltares.png"
 st.sidebar.image(logo)
 
 

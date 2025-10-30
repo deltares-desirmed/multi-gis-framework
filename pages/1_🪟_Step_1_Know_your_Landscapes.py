@@ -599,7 +599,7 @@ st.info(" To check export progress, go to the [Earth Engine Code Editor](https:/
 import datetime
 from zoneinfo import ZoneInfo
 
-logo = "https://www.informatiehuismarien.nl/publish/pages/113886/deltares-logo.jpg"
+logo = "https://www.desirmed.eu/theme17/img/logos/6_Deltares.png"
 st.sidebar.image(logo)
 
 # Custom CSS to hide GitHub icon and other elements
