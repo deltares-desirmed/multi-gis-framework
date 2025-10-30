@@ -661,7 +661,7 @@ amsterdam_time = datetime.datetime.now(ZoneInfo("Europe/Amsterdam"))
 
 # Footer content
 current_year = amsterdam_time.year
-st.sidebar.markdown(f"© {current_year}  Stichting Deltares")
+st.sidebar.markdown(f"© {current_year}  Foundation Deltares")
 
 # Display date and time in Amsterdam timezone
 last_updated = amsterdam_time.strftime("%B %d, %Y")
