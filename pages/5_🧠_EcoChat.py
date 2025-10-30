@@ -10,59 +10,6 @@ import sys
 from dotenv import load_dotenv, dotenv_values
 load_dotenv()
 
-# #===========================================
-# updates = '''
-# Updates
-# + 04/20/2025
-# - Changed the inference from HF b/c 
-#     API calls are not very limted.
-# - Added API call limiting to allow for demoing
-# - Added support for adding your own API token.     
-
-# + 04/16/2025  
-# - Changed the inference points on HF b/c
-#     older points no longer supported.
-    
-# '''
-# #-------------------------------------------
-
-
-# EcoChat.py — Streamlit Chatbot Using Local Embedding Search
-# import streamlit as st
-# from ecosystem_search import search_ess_knowledge
-
-# # --- Page config ---
-# st.set_page_config(page_title="EcoChat", page_icon="🧠", layout="wide")
-# st.title("🧠 EcoChat: Ask About Ecosystem Services")
-
-# # --- Chat Input ---
-# user_question = st.chat_input("Ask EcoChat about ecosystem services...")
-
-# if user_question:
-#     # Step 1: Search in-memory vector store using cosine similarity
-#     results_df, top_chunks = search_ess_knowledge(user_question)
-
-#     # Step 2: Show natural-language snippets
-#     st.markdown("### 🔍 Relevant Knowledge Snippets")
-#     for i, chunk in enumerate(top_chunks):
-#         st.markdown(f"**{i+1}.** {chunk}")
-
-#     # Step 3: Optional table for source rows
-#     with st.expander("📄 Matching ESS database rows"):
-#         st.dataframe(results_df, use_container_width=True)
-
-#     # Step 4 (Optional): Placeholder for future LLM integration
-#     # Example:
-#     # llm_response = my_llm(prompt=f"Context:\n{top_chunks}\n\nQuestion: {user_question}")
-#     # st.markdown("### 🤖 EcoChat's Response")
-#     # st.write(llm_response)
-
-#     st.success(" Response generated using local embedding search on ESS data.")
-
-
-
-
-
 
 
 
@@ -173,21 +120,6 @@ model_info ={
 }
 
 
-
-#Random dog images for error message
-# random_dog = ["0f476473-2d8b-415e-b944-483768418a95.jpg",
-#               "1bd75c81-f1d7-4e55-9310-a27595fa8762.jpg",
-#               "526590d2-8817-4ff0-8c62-fdcba5306d02.jpg",
-#               "1326984c-39b0-492c-a773-f120d747a7e2.jpg",
-#               "42a98d03-5ed7-4b3b-af89-7c4876cb14c3.jpg",
-#               "8b3317ed-2083-42ac-a575-7ae45f9fdc0d.jpg",
-#               "ee17f54a-83ac-44a3-8a35-e89ff7153fb4.jpg",
-#               "027eef85-ccc1-4a66-8967-5d74f34c8bb4.jpg",
-#               "08f5398d-7f89-47da-a5cd-1ed74967dc1f.jpg",
-#               "0fd781ff-ec46-4bdc-a4e8-24f18bf07def.jpg",
-#               "0fb4aeee-f949-4c7b-a6d8-05bf0736bdd1.jpg",
-#               "6edac66e-c0de-4e69-a9d6-b2e6f6f9001b.jpg",
-#               "bfb9e165-c643-4993-9b3a-7e73571672a6.jpg"]
 
 
 
@@ -385,7 +317,7 @@ if prompt := st.chat_input(f"Hi, ask me a question about ecosystem services "):
                     st.markdown(f"\n\n <span style='float: right; font-size: 0.8em; color: gray;'>API calls:({remaining_calls}/{API_CALL_LIMIT})</span>", unsafe_allow_html=True)
 
             except Exception as e:
-                response = "😵‍💫 Looks like someone unplugged something!\
+                response = " Looks like someone unplugged something!\
                         \n Either the model space is being updated or something is down.\
                         \n\
                         \n Try again later. \

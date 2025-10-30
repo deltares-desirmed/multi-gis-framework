@@ -59,8 +59,7 @@ if uploaded:
         except Exception as e:
             st.error(f" Error reading shapefile: {e}")
 
-# AOI used: uploaded shapefile or dropdown
-# AOI used: uploaded shapefile or dropdown
+# AOI used: uploaded shapefile or dropdown selection
 final_aoi_fc = uploaded_aoi_fc if uploaded_aoi_fc else aoi            # For styling/layer display
 final_aoi = uploaded_geom if uploaded_geom else aoi.geometry()         # For geometry-based operations
 selected_subregion = "User_AOI" if uploaded_aoi_fc else selected_subregion
@@ -117,7 +116,7 @@ corine_img = (
 )
 
 
-# Full CORINE class palette (44 values)
+# Full CORINE class (44 values)
 corine_classes = {
     111: 'Continuous Urban Fabric',
     112: 'Discontinuous Urban Fabric',
@@ -227,13 +226,7 @@ archetype_img = reclassify(corine_img).clip(final_aoi)
 st.subheader(f"Check out and inspect Biophysical archetypes ({selected_year})")
 # Map = geemap.Map(center=[51, 3], zoom=8)
 
-# Map.addLayer(final_aoi.style(**{
-#     "color": "red", "fillColor": "00000000", "width": 2
-# }), {}, "AOI Boundary")
 
-# Map.addLayer(archetype_img, {"min": 1, "max": 14, "palette": palette}, f"Archetypes {selected_year}")
-# Create the map
-# Compute center coordinates dynamically
 # Handle both ee.Geometry and ee.FeatureCollection for centroid
 aoi_geom_for_centroid = final_aoi if isinstance(final_aoi, ee.Geometry) else final_aoi.geometry()
 aoi_centroid = aoi_geom_for_centroid.centroid().coordinates().getInfo()
@@ -522,7 +515,7 @@ with st.expander("Check this Population out!"):
     - 👥 Explore **WorldPop age and gender demographics** (2020)
     - 📊 **Download** results as **Excel tables** or **graph summaries** for your custom area
 
-    🔧 **Note:** Use the **Draw Tool** on the map to outline your **Area of Interest (AOI)**. All statistics will be based on the area you draw.
+     **Note:** Use the **Draw Tool** on the map to outline your **Area of Interest (AOI)**. All statistics will be based on the area you draw.
 
      [**Click here to launch the app**](https://desirmed.projects.earthengine.app/view/explore-population-and-sex-dynamics)
 
@@ -535,7 +528,7 @@ st.subheader(" Export Options")
 export_format = st.radio("Select Export Format", ["GeoTIFF", "SHP"])
 selected_years = st.multiselect("Select CORINE Year(s)", ['2012', '2018'], default=['2012'])
 
-export_folder = st.text_input("Drive folder name", value="desirmed/nbracer")
+export_folder = st.text_input("Drive folder name", value="desirmed")
 custom_prefix = st.text_input("File name prefix (base)", value="Archetypes")
 
 def vectorize(image, geom, year):
@@ -553,19 +546,19 @@ col1, col2 = st.columns(2)
 export_base_name = f"{custom_prefix}_{selected_subregion}_{selected_year}"
 region = final_aoi if isinstance(final_aoi, ee.Geometry) else final_aoi.geometry()
 
-with col1:
-    if st.button("Export to EE Asset"):
-        asset_id = f"projects/ee-desmond/assets/{export_base_name}"
-        task = ee.batch.Export.image.toAsset(
-            image=archetype_img,
-            description=export_base_name + "_Asset",
-            assetId=asset_id,
-            region=region,
-            scale=100,
-            maxPixels=1e13
-        )
-        task.start()
-        st.success(f" Export to EE Asset started.\n Asset ID: `{asset_id}`")
+# with col1:
+#     if st.button("Export to EE Asset"):
+#         asset_id = f"projects/ee-desmond/assets/{export_base_name}"
+#         task = ee.batch.Export.image.toAsset(
+#             image=archetype_img,
+#             description=export_base_name + "_Asset",
+#             assetId=asset_id,
+#             region=region,
+#             scale=100,
+#             maxPixels=1e13
+#         )
+#         task.start()
+#         st.success(f" Export to EE Asset started.\n Asset ID: `{asset_id}`")
 
 # Export to Drive
 with col2:
@@ -602,9 +595,9 @@ with col2:
 
 st.info(" To check export progress, go to the [Earth Engine Code Editor](https://code.earthengine.google.com/) and click on the 'Tasks' tab.")
 
-import streamlit as st
+
 import datetime
-from zoneinfo import ZoneInfo  # Requires Python 3.9+
+from zoneinfo import ZoneInfo
 
 logo = "https://www.informatiehuismarien.nl/publish/pages/113886/deltares-logo.jpg"
 st.sidebar.image(logo)
